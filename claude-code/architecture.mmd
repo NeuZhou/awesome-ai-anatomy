@@ -1,0 +1,69 @@
+graph TB
+    subgraph Entry["CLI Entry Layer"]
+        CLI["claude CLI<br/>(Bun runtime)"]
+        CLI -->|"zero-import<br/>--version path"| VersionCheck["Version Check<br/>(inline constant)"]
+        CLI -->|"lazy import()"| MainApp["Main Application<br/>(React/Ink)"]
+    end
+
+    subgraph Session["Session Layer"]
+        MainApp --> SessionMgr["Session Manager"]
+        SessionMgr --> Auth["Auth Provider<br/>(OAuth / API Key /<br/>Bedrock / Vertex)"]
+        SessionMgr --> Config["Config Loader<br/>(settings, permissions,<br/>feature flags)"]
+        SessionMgr --> Memory["Memory System<br/>(.claude/ directory)"]
+    end
+
+    subgraph Core["Agentic Core"]
+        SessionMgr --> QueryLoop["query.ts<br/>Agentic Loop<br/>(1,729 lines)"]
+        
+        QueryLoop --> ContextMgr["Context Manager<br/>(4-layer cascade)"]
+        QueryLoop --> APICall["Claude API<br/>(streaming SSE)"]
+        QueryLoop --> ResponseParser["Response Parser<br/>(tool_use detection)"]
+        ResponseParser --> StreamExecutor["StreamingToolExecutor<br/>(parallel execution)"]
+        StreamExecutor -->|"results"| QueryLoop
+    end
+
+    subgraph Context["Context Management (4 Layers)"]
+        ContextMgr --> L1["L1: HISTORY_SNIP<br/>Surgical deletion"]
+        L1 -->|"still too long"| L2["L2: Microcompact<br/>Cache-level editing"]
+        L2 -->|"still too long"| L3["L3: CONTEXT_COLLAPSE<br/>Structured archival"]
+        L3 -->|"still too long"| L4["L4: Autocompact<br/>Full compression"]
+    end
+
+    subgraph Tools["Tool System (40+ tools)"]
+        StreamExecutor --> ToolPool["Dynamic Tool Pool"]
+        ToolPool --> BashTool["BashTool<br/>(sandbox, timeout,<br/>large output mgmt)"]
+        ToolPool --> FileTool["FileRead/Write<br/>(diff-based edits)"]
+        ToolPool --> SearchTool["Search/Grep<br/>(concurrent safe)"]
+        ToolPool --> MCPTool["MCP Bridges<br/>(external tools)"]
+        ToolPool --> AgentTool["Agent Spawn<br/>(multi-agent)"]
+    end
+
+    subgraph Flags["Feature Flag System"]
+        Config --> CompileFlags["Compile-time<br/>Bun feature() macro<br/>Dead Code Elimination"]
+        Config --> RuntimeFlags["Runtime<br/>GrowthBook gates<br/>(tengu_ prefix)"]
+    end
+
+    subgraph Skills["Skill System"]
+        Memory --> SkillLoader["Skill Loader<br/>(.claude/skills/*.md)"]
+        SkillLoader -->|"YAML frontmatter<br/>+ markdown body"| QueryLoop
+    end
+
+    subgraph MultiAgent["Multi-Agent Coordination"]
+        AgentTool --> Coordinator["Coordinator"]
+        Coordinator --> Worker1["Worker 1<br/>(no TeamCreate)"]
+        Coordinator --> Worker2["Worker 2<br/>(no TeamCreate)"]
+    end
+
+    subgraph Hidden["Unreleased Features"]
+        CompileFlags -.->|"VOICE_MODE"| Voice["Voice Mode<br/>(Amber Quartz)"]
+        CompileFlags -.->|"BRIDGE_MODE"| Bridge["Bridge Mode<br/>(remote control)"]
+        RuntimeFlags -.->|"buddy"| Buddy["Buddy System<br/>(18 species,<br/>5 rarity tiers)"]
+    end
+
+    style Core fill:#1a1a2e,stroke:#e94560,color:#fff
+    style Context fill:#16213e,stroke:#0f3460,color:#fff
+    style Tools fill:#1a1a2e,stroke:#e94560,color:#fff
+    style Entry fill:#0f3460,stroke:#533483,color:#fff
+    style Session fill:#16213e,stroke:#533483,color:#fff
+    style Flags fill:#1a1a2e,stroke:#e94560,color:#fff
+    style Hidden fill:#2d2d2d,stroke:#666,color:#999

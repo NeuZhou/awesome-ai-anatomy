@@ -1,0 +1,55 @@
+sequenceDiagram
+    participant User
+    participant CLI as Claude CLI
+    participant Loop as Agentic Loop
+    participant API as Claude API
+    participant SE as StreamingToolExecutor
+    participant T1 as Tool (read-only)
+    participant T2 as Tool (write)
+    participant CM as Context Manager
+
+    User->>CLI: "refactor this module to async"
+    CLI->>Loop: start query
+    
+    Loop->>CM: preprocess context
+    CM->>CM: L1: SNIP old tool results
+    CM->>CM: L2: Microcompact (cache edit)
+    CM-->>Loop: trimmed messages
+    
+    Loop->>API: stream request (SSE)
+    
+    Note over API,SE: Model starts generating response...
+    
+    API-->>Loop: text chunk "Let me analyze..."
+    API-->>Loop: tool_use: {grep, pattern: "async"}
+    
+    Loop->>SE: execute grep (read-only)
+    SE->>T1: grep started ⚡
+    
+    API-->>Loop: text chunk "I see 5 files..."
+    API-->>Loop: tool_use: {read_file, "src/main.ts"}
+    
+    Loop->>SE: execute read_file (read-only)
+    SE->>T1: read started ⚡ (parallel!)
+    
+    Note over T1: Both tools running<br/>while model still talks
+    
+    T1-->>SE: grep results
+    T1-->>SE: file contents
+    
+    API-->>Loop: tool_use: {write_file, "src/main.ts"}
+    Loop->>SE: execute write (exclusive lock)
+    SE->>T2: write started 🔒
+    T2-->>SE: write complete
+    
+    API-->>Loop: [stream end]
+    
+    SE-->>Loop: all results (ordered)
+    Loop->>Loop: append results to messages
+    Loop->>API: next turn (with tool results)
+    
+    API-->>Loop: "Done! I've refactored..."
+    API-->>Loop: [end_turn, no tools]
+    
+    Loop-->>CLI: final response
+    CLI-->>User: display result

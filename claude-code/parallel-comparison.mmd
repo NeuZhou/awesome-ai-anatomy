@@ -1,0 +1,28 @@
+graph LR
+    subgraph Traditional["Traditional Agent"]
+        A1["Model<br/>generates"] --> A2["Parse<br/>response"]
+        A2 --> A3["Execute<br/>tool"]
+        A3 --> A4["Next<br/>turn"]
+        style A1 fill:#e74c3c,color:#fff
+        style A2 fill:#f39c12,color:#fff
+        style A3 fill:#e74c3c,color:#fff
+        style A4 fill:#f39c12,color:#fff
+    end
+
+    subgraph ClaudeCode["Claude Code"]
+        B1["Model generates"] --> B2["Tool 1 (read)"]
+        B1 --> B3["Tool 2 (read)"]
+        B1 --> B4["Parse complete"]
+        B4 --> B5["Tool 3 (write)"]
+        B5 --> B6["Next turn"]
+        
+        style B1 fill:#2ecc71,color:#fff
+        style B2 fill:#3498db,color:#fff
+        style B3 fill:#3498db,color:#fff
+        style B4 fill:#2ecc71,color:#fff
+        style B5 fill:#e74c3c,color:#fff
+        style B6 fill:#2ecc71,color:#fff
+    end
+
+    style Traditional fill:#1a1a2e,stroke:#e74c3c,color:#fff
+    style ClaudeCode fill:#1a1a2e,stroke:#2ecc71,color:#fff
