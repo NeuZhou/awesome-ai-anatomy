@@ -1,0 +1,33 @@
+name: skill-self-improvement
+category: learning
+description: "Agent autonomously creates, edits, and patches skills based on experience, turning successful approaches into reusable procedural knowledge"
+first_seen: hermes-agent
+also_seen: []
+projects:
+  hermes-agent:
+    implementation: "SkillManagerTool with 6 actions: create, edit, patch, delete, write_file, remove_file"
+    file: "tools/skill_manager_tool.py"
+    security: "Post-write security scan on every skill modification"
+    storage: "~/.hermes/skills/"
+    actions:
+      create: "Create new skill with SKILL.md + directory structure"
+      edit: "Full rewrite of SKILL.md"
+      patch: "Targeted find-and-replace within any skill file"
+      delete: "Remove skill entirely"
+      write_file: "Add/overwrite supporting files"
+      remove_file: "Remove supporting files"
+  deer-flow:
+    implementation: "Skills are static, loaded from directory. No self-improvement."
+    note: "Skills are read-only configuration, not learned behavior"
+  openclaw:
+    implementation: "Skills are static. Agent can suggest new skills but can't create them automatically."
+    note: "Manual skill creation only"
+pros:
+  - "Agent gets better at repeated tasks over time"
+  - "Turns tacit knowledge into explicit procedures"
+  - "Security scanning prevents injection via skill modification"
+cons:
+  - "LLM-authored skills may encode bad patterns"
+  - "No quality gate beyond security scanning (no accuracy check)"
+  - "Skill proliferation — hundreds of low-quality skills can slow down discovery"
+verdict: "Genuinely innovative feature. The security scan is the critical safety net. Without it, this would be a prompt injection highway."

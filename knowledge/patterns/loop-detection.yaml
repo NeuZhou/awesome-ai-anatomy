@@ -1,0 +1,27 @@
+name: loop-detection
+category: safety
+description: "Detects when the agent is stuck calling the same tools repeatedly and breaks the loop via escalating intervention"
+first_seen: deer-flow
+also_seen:
+  - openclaw  # has loop-circuit-breaker skill
+projects:
+  deer-flow:
+    implementation: "Hash tool calls (order-independent), sliding window of 20, warn at 3 repeats, force-stop at 5"
+    file: "backend/packages/harness/deerflow/agents/middlewares/loop_detection_middleware.py"
+    thresholds:
+      warn: 3
+      hard_stop: 5
+      window_size: 20
+      max_tracked_threads: 100
+    hash_method: "Order-independent hash of (name, args) tuples"
+  hermes-agent:
+    implementation: "Not found as a dedicated module. May be handled in the monolithic run_agent.py"
+    note: "No evidence of explicit loop detection"
+pros:
+  - "Prevents $500 API bills from stuck agents at 3am"
+  - "Escalating intervention (warn first, then force-stop) is less disruptive"
+  - "Order-independent hashing prevents evasion by reordering calls"
+cons:
+  - "Window size of 20 might be too small for complex multi-tool workflows"
+  - "Hard stop forces text-only response, which may not resolve the underlying issue"
+verdict: "Non-negotiable safety feature for any production agent. Build it before you need it."

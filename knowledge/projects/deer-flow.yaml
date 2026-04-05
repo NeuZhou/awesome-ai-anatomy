@@ -1,0 +1,26 @@
+name: deer-flow
+full_name: bytedance/deer-flow
+stars: 58080
+forks: 7241
+language: Python
+framework: LangGraph + FastAPI + Next.js
+loc: ~26000  # repo size, not full LOC count
+license: MIT
+teardown_date: 2026-04-05
+teardown_path: deer-flow/README.md
+patterns_found:
+  - middleware-chain
+  - loop-detection
+  - subagent-delegation
+  - memory-frozen-snapshot
+anti_patterns_found:
+  - no-cost-budget
+key_innovations:
+  - "14-layer middleware chain with strict ordering constraints"
+  - "Virtual path translation for sandbox isolation"
+  - "Feishu streaming card updates (patching same message_id)"
+key_criticisms:
+  - "No cost budgets"
+  - "Single-file JSON memory with no locking"
+  - "Security model is advisory only"
+  - "LangGraph adds abstraction without clear benefit"

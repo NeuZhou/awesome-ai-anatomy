@@ -1,0 +1,19 @@
+name: no-cost-budget
+category: safety
+description: "Agent tracks token usage but has no mechanism to stop at a spending limit"
+severity: high
+first_seen: deer-flow
+also_seen:
+  - hermes-agent
+projects:
+  deer-flow:
+    has_tracking: true
+    has_budget: false
+    note: "TokenUsageMiddleware counts tokens but never stops the agent"
+  hermes-agent:
+    has_tracking: true
+    has_budget: false
+    note: "InsightsEngine shows costs retroactively, no proactive limit"
+impact: "Agent running overnight can burn through hundreds of dollars before anyone notices"
+better_alternative: "Set a hard per-session and per-day spending cap. Kill the agent loop when exceeded."
+lesson: "If your agent can run unattended and spawn subagents, you NEED a cost circuit breaker. Track costs is table stakes — enforcing limits is what matters."

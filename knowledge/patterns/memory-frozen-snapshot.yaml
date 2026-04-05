@@ -1,0 +1,25 @@
+name: memory-frozen-snapshot
+category: optimization
+description: "System prompt uses a frozen memory snapshot from session start; writes go to disk immediately but don't change the running prompt (preserves prefix cache)"
+first_seen: hermes-agent
+also_seen: []
+projects:
+  hermes-agent:
+    implementation: "BuiltinMemoryProvider loads MEMORY.md at session start as frozen snapshot. Tool calls update disk files but system prompt stays stable."
+    file: "agent/builtin_memory_provider.py"
+    line_range: "60-75"
+    benefit: "Preserves LLM prefix cache — saves money on long sessions"
+  deer-flow:
+    implementation: "Memory middleware queues updates for async extraction. Different approach but similar effect."
+    file: "backend/packages/harness/deerflow/agents/middlewares/memory_middleware.py"
+  claude-code:
+    implementation: "CLAUDE.md is read-only at session start. No mid-session updates."
+    note: "Simplest approach — no writes at all during session"
+pros:
+  - "Preserves prefix cache (real cost savings)"
+  - "Prevents mid-session prompt instability"
+  - "Writes are durable immediately (no data loss)"
+cons:
+  - "Agent doesn't see its own memory writes in current session"
+  - "Can lead to duplicate writes if agent forgets what it already wrote"
+verdict: "Worth implementing in any agent that runs sessions >10 minutes. The cache savings add up."

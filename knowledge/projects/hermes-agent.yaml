@@ -1,0 +1,28 @@
+name: hermes-agent
+full_name: NousResearch/hermes-agent
+stars: 26130
+forks: 3416
+language: Python
+framework: Custom (OpenAI SDK based)
+loc: ~260000
+license: MIT
+teardown_date: 2026-04-05
+teardown_path: hermes-agent/README.md
+patterns_found:
+  - memory-frozen-snapshot
+  - subagent-delegation
+  - skill-self-improvement
+anti_patterns_found:
+  - god-file
+  - no-cost-budget
+key_innovations:
+  - "Self-improving skill system (auto-create + patch + security scan)"
+  - "Session search via FTS5 + LLM summarization"
+  - "6 terminal backends (Local/Docker/SSH/Daytona/Singularity/Modal)"
+  - "Memory threat pattern scanning"
+  - "OpenClaw migration tool"
+key_criticisms:
+  - "9000-line monolithic agent file"
+  - "Subagents can't run code"
+  - "Only one external memory provider allowed"
+  - "Essentially OpenClaw rewritten in Python"

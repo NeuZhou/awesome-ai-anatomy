@@ -1,0 +1,21 @@
+name: claude-code
+full_name: anthropic/claude-code (npm @anthropic-ai/claude-code)
+stars: N/A  # npm package, not a public repo
+language: TypeScript
+framework: Custom
+loc: ~510000  # from source map analysis
+license: Proprietary
+teardown_date: 2026-04-04
+teardown_path: claude-code/README.md
+patterns_found:
+  - middleware-chain  # inferred from architecture
+  - subagent-delegation
+anti_patterns_found: []
+key_innovations:
+  - "Hidden Tamagotchi/pet system in source code"
+  - "KAIROS agent system"
+  - "Source map accidentally shipped with npm package"
+key_criticisms:
+  - "Source map leak was a significant security oversight"
+  - "Closed source limits community contribution"
+note: "Teardown based on leaked source maps, not official open source"

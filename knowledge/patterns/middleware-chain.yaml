@@ -1,0 +1,31 @@
+name: middleware-chain
+category: architecture
+description: "Sequential chain of middleware functions processing each request/message in strict order"
+first_seen: deer-flow
+also_seen:
+  - openclaw
+  - express.js
+  - koa.js
+projects:
+  deer-flow:
+    implementation: "14+ middlewares in strict order, each handles one cross-cutting concern"
+    file: "backend/packages/harness/deerflow/agents/lead_agent/agent.py"
+    line_range: "210-260"
+    ordering_constraints:
+      - "ThreadDataMiddleware must be first (provides thread_id)"
+      - "SummarizationMiddleware before MemoryMiddleware"
+      - "ClarificationMiddleware must be last"
+    count: 14
+  hermes-agent:
+    implementation: "No formal middleware chain — logic embedded in run_agent.py monolith"
+    file: "run_agent.py"
+    note: "9000+ lines, no middleware separation"
+pros:
+  - "Clean separation of concerns — each middleware testable in isolation"
+  - "Easy to add new cross-cutting features without touching core logic"
+  - "Ordering constraints are explicit and documented"
+cons:
+  - "Ordering dependency graph becomes complex at >10 middlewares"
+  - "Debugging across middleware boundaries is harder"
+  - "Requires discipline to maintain ordering invariants"
+verdict: "Best practice for agent systems with >5 cross-cutting concerns. DeerFlow gets this right."

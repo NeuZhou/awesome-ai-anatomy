@@ -1,0 +1,13 @@
+name: god-file
+category: architecture
+description: "Entire agent loop in a single massive file (thousands of lines)"
+severity: high
+first_seen: hermes-agent
+projects:
+  hermes-agent:
+    file: "run_agent.py"
+    lines: 9000+
+    impact: "Every PR touches this file, merge conflicts are constant, onboarding is painful"
+    root_cause: "Grew organically from prototype, nobody refactored because it would mean rewriting the product"
+better_alternative: "DeerFlow's middleware chain — separates concerns into composable, testable units"
+lesson: "If your main file exceeds 1000 lines, stop adding features and refactor. The longer you wait, the harder it gets."

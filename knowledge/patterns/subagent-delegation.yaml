@@ -1,0 +1,40 @@
+name: subagent-delegation
+category: architecture
+description: "Spawning child agent instances with isolated context for parallel task execution"
+first_seen: deer-flow
+also_seen:
+  - hermes-agent
+  - openclaw
+projects:
+  deer-flow:
+    max_concurrent: 3
+    max_depth: 1
+    timeout: "15 minutes"
+    isolation: "Shares parent thread state"
+    blocked_tools: []
+    implementation: "Two thread pools (scheduler + executor), SSE streaming results"
+    file: "backend/packages/harness/deerflow/subagents/executor.py"
+  hermes-agent:
+    max_concurrent: 3
+    max_depth: 1
+    timeout: "not specified in code"
+    isolation: "Fully isolated (no shared memory)"
+    blocked_tools:
+      - "delegate_task (no recursion)"
+      - "clarify (no user interaction)"
+      - "memory (no shared writes)"
+      - "send_message (no side effects)"
+      - "execute_code (no scripts)"
+    implementation: "ThreadPoolExecutor, parent blocks until children complete"
+    file: "tools/delegate_tool.py"
+  openclaw:
+    max_concurrent: "configurable"
+    max_depth: "configurable"
+    isolation: "isolated with optional streaming to parent"
+    note: "Most flexible of the three"
+comparison_notes:
+  - "DeerFlow: children share parent state → risk of concurrent writes"
+  - "Hermes: children fully isolated → can't benefit from each other's work"
+  - "OpenClaw: configurable depth → most flexible but harder to reason about"
+  - "All three limit depth to 1 in practice"
+verdict: "Hermes's approach (fully isolated, restricted tools) is safer. DeerFlow's (shared state) is more capable. Trade-off depends on your trust in the LLM."
