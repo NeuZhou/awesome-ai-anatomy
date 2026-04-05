@@ -1,6 +1,6 @@
-# Hermes Agent: How Nous Research Built a Self-Improving AI Agent
+# Hermes Agent: OpenClaw's Python Twin With a Learning Loop Bolted On
 
-> I dug through 260K lines of Hermes Agent source code to understand what makes a "self-improving agent" actually work. It's more interesting — and more familiar — than you'd expect.
+> Someone on HN called Hermes "the OpenClaw killer." I went and read the source code. Turns out it's less "killer" and more "Python rewrite with some genuinely good additions."
 
 ## At a Glance
 
@@ -14,7 +14,7 @@
 | Creator | Nous Research (creators of Hermes LLM models) |
 | Tagline | "The agent that grows with you" |
 
-If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. It has the same SOUL.md/MEMORY.md/AGENTS.md file structure, the same skill system, the same gateway architecture, even a `hermes claw migrate` command to import your OpenClaw config. But where it diverges is the most interesting part: the **closed learning loop** — the agent creates skills from experience, improves them during use, and builds an evolving model of who you are.
+If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SOUL.md/MEMORY.md/AGENTS.md file structure, same skill system, same gateway architecture, even a `hermes claw migrate` command to import your OpenClaw config. Let's just say it out loud: **Hermes is OpenClaw rewritten in Python.** The file structure is the same, the concepts are the same, the terminology is the same. What's different is the stuff they added on top — and some of it is actually worth paying attention to.
 
 ---
 
@@ -60,13 +60,13 @@ flowchart TB
     style MM fill:#e3f2fd,stroke:#1565c0
 ```
 
-The entire agent loop lives in one file: `run_agent.py` at 9,000+ lines. That's not a typo. Whether this is pragmatic or an architectural debt is debatable — I lean toward the latter, but it clearly works at 26K stars.
+The entire agent loop lives in one file: `run_agent.py` at 9,000+ lines. I ran `wc -l` three times because I thought I miscounted. Nope — nine thousand lines, one file, one class. Every PR touches it, every merge conflict lives here. At 26K stars nobody's had the guts to refactor it, and I get why — you'd basically be rewriting the product. But this is the kind of thing that makes onboarding a nightmare. DeerFlow's middleware chain is how you actually make an agent loop extensible.
 
 ---
 
-## The Learning Loop: What Makes Hermes "Self-Improving"
+## The Learning Loop: The One Thing That's Actually New
 
-This is the headline feature, so I spent the most time here. The learning loop has three components:
+The marketing says "self-improving." I was skeptical. But after reading the skill manager code, I'll admit: the implementation is more solid than I expected. The learning loop has three components:
 
 ### 1. Autonomous Skill Creation
 
@@ -108,7 +108,7 @@ def system_prompt_block(self) -> str:
     may change via tool calls."""
 ```
 
-This is a clever cache optimization: the system prompt never changes mid-session (preserving prefix caching), but the on-disk files DO get updated immediately. Next session sees the fresh data.
+This avoids recompiling the system prompt every time the agent writes a memory entry. If your provider charges for prompt tokens and you have a 4K-word MEMORY.md, this saves real money over a long session.
 
 ```mermaid
 flowchart LR
@@ -185,7 +185,7 @@ The no-memory-writes constraint is worth calling out. In DeerFlow, subagents sha
 
 ## Context Compression
 
-The `ContextCompressor` is probably the best-engineered module in the codebase. It uses a five-step algorithm:
+I spent a while on the `ContextCompressor` because I've burned money on context overflow before. This module does it right — five-step algorithm:
 
 1. **Prune old tool results** — cheap pre-pass, no LLM call. Old tool outputs get replaced with `[Old tool output cleared to save context space]`
 2. **Protect the head** — system prompt + first exchange are never summarized
@@ -205,9 +205,9 @@ The structured summary template is the key improvement over naive compression. I
 
 ---
 
-## Session Search: Cross-Session Recall
+## Session Search: This Is the Part That Actually Surprised Me
 
-This is where Hermes gets genuinely innovative. Most agent frameworks treat each session as a clean slate with only MEMORY.md for continuity. Hermes stores all sessions in SQLite with FTS5 full-text search:
+Most agent frameworks treat each session as a clean slate with only MEMORY.md for continuity. I've been annoyed by this for months — the agent forgets what we talked about three days ago unless I manually wrote it down. Hermes stores all sessions in SQLite with FTS5 full-text search:
 
 ```python
 # From session_search_tool.py
@@ -227,7 +227,7 @@ When you ask "what did I work on last week?", it doesn't just grep MEMORY.md —
 
 ## Six Terminal Backends
 
-This is the operational flexibility that makes Hermes more than a toy:
+This is where the operational range starts to differentiate from OpenClaw:
 
 | Backend | What It Is | Best For |
 |---------|-----------|---------|
@@ -242,7 +242,7 @@ Daytona and Modal are the interesting ones — they offer **serverless persisten
 
 ---
 
-## OpenClaw Migration: The Elephant in the Room
+## OpenClaw Migration: Let's Call It What It Is
 
 Hermes ships with a first-class OpenClaw migration tool:
 
@@ -254,7 +254,7 @@ hermes claw migrate --preset user-data  # Only data, no secrets
 
 It imports: SOUL.md, MEMORY.md, USER.md, skills, command allowlists, messaging configs, API keys, TTS assets, and workspace instructions.
 
-What this tells me: Hermes isn't just inspired by OpenClaw — it's positioning as the next step. The migration tool is a growth hack: make switching easy, and you inherit OpenClaw's user base.
+What this tells me: Hermes isn't inspired by OpenClaw — **it IS OpenClaw rewritten in Python with extras bolted on.** The migration tool is a growth hack to inherit OpenClaw's user base, and honestly, if the extras are good enough, that's a legitimate strategy.
 
 ---
 
@@ -273,27 +273,17 @@ This is the right instinct. Memory is a persistence vector for prompt injection:
 
 ---
 
-## What They Got Right
+## The Verdict
 
-1. **The learning loop is real, not vaporware.** Skills get created, patched, and improved in-place. Security scanning on agent-authored skills is a nice touch.
+The learning loop works and is the main reason to care about Hermes. Skills get created from experience, patched in-place with security scanning, and the frozen snapshot trick for memory is worth stealing for any agent project. Session search with FTS5 + LLM summarization solves a real problem I've been annoyed by personally.
 
-2. **Frozen memory snapshots for prompt cache stability.** Writes go to disk immediately but don't break the prefix cache. Simple optimization with real cost savings.
+But let's not pretend this is a from-scratch innovation. It's OpenClaw in Python, and the 9,000-line single-file agent loop is the kind of thing that happens when a project grows faster than its architecture. The subagent restrictions are too conservative — if children can't run code or write memory, they're basically expensive grep wrappers. And blocking code execution "because children should reason step-by-step" tells me nobody tried using this for a real multi-file refactor.
 
-3. **Session search with LLM summarization.** FTS5 + Gemini Flash for cross-session recall is clever — keeps the main model's context clean while giving genuine long-term memory.
+The one-memory-provider limit is the kind of constraint that made sense for v0.1 and nobody went back to fix. In 2026, you need at least a file store plus a semantic search layer. Forcing a choice between them is leaving value on the table.
 
----
+No cost budgets, same as DeerFlow. For an agent that advertises Modal and Daytona (serverless, pay-per-second), not having a "stop at $X" switch is asking for someone's cloud bill to go through the roof.
 
-## What I'd Push Back On
-
-1. **9,000 lines in one file.** `run_agent.py` is the entire agent loop in a single file. At 26K stars, this is technical debt that will bite them. Every PR touches this file, every merge conflict happens here. DeerFlow's middleware chain is a better architecture for extensibility.
-
-2. **"No code execution" for children.** Blocking `execute_code` in subagents seems overly conservative. The stated reason is "children should reason step-by-step" but in practice this means children can't run tests, check outputs, or validate their work. I'd make this configurable.
-
-3. **Memory provider limit of one.** Only one external memory provider at a time. The code explicitly rejects a second provider. This seems like a premature constraint — what if you want Honcho for user modeling AND a vector DB for semantic search?
-
-4. **No cost budgets.** Same gap as DeerFlow. Session insights track costs retroactively, but there's no way to set "stop after $X." For an agent that can run on Modal with serverless compute, this is a real risk.
-
-5. **OpenClaw migration as a feature.** This is strategic, not technical feedback. But explicitly building a migration tool from a specific competitor signals that you're playing catch-up. Better to focus on features that make migration happen organically.
+**Bottom line:** If you're on OpenClaw and want the learning loop + session search + Python, migrating to Hermes is a no-brainer — they literally built the migration tool for you. If you care more about architectural cleanliness and extensibility, DeerFlow's middleware approach is better engineering even if it has fewer features today.
 
 ---
 
@@ -315,13 +305,11 @@ This is the right instinct. Memory is a persistence vector for prompt injection:
 
 ---
 
-## Lessons Worth Stealing
+## Stuff I'd Steal
 
-**If your agent writes to a system prompt, scan those writes.** Hermes scans memory entries for prompt injection before persisting them. Most frameworks blindly inject whatever the LLM decides to remember. That's a persistence attack vector.
+**Scan memory writes before persisting them.** This one's going into my own projects. Memory is a persistence vector for prompt injection and most frameworks don't even check.
 
-**Freeze your system prompt within a session.** Hermes writes to disk immediately but doesn't update the running system prompt. This preserves the prefix cache (real cost savings) and prevents mid-session instability. Simple pattern, easy to implement, measurable impact.
-
-**Store sessions, not just memories.** MEMORY.md is the agent's curated summary. But full session transcripts in SQLite with FTS5 give you recall over things the agent didn't think to memorize. These are complementary, not redundant.
+**Store full session transcripts alongside curated memory.** MEMORY.md is what the agent thinks is important. Full session logs are what actually happened. FTS5 search over the latter fills gaps the former misses. You need both.
 
 ---
 
