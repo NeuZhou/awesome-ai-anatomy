@@ -224,7 +224,7 @@ flowchart LR
     CAT --> |work| WC[workContext]
     CAT --> |personal| PC[personalContext]
     CAT --> |top-of-mind| TOM[topOfMind]
-    CAT --> |fact| F[facts[] + confidence]
+    CAT --> |fact| F["facts + confidence scores"]
     CAT --> |history| H[history.recentMonths]
 
     JSON[(memory.json)] --> SYS[System Prompt Injection]
