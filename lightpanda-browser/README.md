@@ -26,27 +26,27 @@ The pitch: 9x faster than Chrome, 16x less memory, instant startup. The reality:
 ```mermaid
 graph TB
     subgraph Entry["Binary Entry Points"]
-        Main["main.zig"] --> |"serve"| Server["Server.zig<br/>(CDP WebSocket)"]
-        Main --> |"fetch"| Fetch["fetch mode<br/>(single URL dump)"]
-        Main --> |"mcp"| MCP["MCP Server<br/>(stdio JSON-RPC)"]
+        Main["main.zig"] --> |"serve"| Server["Server.zig\n(CDP WebSocket)"]
+        Main --> |"fetch"| Fetch["fetch mode\n(single URL dump)"]
+        Main --> |"mcp"| MCP["MCP Server\n(stdio JSON-RPC)"]
     end
 
     subgraph Core["Browser Core"]
-        Server --> CDP["CDP.zig<br/>(protocol dispatcher)"]
+        Server --> CDP["CDP.zig\n(protocol dispatcher)"]
         CDP --> Browser["Browser.zig"]
-        Browser --> Session["Session.zig<br/>(1 per tab)"]
-        Session --> Page["Page.zig<br/>(3,660 lines, the beast)"]
+        Browser --> Session["Session.zig\n(1 per tab)"]
+        Session --> Page["Page.zig\n(3,660 lines, the beast)"]
     end
 
     subgraph Engines["Foreign Engines (FFI)"]
-        Page --> V8["V8 via zig-v8-fork<br/>(JavaScript execution)"]
-        Page --> H5E["html5ever (Rust)<br/>(HTML parsing via C FFI)"]
+        Page --> V8["V8 via zig-v8-fork\n(JavaScript execution)"]
+        Page --> H5E["html5ever (Rust)\n(HTML parsing via C FFI)"]
     end
 
     subgraph Net["Network Layer"]
         Page --> HttpClient["HttpClient.zig"]
-        HttpClient --> Network["Network.zig<br/>(libcurl multi + poll loop)"]
-        Network --> Curl["libcurl + BoringSSL<br/>(HTTP/2, brotli, zlib)"]
+        HttpClient --> Network["Network.zig\n(libcurl multi + poll loop)"]
+        Network --> Curl["libcurl + BoringSSL\n(HTTP/2, brotli, zlib)"]
     end
 
     subgraph WebAPI["Web APIs (Zig)"]
@@ -55,7 +55,7 @@ graph TB
         Page --> DOM["60+ DOM/Web API files"]
     end
 
-    CDP --> |"notifications"| Notification["Notification.zig<br/>(event bus)"]
+    CDP --> |"notifications"| Notification["Notification.zig\n(event bus)"]
     Notification --> Page
 
     classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
@@ -160,7 +160,7 @@ This is a two-level dispatch. First, it branches on the domain name *length*. Th
 
 ```mermaid
 flowchart LR
-    MSG["CDP Message<br/>'Page.navigate'"] --> SPLIT["Split at '.'"]
+    MSG["CDP Message\n'Page.navigate'"] --> SPLIT["Split at '.'"]
     SPLIT --> LEN["domain.len = 4"]
     LEN --> CAST["@bitCast 'Page' → u32"]
     CAST --> SWITCH["switch(u32)"]
@@ -223,7 +223,7 @@ sequenceDiagram
         Rust->>Zig: append_callback(parent, child)
     end
     Rust->>Zig: Return (parsing done)
-    Zig->>V8: Execute <script> tags found during parse
+    Zig->>V8: Execute script tags found during parse
     V8->>Zig: DOM manipulation calls (via bridge.zig)
 ```
 

@@ -33,7 +33,7 @@ flowchart LR
 
     subgraph LG[LangGraph Server]
         direction TB
-        MSG[Message In] --> MW[Middleware Chain<br/>14+ middlewares]
+        MSG[Message In] --> MW["Middleware Chain\n14+ middlewares"]
         MW --> LLM[LLM Call]
         LLM --> TD[Tool Dispatch]
         TD --> SA[SubAgent Pool]
@@ -80,23 +80,23 @@ This is the most interesting engineering decision in the codebase. Every message
 
 ```mermaid
 flowchart TD
-    IN([Message In]) --> TD[ThreadDataMiddleware<br/><i>creates per-thread dirs</i>]
-    TD --> UP[UploadsMiddleware<br/><i>injects new files</i>]
-    UP --> SB[SandboxMiddleware<br/><i>acquires sandbox env</i>]
-    SB --> SA[SandboxAuditMiddleware<br/><i>logs file ops</i>]
-    SA --> DT[DanglingToolCallMiddleware<br/><i>patches orphan calls</i>]
-    DT --> LE[LLMErrorHandlingMiddleware<br/><i>retry with backoff</i>]
-    LE --> TE[ToolErrorHandlingMiddleware<br/><i>exceptions → ToolMessages</i>]
-    TE --> SU[SummarizationMiddleware<br/><i>compress when near limit</i>]
-    SU --> TODO[TodoMiddleware<br/><i>task tracking in plan mode</i>]
-    TODO --> TU[TokenUsageMiddleware<br/><i>cost monitoring</i>]
-    TU --> TI[TitleMiddleware<br/><i>auto-title after 1st exchange</i>]
-    TI --> ME[MemoryMiddleware<br/><i>queue for async extraction</i>]
-    ME --> VI[ViewImageMiddleware<br/><i>inject images for vision models</i>]
-    VI --> LD[LoopDetectionMiddleware<br/><i>warn@3, kill@5 repeats</i>]
-    LD --> SL[SubagentLimitMiddleware<br/><i>cap parallel tasks</i>]
-    SL --> CL[ClarificationMiddleware<br/><i>MUST BE LAST</i>]
-    CL --> OUT([To LLM])
+    IN(["Message In"]) --> TD["ThreadDataMiddleware\ncreates per-thread dirs"]
+    TD --> UP["UploadsMiddleware\ninjects new files"]
+    UP --> SB["SandboxMiddleware\nacquires sandbox env"]
+    SB --> SA["SandboxAuditMiddleware\nlogs file ops"]
+    SA --> DT["DanglingToolCallMiddleware\npatches orphan calls"]
+    DT --> LE["LLMErrorHandlingMiddleware\nretry with backoff"]
+    LE --> TE["ToolErrorHandlingMiddleware\nexceptions to ToolMessages"]
+    TE --> SU["SummarizationMiddleware\ncompress when near limit"]
+    SU --> TODO["TodoMiddleware\ntask tracking in plan mode"]
+    TODO --> TU["TokenUsageMiddleware\ncost monitoring"]
+    TU --> TI["TitleMiddleware\nauto-title after 1st exchange"]
+    TI --> ME["MemoryMiddleware\nqueue for async extraction"]
+    ME --> VI["ViewImageMiddleware\ninject images for vision models"]
+    VI --> LD["LoopDetectionMiddleware\nwarn at 3, kill at 5 repeats"]
+    LD --> SL["SubagentLimitMiddleware\ncap parallel tasks"]
+    SL --> CL["ClarificationMiddleware\nMUST BE LAST"]
+    CL --> OUT(["To LLM"])
 
     classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
     classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
@@ -172,7 +172,7 @@ sequenceDiagram
     EP-->>LA: Results (batch 2)
     LA->>U: Synthesized comparison
 
-    Note over SP,EP: 15-min timeout per subagent<br/>Max 3 concurrent
+    Note over SP,EP: 15-min timeout per subagent\nMax 3 concurrent
 ```
 
 The batching is enforced at two levels: `SubagentLimitMiddleware` silently truncates excess `task()` calls, and the system prompt has 200+ lines teaching the model to count sub-tasks and plan batches.
@@ -218,8 +218,8 @@ Compared to OpenClaw's flat `MEMORY.md` or Claude Code's `CLAUDE.md` rules file,
 
 ```mermaid
 flowchart LR
-    CONV([Conversation]) --> MM[MemoryMiddleware<br/><i>debounce & queue</i>]
-    MM --> LLM[LLM Extraction<br/><i>cheap model</i>]
+    CONV(["Conversation"]) --> MM["MemoryMiddleware\ndebounce and queue"]
+    MM --> LLM["LLM Extraction\ncheap model"]
     LLM --> CAT{Categorize}
     CAT --> |work| WC[workContext]
     CAT --> |personal| PC[personalContext]

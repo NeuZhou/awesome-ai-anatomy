@@ -205,7 +205,7 @@ sequenceDiagram
             else FailResult
                 Val-->>VS: FailResult (error_message, fix_value)
                 VS->>VS: perform_correction(result, value, validator)
-                Note over VS: REASK → FieldReAsk object<br/>FIX → use fix_value<br/>EXCEPTION → raise<br/>FILTER → Filter sentinel<br/>REFRAIN → Refrain sentinel
+                Note over VS: REASK = FieldReAsk object\nFIX = use fix_value\nEXCEPTION = raise\nFILTER = Filter sentinel\nREFRAIN = Refrain sentinel
             end
         end
         

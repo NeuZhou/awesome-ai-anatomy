@@ -24,29 +24,29 @@ Goose is an on-machine AI agent that runs shell commands, edits files, manages e
 ```mermaid
 graph TB
     subgraph Entry["Entry Points"]
-        CLI["goose CLI<br/>(goose-cli crate)"]
-        Desktop["Desktop App<br/>(Electron + React)"]
+        CLI["goose CLI\n(goose-cli crate)"]
+        Desktop["Desktop App\n(Electron + React)"]
     end
 
     subgraph Server["goose-server (Axum)"]
         API["REST + WebSocket API"]
-        SessionMgr["Session Manager<br/>(SQLite-backed)"]
+        SessionMgr["Session Manager\n(SQLite-backed)"]
     end
 
     subgraph Core["goose crate — The Agent"]
         Agent["Agent struct"]
         PromptMgr["Prompt Manager"]
         ExtMgr["Extension Manager"]
-        ToolInspection["Tool Inspection Pipeline<br/>(Security → Egress → Adversary → Permission → Repetition)"]
-        ContextMgmt["Context Management<br/>(auto-compact + tool-pair summarization)"]
-        ProviderRegistry["Provider Registry<br/>(30+ providers)"]
+        ToolInspection["Tool Inspection Pipeline\n(Security / Egress / Adversary / Permission / Repetition)"]
+        ContextMgmt["Context Management\n(auto-compact + tool-pair summarization)"]
+        ProviderRegistry["Provider Registry\n(30+ providers)"]
     end
 
     subgraph Extensions["Extension Layer (MCP)"]
-        Platform["Platform Extensions<br/>(developer, analyze, todo, apps, summon...)"]
-        Builtin["Builtin MCP Servers<br/>(memory, computercontroller, autovisualiser, tutorial)"]
-        External["External MCP Servers<br/>(stdio | streamable-http)"]
-        Frontend["Frontend Tools<br/>(desktop-only)"]
+        Platform["Platform Extensions\n(developer, analyze, todo, apps, summon...)"]
+        Builtin["Builtin MCP Servers\n(memory, computercontroller, autovisualiser, tutorial)"]
+        External["External MCP Servers\n(stdio | streamable-http)"]
+        Frontend["Frontend Tools\n(desktop-only)"]
     end
 
     CLI --> API
@@ -209,16 +209,16 @@ Three things stand out:
 ```mermaid
 graph LR
     subgraph ExtensionManager
-        Registry["Extension Registry<br/>(HashMap&lt;String, Extension&gt;)"]
-        ToolsCache["Tools Cache<br/>(Arc&lt;Vec&lt;Tool&gt;&gt; + atomic version)"]
+        Registry["Extension Registry\n(HashMap‹String, Extension›)"]
+        ToolsCache["Tools Cache\n(Arc‹Vec‹Tool›› + atomic version)"]
     end
 
     subgraph ExtensionTypes["Extension Types"]
-        PlatformExt["Platform<br/>developer, analyze, todo,<br/>apps, summon, orchestrator,<br/>chatrecall, ext_manager, tom"]
-        BuiltinExt["Builtin MCP<br/>memory, computercontroller,<br/>autovisualiser, tutorial"]
-        StdioExt["Stdio MCP<br/>Any MCP server via<br/>child process"]
-        HttpExt["StreamableHTTP<br/>Remote MCP servers"]
-        InlinePy["InlinePython<br/>Python code via uvx"]
+        PlatformExt["Platform\ndeveloper, analyze, todo,\napps, summon, orchestrator,\nchatrecall, ext_manager, tom"]
+        BuiltinExt["Builtin MCP\nmemory, computercontroller,\nautovisualiser, tutorial"]
+        StdioExt["Stdio MCP\nAny MCP server via\nchild process"]
+        HttpExt["StreamableHTTP\nRemote MCP servers"]
+        InlinePy["InlinePython\nPython code via uvx"]
     end
 
     Registry --> PlatformExt

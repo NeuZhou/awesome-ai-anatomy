@@ -215,7 +215,7 @@ sequenceDiagram
         P->>C3: task + restricted toolset
     end
 
-    Note over C1,C3: No memory writes<br/>No delegation<br/>No user interaction
+    Note over C1,C3: No memory writes\nNo delegation\nNo user interaction
 
     C1-->>P: Summary result
     C2-->>P: Summary result

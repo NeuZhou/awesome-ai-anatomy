@@ -53,27 +53,27 @@
 ```mermaid
 graph TB
     subgraph Entry["🚀 CLI Entry"]
-        CLI["claude CLI<br/>(Bun runtime)"] -->|"lazy import()"| App["Main App<br/>(React/Ink TUI)"]
+        CLI["claude CLI\n(Bun runtime)"] -->|"lazy import()"| App["Main App\n(React/Ink TUI)"]
     end
 
     subgraph Session["📋 Session Layer"]
         App --> SM["Session Manager"]
-        SM --> Auth["Auth<br/>(OAuth/API Key/Bedrock/Vertex)"]
+        SM --> Auth["Auth\n(OAuth/API Key/Bedrock/Vertex)"]
         SM --> Config["Config + Feature Flags"]
         SM --> Mem["Memory (.claude/)"]
     end
 
     subgraph Core["⚡ Agentic Core (query.ts - 1,729 lines)"]
         SM --> Loop["while(true)"]
-        Loop --> Pre["Preprocess<br/>(4-layer context mgmt)"]
-        Pre --> API["Claude API<br/>(streaming SSE)"]
-        API --> Parse["Parse Response<br/>(detect tool_use)"]
-        Parse --> Exec["StreamingToolExecutor<br/>(parallel execution)"]
+        Loop --> Pre["Preprocess\n(4-layer context mgmt)"]
+        Pre --> API["Claude API\n(streaming SSE)"]
+        API --> Parse["Parse Response\n(detect tool_use)"]
+        Parse --> Exec["StreamingToolExecutor\n(parallel execution)"]
         Exec -->|"results → messages"| Loop
     end
 
     subgraph Tools["🔧 Tool System (40+)"]
-        Exec --> Bash["BashTool<br/>(sandbox, timeout)"]
+        Exec --> Bash["BashTool\n(sandbox, timeout)"]
         Exec --> File["FileRead/Write"]
         Exec --> Search["Search/Grep"]
         Exec --> MCP["MCP Bridges"]
@@ -81,10 +81,10 @@ graph TB
     end
 
     subgraph Context["🧠 Context Management"]
-        Pre --> L1["L1: HISTORY_SNIP<br/>Surgical deletion"]
-        L1 --> L2["L2: Microcompact<br/>Cache-level editing"]
-        L2 --> L3["L3: CONTEXT_COLLAPSE<br/>Structured archival"]
-        L3 --> L4["L4: Autocompact<br/>Full compression"]
+        Pre --> L1["L1: HISTORY_SNIP\nSurgical deletion"]
+        L1 --> L2["L2: Microcompact\nCache-level editing"]
+        L2 --> L3["L3: CONTEXT_COLLAPSE\nStructured archival"]
+        L3 --> L4["L4: Autocompact\nFull compression"]
     end
 
     classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
@@ -148,10 +148,10 @@ This is the most sophisticated part of the codebase. Most agents use a single "s
 
 ```mermaid
 graph LR
-    Start["Context too long?"] --> L1["L1: HISTORY_SNIP<br/>🔪 Delete specific messages<br/>Lossless, surgical"]
-    L1 -->|"still too long"| L2["L2: Microcompact<br/>🔬 Cache-level editing<br/>API tells model to ignore cached tokens"]
-    L2 -->|"still too long"| L3["L3: CONTEXT_COLLAPSE<br/>📦 Structured archival<br/>Git-commit-log style summaries"]
-    L3 -->|"still too long"| L4["L4: Autocompact<br/>💣 Full compression<br/>Last resort, brute force"]
+    Start["Context too long?"] --> L1["L1: HISTORY_SNIP\nSurgical deletion, lossless"]
+    L1 -->|"still too long"| L2["L2: Microcompact\nCache-level editing\nAPI tells model to ignore cached tokens"]
+    L2 -->|"still too long"| L3["L3: CONTEXT_COLLAPSE\nStructured archival\nGit-commit-log style summaries"]
+    L3 -->|"still too long"| L4["L4: Autocompact\nFull compression, last resort"]
 
     classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
     classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
@@ -189,7 +189,7 @@ sequenceDiagram
     SE->>R: ⚡ Start immediately
     M->>SE: tool_use: read_file
     SE->>R: ⚡ Start in parallel
-    Note over R: Both running while<br/>model still talks
+    Note over R: Both running while\nmodel still talks
     M->>SE: tool_use: write_file
     R-->>SE: grep results
     R-->>SE: file contents
@@ -282,7 +282,7 @@ This team uses research methodology in production engineering. They can quantify
 
 ```mermaid
 graph TD
-    Main["Main Agent<br/>Tools: TeamCreate, SendMessage, StopWorker"]
+    Main["Main Agent\nTools: TeamCreate, SendMessage, StopWorker"]
     Main -->|spawns| W1["Worker 1"]
     Main -->|spawns| W2["Worker 2"]
     Main -->|spawns| W3["Worker 3"]

@@ -24,13 +24,13 @@ Pi is a monorepo of seven npm packages that together form a full stack for build
 ```mermaid
 graph TB
     subgraph "pi-mono Monorepo"
-        AI["@mariozechner/pi-ai<br/>Unified LLM API<br/>37K lines"]
-        AGENT["@mariozechner/pi-agent-core<br/>Agent Loop & State<br/>3K lines"]
-        CA["@mariozechner/pi-coding-agent<br/>Coding Agent CLI<br/>69K lines"]
-        TUI["@mariozechner/pi-tui<br/>Terminal UI Library<br/>18K lines"]
-        WEBUI["@mariozechner/pi-web-ui<br/>Web Components<br/>14K lines"]
-        MOM["@mariozechner/pi-mom<br/>Slack Bot<br/>4K lines"]
-        PODS["@mariozechner/pi-pods<br/>vLLM Pod Manager<br/>2K lines"]
+        AI["@mariozechner/pi-ai\nUnified LLM API\n37K lines"]
+        AGENT["@mariozechner/pi-agent-core\nAgent Loop and State\n3K lines"]
+        CA["@mariozechner/pi-coding-agent\nCoding Agent CLI\n69K lines"]
+        TUI["@mariozechner/pi-tui\nTerminal UI Library\n18K lines"]
+        WEBUI["@mariozechner/pi-web-ui\nWeb Components\n14K lines"]
+        MOM["@mariozechner/pi-mom\nSlack Bot\n4K lines"]
+        PODS["@mariozechner/pi-pods\nvLLM Pod Manager\n2K lines"]
     end
 
     AI --> AGENT
@@ -189,19 +189,19 @@ This maps directly to how game engines handle input buffering — you don't proc
 ```mermaid
 graph LR
     subgraph "Extension Lifecycle"
-        LOAD["Extension Loader<br/>Dynamic import()"]
-        REG["Registration Phase<br/>pi.on(), pi.registerTool()"]
-        BIND["Binding Phase<br/>UI context, commands"]
-        RUN["Runtime Phase<br/>Event emission"]
+        LOAD["Extension Loader\nDynamic import()"]
+        REG["Registration Phase\npi.on(), pi.registerTool()"]
+        BIND["Binding Phase\nUI context, commands"]
+        RUN["Runtime Phase\nEvent emission"]
     end
 
     LOAD --> REG --> BIND --> RUN
 
     subgraph "Extension API Surface"
-        EVENTS["30+ Event Types<br/>session_start, tool_call, etc."]
-        TOOLS["Custom Tools<br/>ToolDefinition + TUI renderer"]
-        CMDS["Slash Commands<br/>/command handler"]
-        PROVIDERS["Custom Providers<br/>registerProvider()"]
+        EVENTS["30+ Event Types\nsession_start, tool_call, etc."]
+        TOOLS["Custom Tools\nToolDefinition + TUI renderer"]
+        CMDS["Slash Commands\n/command handler"]
+        PROVIDERS["Custom Providers\nregisterProvider()"]
     end
 
     RUN --> EVENTS
