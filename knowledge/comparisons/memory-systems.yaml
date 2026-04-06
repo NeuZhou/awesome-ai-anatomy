@@ -1,0 +1,60 @@
+name: memory-systems
+category: memory
+description: "How different agent frameworks handle persistent memory across sessions"
+last_updated: 2026-04-05
+
+projects_compared: [deer-flow, hermes-agent, openclaw, claude-code]
+
+dimensions:
+  - name: storage_format
+    deer-flow: "JSON file (hierarchical schema)"
+    hermes-agent: "Markdown files (MEMORY.md + USER.md)"
+    openclaw: "Markdown file (MEMORY.md)"
+    claude-code: "Markdown file (CLAUDE.md — rules only)"
+
+  - name: structure
+    deer-flow: "user context (work/personal/top-of-mind) + history (3 time horizons) + facts (id/content/category/confidence)"
+    hermes-agent: "Flat entries delimited by § (section sign), character-limited"
+    openclaw: "Free-form markdown with manual sections"
+    claude-code: "Flat rules/instructions"
+
+  - name: update_mechanism
+    deer-flow: "LLM-extracted, debounced, async queue"
+    hermes-agent: "Agent tool calls (add/replace/remove), substring matching"
+    openclaw: "Manual edits + agent file writes"
+    claude-code: "Manual only"
+
+  - name: confidence_scoring
+    deer-flow: "Yes — per-fact 0-1 confidence"
+    hermes-agent: "No"
+    openclaw: "No"
+    claude-code: "No"
+
+  - name: cross_session_recall
+    deer-flow: "No"
+    hermes-agent: "Yes — FTS5 session search + LLM summarization via cheap model"
+    openclaw: "Partial — session transcripts in memory/ but no search"
+    claude-code: "No"
+
+  - name: prompt_cache_optimization
+    deer-flow: "No (memory can change mid-session)"
+    hermes-agent: "Yes — frozen snapshot injected at session start, writes don't update running prompt"
+    openclaw: "No"
+    claude-code: "N/A (no dynamic memory)"
+
+  - name: security_scanning
+    deer-flow: "No"
+    hermes-agent: "Yes — threat pattern scanning on memory writes"
+    openclaw: "No"
+    claude-code: "No"
+
+  - name: concurrent_write_safety
+    deer-flow: "No file locking (corruption risk)"
+    hermes-agent: "fcntl file locking"
+    openclaw: "No file locking"
+    claude-code: "N/A"
+
+analysis: |
+  Hermes has the most complete memory implementation: structured storage, cross-session search, frozen snapshots for cache optimization, and security scanning. DeerFlow has the best schema design with confidence-scored facts and hierarchical context, but lacks search and caching. OpenClaw and Claude Code are basic by comparison.
+
+  The biggest gap across all: none handle multi-tenant or multi-agent memory safely. DeerFlow's single-file JSON with no locking is a corruption bug waiting to happen in any concurrent scenario.

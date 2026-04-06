@@ -1,77 +1,133 @@
 # Teardown Template — awesome-ai-anatomy
 
-> Use this template for every project teardown. Consistency is key.
+> Use this template for every project teardown. Sections marked [REQUIRED] must be included. Sections marked [IF APPLICABLE] can be skipped if not relevant.
 
 ---
 
-# [Project Name]: [One-Line Hook That Makes You Click]
+# {Project Name}: {One-Line Hook That Makes People Click}
 
-> [1-2 sentences. What you expected vs what you actually found. Set up the tension.]
+> {1-2 sentences: what you found, why it matters, stated as personal experience}
 
-## At a Glance
+## At a Glance [REQUIRED]
 
 | Metric | Value |
 |--------|-------|
-| Stars | [verified via GitHub API] |
-| Forks | [verified via GitHub API] |
-| Language | |
-| Framework | |
-| Lines of Code | [verified via cloc/wc -l] |
-| License | |
-| First commit | |
-| Key claim | [what the project says it does] |
+| Stars | {verified via GitHub API} |
+| Forks | {verified via GitHub API} |
+| Language | {primary language(s)} |
+| Framework | {key frameworks used} |
+| Lines of Code | {verified via cloc/wc -l} |
+| License | {license type} |
+| First Commit | {date} |
+| Latest Release | {version + date} |
 
-## Architecture
+{2-3 sentences: what this project IS in plain language. No marketing speak. What does it actually do when you run it?}
 
-[Mermaid flowchart showing the overall system. Must include:]
-- Entry points (CLI, API, Gateway)
-- Core processing pipeline
-- Key subsystems
-- Data stores
+---
 
-[2-3 paragraphs of analysis. Include at least one personal observation — something that surprised you, confused you, or that you verified/disproved by reading the code.]
+## Architecture [REQUIRED]
 
-## [Core Innovation Name] — The Part Worth Reading About
+```mermaid
+{Overall architecture diagram — flowchart showing main components and data flow}
+```
 
-[Every project has 1-2 things that are genuinely novel or well-done. This section dives deep into those.]
+{Explain the architecture in 2-3 paragraphs. Focus on:
+- What are the main components?
+- How do they communicate?
+- Why was it designed this way?
+- Include personal reaction: what surprised you?}
 
-[Must include:]
-- Source code reference (file path + line range)
-- Mermaid diagram if the concept benefits from visualization  
-- How it actually works (not how the README says it works)
-- Your honest assessment — is this as good as they claim?
+**Files to reference:**
+- `{path/to/main/entry/point}` — {what it does}
+- `{path/to/key/module}` — {what it does}
 
-## How It Actually Works
+---
 
-[Walk through the request/execution flow from user input to output. This is where you prove you read the code, not just the README.]
+## Core Innovation [REQUIRED]
 
-[Must include:]
-- At least 3 source code references with file paths
-- At least 1 code snippet showing a key design decision
-- Specific numbers (buffer sizes, timeouts, limits) from the actual code
+{What is the 1-2 things this project does that others don't? This is the section that makes people share the teardown.}
 
-## The Verdict
+{Include code snippets with file paths and line numbers:}
 
-[Do NOT split into separate "pros" and "cons" sections. Mix them together like a real person would talk about it. Some paragraphs praise, some criticize, flow naturally.]
+```python
+# From {file_path}:{line_number}
+{actual code from the project}
+```
 
-[Must include:]
-- At least 1 genuinely sharp criticism (code review voice, not polite suggestion)
-- At least 1 genuine compliment with specific reasoning
-- A clear bottom-line: who should use this and who shouldn't
+{Explain WHY this matters, not just WHAT it does.}
 
-## How It Compares
+---
 
-[Comparison table with previously teardown projects. Pull data from knowledge base.]
+## How It Actually Works [REQUIRED]
 
-| Feature | This Project | [Project A] | [Project B] |
-|---------|-------------|-------------|-------------|
+{Deep dive into the mechanics. Pick 2-3 subsystems to analyze in detail.}
+
+### {Subsystem 1 Name}
+
+```mermaid
+{Diagram for this subsystem — sequence diagram, state machine, or flowchart}
+```
+
+{Analysis: how it works, key design decisions, trade-offs}
+
+### {Subsystem 2 Name}
+
+{Same structure: diagram + analysis}
+
+### {Subsystem 3 Name} [IF APPLICABLE]
+
+{Same structure: diagram + analysis}
+
+---
+
+## The Verdict [REQUIRED]
+
+{NOT separated into "pros" and "cons" lists. Write this as flowing paragraphs mixing positives and negatives naturally. Be opinionated — say what you actually think.}
+
+{Include at least:
+- 2-3 things that are genuinely well-designed (with specific evidence)
+- 2-3 things that are problematic (with specific evidence)
+- Your overall assessment: would you use this? recommend it? contribute to it?}
+
+---
+
+## Cross-Project Comparison [REQUIRED after 3+ teardowns]
+
+| Feature | {This Project} | {Project A} | {Project B} |
+|---------|---------------|-------------|-------------|
+| {Feature 1} | {value} | {value} | {value} |
+| {Feature 2} | {value} | {value} | {value} |
 | ... | ... | ... | ... |
 
-[1 paragraph interpreting the table — don't just show data, say what it means.]
+{Brief analysis: where does this project sit in the landscape?}
 
-## Stuff I'd Steal
+---
 
-[2-3 specific design patterns or implementation tricks worth borrowing. Be concrete — "the way they do X in file Y" not "their approach to scalability".]
+## Stuff Worth Stealing [REQUIRED]
+
+{2-3 design patterns or techniques that are worth adopting in your own projects. Be specific — link to the exact code.}
+
+---
+
+## Hooks & Easter Eggs [IF FOUND]
+
+{Any surprising discoveries: hidden features, funny comments, unusual design choices, Easter eggs. These are the most shareable parts of any teardown.}
+
+---
+
+## Verification Log [REQUIRED — at end of file, collapsed]
+
+<details>
+<summary>Fact-check log (click to expand)</summary>
+
+| Claim | Verification Method | Result |
+|-------|-------------------|--------|
+| {star count} | GitHub API | ✅ Verified |
+| {LOC count} | cloc output | ✅ Verified |
+| {file path reference} | file exists check | ✅ Verified |
+| ... | ... | ... |
+
+</details>
 
 ---
 
@@ -79,18 +135,29 @@
 
 ---
 
-## Quality Checklist (remove before publishing)
+## Template Usage Notes (delete this section in actual teardowns)
 
-- [ ] Title has a hook (not just "[Project]: A Deep Dive")
-- [ ] All star/fork/LOC numbers verified via API/CLI
-- [ ] At least 3 source code references with file paths
-- [ ] At least 2 Mermaid diagrams
-- [ ] At least 1 code snippet from actual source
-- [ ] No "clever", "innovative", "remarkably", "genuinely" or other AI words
-- [ ] Pros and cons are NOT in symmetric lists
-- [ ] At least 1 sharp criticism in code-review voice
-- [ ] At least 1 personal observation/experience
-- [ ] Comparison table with previous teardowns
-- [ ] FactChecker agent verified all claims
-- [ ] AIToneChecker agent passed
-- [ ] Cross-reference with knowledge base patterns
+### Quality Checklist
+- [ ] All numbers verified (stars, LOC, dates)
+- [ ] All file paths verified to exist
+- [ ] At least 3 Mermaid diagrams
+- [ ] At least 5 code snippets with file:line references
+- [ ] Cross-project comparison table included
+- [ ] Verification log complete
+- [ ] Passed AI tone review (no "remarkably", "genuinely", "innovative", etc.)
+- [ ] Has at least 1 personal reaction/experience
+- [ ] Verdict section mixes positives and negatives (not separated lists)
+- [ ] Hook/title would make someone click on HN
+
+### Banned Words/Phrases
+- remarkably, genuinely, innovative, cleverly, elegant
+- "it's worth noting", "interestingly", "notably"
+- "a testament to", "speaks volumes"
+- "the elephant in the room"
+- "deep-dive" (in title/subtitle)
+- Any three-adjective ending ("Simple, powerful, effective.")
+
+### Title Formula
+- "{Project}: {Surprising Finding}" — e.g., "Claude Code: There's a Hidden Tamagotchi in Anthropic's AI"
+- "{Project}: {Contrarian Take}" — e.g., "Hermes Agent: OpenClaw's Python Twin With a Learning Loop Bolted On"
+- Never use "A Deep Dive Into..." or "Understanding..."

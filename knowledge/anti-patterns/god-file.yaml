@@ -1,13 +1,22 @@
 name: god-file
-category: architecture
-description: "Entire agent loop in a single massive file (thousands of lines)"
+category: maintainability
+description: "Single file containing the entire agent loop — thousands of lines with no separation of concerns"
 severity: high
-first_seen: hermes-agent
-projects:
-  hermes-agent:
-    file: "run_agent.py"
+tags: [anti-pattern, maintainability, code-smell, technical-debt]
+
+seen_in:
+  - project: hermes-agent
+    file: run_agent.py
     lines: 9000+
-    impact: "Every PR touches this file, merge conflicts are constant, onboarding is painful"
-    root_cause: "Grew organically from prototype, nobody refactored because it would mean rewriting the product"
-better_alternative: "DeerFlow's middleware chain — separates concerns into composable, testable units"
-lesson: "If your main file exceeds 1000 lines, stop adding features and refactor. The longer you wait, the harder it gets."
+    notes: "The entire AIAgent class and agent loop in one file. Every PR touches this file."
+
+impact:
+  - "Every merge conflict happens in one file"
+  - "New contributors can't find what they're looking for"
+  - "Impossible to test individual components in isolation"
+  - "IDE performance degrades on files this large"
+  - "Code review is painful — diff of 9K file is unreadable"
+
+better_alternative: "Middleware chain pattern (see: deer-flow) or at minimum, split into separate modules per concern"
+
+notes: "This is a common pattern in fast-growing projects — the original author knows where everything is, so there's no incentive to refactor. By the time it hurts, the file is too big to safely split."

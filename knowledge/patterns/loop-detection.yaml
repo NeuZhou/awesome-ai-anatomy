@@ -1,27 +1,32 @@
 name: loop-detection
-category: safety
-description: "Detects when the agent is stuck calling the same tools repeatedly and breaks the loop via escalating intervention"
-first_seen: deer-flow
+category: security
+description: "Detect and break repetitive tool call loops using hash-based sliding window detection"
+tags: [safety, loop, circuit-breaker, cost-protection]
+
+first_seen:
+  project: deer-flow
+  file: backend/packages/harness/deerflow/agents/middlewares/loop_detection_middleware.py
+  lines: 1-60
+  date: 2026-04-05
+
 also_seen:
-  - openclaw  # has loop-circuit-breaker skill
-projects:
-  deer-flow:
-    implementation: "Hash tool calls (order-independent), sliding window of 20, warn at 3 repeats, force-stop at 5"
-    file: "backend/packages/harness/deerflow/agents/middlewares/loop_detection_middleware.py"
-    thresholds:
-      warn: 3
-      hard_stop: 5
-      window_size: 20
-      max_tracked_threads: 100
-    hash_method: "Order-independent hash of (name, args) tuples"
-  hermes-agent:
-    implementation: "Not found as a dedicated module. May be handled in the monolithic run_agent.py"
-    note: "No evidence of explicit loop detection"
+  - project: hermes-agent
+    notes: "Has max_iterations limit but no hash-based detection"
+
+implementation:
+  algorithm: "Hash tool calls (name+args, order-independent) → sliding window → warn at threshold → force-stop at hard limit"
+  warn_threshold: 3
+  hard_limit: 5
+  window_size: 20
+  lru_threads: 100
+
 pros:
-  - "Prevents $500 API bills from stuck agents at 3am"
-  - "Escalating intervention (warn first, then force-stop) is less disruptive"
-  - "Order-independent hashing prevents evasion by reordering calls"
+  - "Order-independent hashing prevents evasion by call reordering"
+  - "Escalating response (warn then stop) gives model a chance to self-correct"
+  - "Per-thread tracking with LRU eviction — memory bounded"
+
 cons:
-  - "Window size of 20 might be too small for complex multi-tool workflows"
-  - "Hard stop forces text-only response, which may not resolve the underlying issue"
-verdict: "Non-negotiable safety feature for any production agent. Build it before you need it."
+  - "Only detects exact repeats — novel but useless tool calls still pass"
+  - "Hard limit of 5 may be too aggressive for some legitimate retry patterns"
+
+verdict: "Essential safety feature. The $500 API bill from a runaway loop is real. Every production agent needs this. DeerFlow's implementation is clean and well-parameterized."

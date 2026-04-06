@@ -1,33 +1,35 @@
 name: skill-self-improvement
-category: learning
-description: "Agent autonomously creates, edits, and patches skills based on experience, turning successful approaches into reusable procedural knowledge"
-first_seen: hermes-agent
+category: memory
+description: "Agent autonomously creates skills from experience and patches them during subsequent use"
+tags: [learning, skills, procedural-memory, self-improvement]
+
+first_seen:
+  project: hermes-agent
+  file: tools/skill_manager_tool.py
+  lines: 1-60
+  date: 2026-04-05
+
 also_seen: []
-projects:
-  hermes-agent:
-    implementation: "SkillManagerTool with 6 actions: create, edit, patch, delete, write_file, remove_file"
-    file: "tools/skill_manager_tool.py"
-    security: "Post-write security scan on every skill modification"
-    storage: "~/.hermes/skills/"
-    actions:
-      create: "Create new skill with SKILL.md + directory structure"
-      edit: "Full rewrite of SKILL.md"
-      patch: "Targeted find-and-replace within any skill file"
-      delete: "Remove skill entirely"
-      write_file: "Add/overwrite supporting files"
-      remove_file: "Remove supporting files"
-  deer-flow:
-    implementation: "Skills are static, loaded from directory. No self-improvement."
-    note: "Skills are read-only configuration, not learned behavior"
-  openclaw:
-    implementation: "Skills are static. Agent can suggest new skills but can't create them automatically."
-    note: "Manual skill creation only"
+
+not_used_by:
+  - project: deer-flow
+    notes: "Has skills but no auto-creation or self-improvement"
+  - project: openclaw
+    notes: "Skills are manual-only"
+
+implementation:
+  actions: [create, edit, patch, delete, write_file, remove_file]
+  security: "Post-edit security scan via skills_guard.py"
+  storage: "~/.hermes/skills/{skill-name}/SKILL.md"
+
 pros:
-  - "Agent gets better at repeated tasks over time"
-  - "Turns tacit knowledge into explicit procedures"
-  - "Security scanning prevents injection via skill modification"
+  - "Genuine procedural memory — agent learns HOW to do things"
+  - "Patch action allows targeted fixes without full rewrite"
+  - "Security scanning on agent-authored skills prevents injection"
+
 cons:
-  - "LLM-authored skills may encode bad patterns"
-  - "No quality gate beyond security scanning (no accuracy check)"
-  - "Skill proliferation — hundreds of low-quality skills can slow down discovery"
-verdict: "Genuinely innovative feature. The security scan is the critical safety net. Without it, this would be a prompt injection highway."
+  - "Quality of auto-created skills depends on LLM capability"
+  - "No automatic testing of skills — created skill might not work"
+  - "Skill explosion risk — too many low-quality skills over time"
+
+verdict: "The most interesting feature in Hermes. No other major agent framework does this. The security scanning is a nice touch. But needs a skill quality/relevance scoring system to prevent accumulation of junk skills."

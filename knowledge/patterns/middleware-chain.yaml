@@ -1,31 +1,30 @@
 name: middleware-chain
 category: architecture
-description: "Sequential chain of middleware functions processing each request/message in strict order"
-first_seen: deer-flow
+description: "Chain of middleware functions that process each request sequentially, each handling one cross-cutting concern"
+tags: [middleware, pipeline, chain-of-responsibility, extensibility]
+
+first_seen:
+  project: deer-flow
+  file: backend/packages/harness/deerflow/agents/lead_agent/agent.py
+  lines: 210-260
+  date: 2026-04-05
+
 also_seen:
-  - openclaw
-  - express.js
-  - koa.js
-projects:
-  deer-flow:
-    implementation: "14+ middlewares in strict order, each handles one cross-cutting concern"
-    file: "backend/packages/harness/deerflow/agents/lead_agent/agent.py"
-    line_range: "210-260"
-    ordering_constraints:
-      - "ThreadDataMiddleware must be first (provides thread_id)"
-      - "SummarizationMiddleware before MemoryMiddleware"
-      - "ClarificationMiddleware must be last"
-    count: 14
-  hermes-agent:
-    implementation: "No formal middleware chain — logic embedded in run_agent.py monolith"
-    file: "run_agent.py"
-    note: "9000+ lines, no middleware separation"
+  - project: openclaw
+    notes: "Event-driven middleware equivalent"
+
+not_used_by:
+  - project: hermes-agent
+    notes: "Monolithic 9K-line agent loop instead. No middleware separation."
+
 pros:
-  - "Clean separation of concerns — each middleware testable in isolation"
-  - "Easy to add new cross-cutting features without touching core logic"
-  - "Ordering constraints are explicit and documented"
+  - "Each middleware is independently testable"
+  - "Adding/removing features doesn't touch core agent logic"
+  - "Ordering constraints are documented in code comments"
+
 cons:
-  - "Ordering dependency graph becomes complex at >10 middlewares"
-  - "Debugging across middleware boundaries is harder"
-  - "Requires discipline to maintain ordering invariants"
-verdict: "Best practice for agent systems with >5 cross-cutting concerns. DeerFlow gets this right."
+  - "Ordering dependencies become a DAG problem beyond ~15 middlewares"
+  - "Debugging across middleware boundaries requires good logging"
+  - "Performance overhead from passing through all layers even when not needed"
+
+verdict: "Best pattern for agent frameworks that prioritize extensibility. DeerFlow's 14-layer chain is well-executed. Hermes's lack of this pattern is their biggest architectural debt."
