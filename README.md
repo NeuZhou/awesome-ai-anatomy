@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="assets/hero-banner.png" alt="Awesome AI Anatomy" width="100%">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=social" alt="Stars">
   <img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks">
   <img src="https://img.shields.io/badge/teardowns-10-blue" alt="Teardowns">
