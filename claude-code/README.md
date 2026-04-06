@@ -24,16 +24,18 @@
 
 ## Table of Contents
 
+- [At a Glance](#at-a-glance)
 - [Architecture Overview](#architecture-overview)
 - [Tech Stack - Why These Choices](#tech-stack--why-these-choices)
 - [The Brain: Agentic Loop](#the-brain-agentic-loop)
-- [Context Management - 4 Surgical Layers](#context-management--4-surgical-layers)
+- [Core Innovation: Context Management - 4 Surgical Layers](#core-innovation-context-management--4-surgical-layers)
 - [Streaming Tool Execution](#streaming-tool-execution--why-claude-code-feels-fast)
 - [Tool System - 40+ Tools, Zero Inheritance](#tool-system--40-tools-zero-inheritance)
 - [Feature Flags - Compile-time + Runtime](#feature-flags--the-best-engineering)
 - [Multi-Agent Coordination](#multi-agent-coordination)
 - [Unreleased Features](#unreleased-features-found-in-the-code)
 - [Design Decisions - The "Why" Analysis](#design-decisions--the-why-analysis)
+- [Stuff Worth Stealing](#stuff-worth-stealing)
 - [Limitations & Potential Issues](#limitations--potential-issues)
 - [Comparison with Alternatives](#comparison-with-alternatives)
 - [Key Takeaways](#key-takeaways)
@@ -330,6 +332,19 @@ Claude Code is at 40. They made the right call for their current scale.
 | RAG retrieval | "Never forgets" | Retrieval relevance not guaranteed, adds latency, poor at maintaining conversational continuity |
 
 For coding tasks, **continuity matters more than retrieval**. You need coherent understanding of the current task flow, not keyword search over past conversations. The cascade approach is the right fit.
+
+---
+
+## Stuff Worth Stealing
+
+### 1. The 4-Layer Context Cascade
+Lossless before lossy, local before global. Most agents do one-shot summarization or sliding windows. Claude Code's progressive degradation — surgical deletion → cache-level hiding → structured archival → full compression — preserves maximum information at each stage. Any long-running agent benefits from this pattern.
+
+### 2. Streaming Tool Execution with RWLock
+Start executing read-only tools while the model is still generating. Read tools run in parallel; write tools get exclusive locks. The UX speedup is real and the implementation is straightforward — a reader-writer lock pattern applied to tool dispatch.
+
+### 3. `buildTool()` Factory Over Inheritance
+Each tool is a plain object with schema, permissions, execution, UI rendering, and context summary — all co-located in one file. No base class, no inheritance chain, no registration ceremony. At 40+ tools this scales better than class hierarchies because tools share almost no behavior.
 
 ---
 

@@ -312,7 +312,7 @@ if tool_calls_count < min_tool_calls:
 
 The Chinese README title translates to "Simple and Universal Collective Intelligence Engine — Predict Everything," but the code's default event configuration examples use a university public opinion scenario (`Student`, `Professor`, `University`). Default agent activity patterns are also designed entirely around Chinese timezone schedules. This shows that despite the "universal" positioning, actual development and testing centered on Chinese public opinion scenarios.
 
-Worth noting: the Acknowledgments mention "MiroFish has received strategic support and incubation from Shanda Group." A Shanda-backed project building a public opinion simulation/prediction tool — the commercial angle isn't hard to see.
+The Acknowledgments mention "MiroFish has received strategic support and incubation from Shanda Group." A Shanda-backed project building a public opinion simulation/prediction tool — the commercial angle isn't hard to see.
 
 The `builtins.open` monkey-patch in the code is the "nuclear option" for Windows compatibility — crude but effective. Shows the team hit real encoding pain in actual deployment, and the OASIS library doesn't handle encoding properly on its own.
 

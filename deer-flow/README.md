@@ -315,7 +315,7 @@ Not surprising that Feishu is the best-supported channel, given that DeerFlow co
 
 ---
 
-## Lessons Worth Stealing
+## Stuff Worth Stealing
 
 **If you're building an agent system, invest in a middleware chain.** It's the highest-leverage architectural decision you'll make. Every cross-cutting concern — logging, error handling, cost tracking, safety — becomes a composable, testable, removable unit. DeerFlow has 14+ of them and the codebase is clean because of it.
 
