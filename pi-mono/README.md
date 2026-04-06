@@ -137,29 +137,30 @@ The author even links to a history tracker for Claude Code's prompts (`https://c
 sequenceDiagram
     participant User
     participant Agent
-    participant Loop as Agent Loop
+    participant AgentLoop as Agent Loop
     participant LLM
     participant Tools
 
-    User->>Agent: prompt("fix the bug")
-    Agent->>Loop: runAgentLoop(messages, context, config)
+    User->>Agent: prompt - fix the bug
+    Agent->>AgentLoop: runAgentLoop(messages, context, config)
 
-    loop Until no more tool calls
-        Loop->>LLM: streamAssistantResponse()
-        LLM-->>Loop: AssistantMessage (with tool calls)
-        Loop-->>Agent: message_start, message_update, message_end
+    rect rgb(30, 40, 50)
+    note right of AgentLoop: Repeats until no more tool calls
+        AgentLoop->>LLM: streamAssistantResponse()
+        LLM-->>AgentLoop: AssistantMessage with tool calls
+        AgentLoop-->>Agent: message_start, message_update, message_end
 
         alt Has tool calls
-            Loop->>Tools: executeToolCalls() [parallel or sequential]
-            Tools-->>Loop: ToolResultMessage[]
-            Loop-->>Agent: tool_execution_start/end
+            AgentLoop->>Tools: executeToolCalls()
+            Tools-->>AgentLoop: ToolResultMessage[]
+            AgentLoop-->>Agent: tool_execution_start/end
         end
 
-        Loop->>Loop: Check steering queue
-        Loop->>Loop: Check follow-up queue
+        AgentLoop->>AgentLoop: Check steering queue
+        AgentLoop->>AgentLoop: Check follow-up queue
     end
 
-    Loop-->>Agent: agent_end
+    AgentLoop-->>Agent: agent_end
 ```
 
 If you squint, this is a game loop. Every "frame" (turn):
