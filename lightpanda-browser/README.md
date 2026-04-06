@@ -23,6 +23,11 @@ The pitch: 9x faster than Chrome, 16x less memory, instant startup. The reality:
 
 ## Architecture
 
+![Architecture](architecture.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 graph LR
     subgraph Entry["Binary Entry Points"]
@@ -71,6 +76,8 @@ graph LR
     class H5E accent
     class Network accent
 ```
+
+</details>
 
 The architecture is a straightforward pipeline: network data comes in through libcurl, gets parsed by html5ever into a DOM tree managed entirely in Zig, V8 runs JavaScript against that DOM through a binding layer, and CDP exposes all of this to external tools like Playwright and Puppeteer.
 

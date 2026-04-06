@@ -21,6 +21,11 @@ Guardrails AI wraps LLM API calls and validates the output against a schema you 
 
 ## Architecture
 
+![Architecture](architecture.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     subgraph UserCode["Your Application"]
@@ -84,6 +89,8 @@ flowchart LR
     class V2 warn
     class Install accent
 ```
+
+</details>
 
 The whole thing flows through a single central class: `Guard`. It holds your validators, your output schema, your execution history, your API client, your telemetry config — everything. When you call it, it builds a `Runner`, which loops through LLM calls and validation steps until the output passes or the reask budget runs out.
 

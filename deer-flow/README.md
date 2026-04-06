@@ -22,7 +22,12 @@ DeerFlow is an orchestration layer that lets one LLM manage sub-agents, run sand
 
 ## Architecture
 
+![Architecture](architecture.png)
+
 The system runs two backend services behind Nginx:
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
 
 ```mermaid
 flowchart LR
@@ -67,6 +72,8 @@ flowchart LR
     class SB accent
     class MCP accent
 ```
+
+</details>
 
 The split is straightforward: LangGraph Server handles the stateful agent loop (can run for hours on a single task). Gateway API is stateless REST for everything else — model config, skill management, memory, file uploads.
 

@@ -22,6 +22,11 @@ If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SO
 
 ## Architecture
 
+![Architecture](architecture.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     subgraph Entry["Entry Points"]
@@ -71,6 +76,8 @@ flowchart LR
     class SS accent
     class SG warn
 ```
+
+</details>
 
 The entire agent loop lives in one file: `run_agent.py` at 9,000+ lines. I ran `wc -l` three times because I thought I miscounted. Nope — nine thousand lines, one file, one class. Every PR touches it, every merge conflict lives here. At 26K stars nobody's had the guts to refactor it, and I get why — you'd basically be rewriting the product. But this is the kind of thing that makes onboarding a nightmare. DeerFlow's middleware chain is how you actually make an agent loop extensible.
 

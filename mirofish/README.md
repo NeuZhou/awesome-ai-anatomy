@@ -21,6 +21,11 @@ What MiroFish does, in plain terms: you feed it a document (news article, policy
 
 ## Architecture
 
+![Architecture](architecture.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     subgraph Frontend["Frontend (Vue.js + Vite)"]
@@ -78,6 +83,8 @@ flowchart LR
     class ZepCloud accent
     class LLM warn
 ```
+
+</details>
 
 MiroFish's architecture breaks into three layers: the outermost is a Vue.js step-by-step wizard UI bundled with Vite, the middle layer is a Flask API, and the bottom layer is a chain of LLM calls.
 

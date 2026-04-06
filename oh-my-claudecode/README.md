@@ -24,6 +24,11 @@ The weird part: it also spawns Codex and Gemini CLI workers alongside Claude. So
 
 ## Architecture
 
+![Architecture](architecture.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart LR
     subgraph CC["Claude Code (Host)"]
@@ -68,6 +73,8 @@ flowchart LR
     class CODEX accent
     class GEMINI accent
 ```
+
+</details>
 
 ## File-Based IPC: The Most Interesting Design Decision
 
