@@ -1,0 +1,223 @@
+# oh-my-claudecode: 19 Agents, File-Based IPC, and a Very Ambitious Plugin
+
+> Someone took Claude Code and strapped a 19-agent team orchestration system on top of it. I read through 194K lines of TypeScript to figure out if it works.
+
+## At a Glance
+
+| Metric | Value |
+|--------|-------|
+| Stars | 24,423 |
+| Forks | 2,230 |
+| Language | TypeScript |
+| Lines of Code | ~194,000 |
+| License | MIT |
+| Creator | Yeachan Heo |
+| Install Method | Claude Code plugin OR npm package |
+
+oh-my-claudecode (OMC) isn't a standalone agent. It's a **plugin for Claude Code** that adds multi-agent orchestration on top. You install it inside Claude Code, and suddenly your single agent becomes a team of 19 specialized agents that coordinate through file-based messaging and tmux sessions.
+
+The weird part: it also spawns Codex and Gemini CLI workers alongside Claude. So you end up with a tri-model team where Claude is the lead, Codex handles code review, and Gemini handles UI work. All from inside Claude Code.
+
+---
+
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph CC["Claude Code (Host)"]
+        OMC["OMC Plugin Layer"]
+        OMC --> SKILL["Skill System\n(auto-inject)"]
+        OMC --> AGENTS["19 Agent Definitions\n(architect/designer/critic/...)"]
+        OMC --> ROUTER["Smart Model Router\n(Haiku→simple, Opus→complex)"]
+    end
+
+    subgraph TEAM["Team Orchestration"]
+        LEAD["Lead Agent"] --> PHASE["Phase Controller\n(plan→exec→verify→fix)"]
+        PHASE --> DISPATCH["Dispatch Queue\n(file-based, locked)"]
+        DISPATCH --> W1["Worker 1\n(tmux pane)"]
+        DISPATCH --> W2["Worker 2\n(tmux pane)"]
+        DISPATCH --> W3["Worker 3\n(tmux pane)"]
+        W1 --> INBOX["Inbox/Outbox\n(.omc/state/team/)"]
+        W2 --> INBOX
+        W3 --> INBOX
+        INBOX --> LEAD
+    end
+
+    subgraph MULTI["Multi-Model Workers"]
+        CLAUDE["claude CLI"]
+        CODEX["codex CLI"]
+        GEMINI["gemini CLI"]
+    end
+
+    W1 --> CLAUDE
+    W2 --> CODEX
+    W3 --> GEMINI
+
+    style OMC fill:#fff3e0,stroke:#e8590c
+    style TEAM fill:#e8f5e9,stroke:#2e7d32
+    style MULTI fill:#e3f2fd,stroke:#1565c0
+```
+
+## File-Based IPC: The Most Interesting Design Decision
+
+This is the thing that makes OMC architecturally unique. Instead of thread pools (DeerFlow) or in-process delegation (Hermes), OMC coordinates agents through the **filesystem**:
+
+```
+.omc/state/team/{team-name}/
+├── dispatch/
+│   ├── requests.json    ← task queue (mutex-locked via mkdir)
+│   └── .lock/           ← directory-based lock (O_EXCL mkdir)
+├── workers/
+│   ├── worker-0/
+│   │   ├── inbox.jsonl  ← messages TO this worker
+│   │   ├── outbox.jsonl ← messages FROM this worker
+│   │   └── heartbeat.json
+│   └── worker-1/
+│       └── ...
+├── tasks/
+│   ├── task-001.json
+│   └── task-002.json
+└── shutdown.signal      ← graceful shutdown
+```
+
+The locking mechanism is `mkdir`-based (O_EXCL flag) — creating a directory is atomic on all filesystems, so it works as a cross-process mutex without needing advisory file locks. Stale locks are detected and cleaned up after 5 minutes.
+
+```typescript
+// From dispatch-queue.ts
+const LOCK_STALE_MS = 5 * 60 * 1000;
+const DISPATCH_LOCK_INITIAL_POLL_MS = 25;
+const DISPATCH_LOCK_MAX_POLL_MS = 500;
+```
+
+Why filesystem instead of sockets or shared memory? Because OMC workers are **separate processes** — real Claude, Codex, and Gemini CLI instances running in tmux panes. They can't share memory. File-based IPC is the lowest-common-denominator that works across all three.
+
+I've used this pattern in distributed systems before (specifically, job queues with NFS-mounted directories). It works surprisingly well for low-throughput coordination. The failure mode is slow (polling + file I/O), not wrong.
+
+---
+
+## 19 Specialized Agents
+
+OMC defines 19 agent roles with model tier assignments:
+
+```mermaid
+flowchart LR
+    subgraph OPUS["Opus Tier (Complex Reasoning)"]
+        CR["code-reviewer"]
+    end
+    
+    subgraph SONNET["Sonnet Tier (Balanced)"]
+        AR["architect"]
+        DE["designer"]  
+        WR["writer"]
+        AN["analyst"]
+        EX["executor"]
+        PL["planner"]
+        QA["qa-tester"]
+        SC["scientist"]
+        DB["debugger"]
+        VR["verifier"]
+        TE["test-engineer"]
+        SR["security-reviewer"]
+        TR["tracer"]
+        EXP["explore"]
+    end
+
+    subgraph HAIKU["Haiku Tier (Fast/Cheap)"]
+        CT["critic"]
+        DS["doc-specialist"]
+    end
+
+    style OPUS fill:#ffebee
+    style SONNET fill:#fff3e0
+    style HAIKU fill:#e8f5e9
+```
+
+The model routing is the interesting part: simple tasks get Haiku (cheap), complex reasoning gets Opus (expensive), everything else gets Sonnet. The `critic` agent specifically uses Haiku because criticism doesn't need deep reasoning — it just needs to point out problems.
+
+Each agent's prompt is loaded from a Markdown file in `/agents/*.md`, which means you can customize agent behavior without touching code. Nice separation of prompt from logic.
+
+---
+
+## Team Pipeline: plan → exec → verify → fix
+
+Team mode runs as a staged pipeline with retry loops:
+
+```mermaid
+stateDiagram-v2
+    [*] --> planning
+    planning --> executing : tasks assigned
+    executing --> executing : some tasks complete, others queued
+    executing --> fixing : task failed, retries remaining
+    fixing --> executing : retry submitted
+    fixing --> failed : all retries exhausted
+    executing --> completed : all tasks done
+    completed --> [*]
+    failed --> [*]
+
+    note right of planning
+        team-plan → team-prd → assign
+    end note
+    note right of fixing
+        permanentlyFailed tasks tracked
+        via metadata.permanentlyFailed
+    end note
+```
+
+The phase controller infers the current phase from task status distribution — no explicit state machine transitions. It looks at how many tasks are pending/in_progress/completed/failed and figures out what phase the team is in. A subtle but important detail: tasks with `metadata.permanentlyFailed === true` have status `completed` but are counted as failed. This prevents the pipeline from reporting success when some tasks actually failed.
+
+---
+
+## The Verdict
+
+OMC is the most ambitious of the four projects I've torn down so far, and also the messiest. 194K lines of TypeScript for a Claude Code plugin is a lot. The 19-agent definitions are mostly thin wrappers around different system prompts — the real engineering is in the team coordination layer.
+
+The file-based IPC is the right call for cross-process coordination, and the mkdir-based locking is solid. But the codebase has that "grew faster than its architecture" feel — 125 TypeScript files just in the `team/` directory, with names like `skininthegamebros-guidance.ts` that suggest rapid iteration without cleanup.
+
+The multi-model angle (Claude + Codex + Gemini) is the real differentiator. None of the other frameworks I've looked at coordinate across model providers. Whether you actually need three different LLMs for a task is debatable, but having the option is interesting.
+
+What concerns me: this is a **plugin** that depends on Claude Code's internals. If Anthropic changes the plugin API or the Claude Code architecture, OMC breaks. There's no abstraction layer insulating OMC from upstream changes. At 24K stars this is a real risk — a lot of users depending on a project that could be rendered non-functional by a single Anthropic release.
+
+---
+
+## Cross-Project Comparison
+
+| Feature | oh-my-claudecode | DeerFlow | Hermes Agent | Claude Code |
+|---------|-----------------|----------|-------------|-------------|
+| Architecture | Plugin on Claude Code | Standalone (LangGraph) | Standalone (Python) | Standalone |
+| Agent count | 19 specialized | 1 lead + subagents | 1 lead + subagents | 1 |
+| Multi-model | ✅ Claude+Codex+Gemini | ❌ Single provider | ✅ Any provider | ❌ Claude only |
+| IPC mechanism | File-based (inbox/outbox) | Thread pool | In-process delegate | N/A |
+| Team pipeline | plan→exec→verify→fix | N/A | N/A | N/A |
+| Model routing | Haiku/Sonnet/Opus tiers | Config-based | Config-based | N/A |
+| Locking | mkdir-based (O_EXCL) | Per-path mutex | fcntl file lock | N/A |
+| Risk | Upstream dependency | Framework lock-in | Monolith | None |
+
+---
+
+## Stuff Worth Stealing
+
+**mkdir-based cross-process locking.** If you need to coordinate separate processes and can't use advisory locks (because NFS or Windows), `mkdir` with O_EXCL is atomic everywhere. OMC's implementation with stale lock detection and exponential backoff polling is production-ready.
+
+**Model tier routing.** Assigning Haiku to `critic` (cheap, fast) and Opus to `code-reviewer` (needs deep reasoning) is an obvious optimization that most frameworks don't bother with. The 30-50% token savings claim seems plausible.
+
+**Prompt-as-Markdown separation.** Loading agent prompts from `.md` files instead of hardcoding them in TypeScript means non-engineers can tune agent behavior. Good for teams where the prompt engineer isn't the same person as the developer.
+
+---
+
+<details>
+<summary>Verification Log</summary>
+
+| Claim | Method | Result |
+|-------|--------|--------|
+| 24,423 stars | GitHub API | ✅ |
+| 194K LOC | wc -l on src/**/*.ts | ✅ |
+| 19 agents | Counted in definitions.ts | ✅ |
+| 125 files in team/ | ls count | ✅ |
+| mkdir-based locking | dispatch-queue.ts source | ✅ |
+| File paths referenced | Verified exist in clone | ✅ |
+
+</details>
+
+---
+
+*Part of [awesome-ai-anatomy](https://github.com/NeuZhou/awesome-ai-anatomy) — source-level teardowns of how production AI systems actually work.*
