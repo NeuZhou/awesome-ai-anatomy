@@ -108,22 +108,6 @@ We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side anal
 
 ---
 
-## 🔧 Methodology
-
-Every teardown follows the same process:
-
-1. **Clone & measure** — `git clone`, `cloc`, GitHub API for stars/forks/license
-2. **Read the code** — Entry points first, then follow the call graph into core modules
-3. **AI-assisted analysis** — LLM agents help identify patterns, but every claim is human-verified
-4. **Cross-reference** — File paths and code snippets are checked against the actual repository
-5. **Verification log** — Each teardown includes a fact-check table at the bottom
-
-We use AI to accelerate the reading, not to replace it. The opinions, judgments, and architectural critiques are from engineering experience — not generated summaries.
-
-> **Transparency:** Some teardowns note "decompiled source" (e.g., Claude Code). We always disclose the data source.
-
----
-
 Video walkthroughs coming soon — follow [@NeuZhou](https://x.com/NeuZhou) on Twitter for updates.
 
 ---
