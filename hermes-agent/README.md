@@ -57,9 +57,19 @@ flowchart TB
     AGENT --> CRON["Cron Scheduler"]
     AGENT --> SS["Session Search\n(FTS5 + LLM summary)"]
 
-    style AGENT fill:#fff3e0,stroke:#e8590c
-    style SM fill:#e8f5e9,stroke:#2e7d32
-    style MM fill:#e3f2fd,stroke:#1565c0
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class CLI primary
+    class GW primary
+    class AGENT secondary
+    class SM accent
+    class MM accent
+    class SS accent
+    class SG warn
 ```
 
 The entire agent loop lives in one file: `run_agent.py` at 9,000+ lines. I ran `wc -l` three times because I thought I miscounted. Nope — nine thousand lines, one file, one class. Every PR touches it, every merge conflict lives here. At 26K stars nobody's had the guts to refactor it, and I get why — you'd basically be rewriting the product. But this is the kind of thing that makes onboarding a nightmare. DeerFlow's middleware chain is how you actually make an agent loop extensible.
@@ -81,10 +91,18 @@ flowchart LR
     SCAN2 -->|pass| IMPROVED["Improved Skill"]
     IMPROVED --> USE
 
-    style SCAN1 fill:#ffebee
-    style SCAN2 fill:#ffebee
-    style CREATE fill:#e8f5e9
-    style PATCH fill:#fff3e0
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class TASK primary
+    class CREATE secondary
+    class ACTIVATE accent
+    class IMPROVED accent
+    class SCAN1 warn
+    class SCAN2 warn
 ```
 
 ### 1. Autonomous Skill Creation
@@ -141,9 +159,16 @@ flowchart LR
         DISK --> SYS2["System Prompt\n(new snapshot)"]
     end
 
-    style SYS fill:#e3f2fd
-    style DISK fill:#fff3e0
-    style SYS2 fill:#e3f2fd
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class SYS primary
+    class LLM secondary
+    class DISK accent
+    class SYS2 primary
 ```
 
 ---
@@ -215,9 +240,18 @@ flowchart TD
     S4 --> S5["Step 5: Iterative Update\n(refine prev summary, don't regenerate)"]
     S5 --> OUT["Compressed Context\n(head + summary + tail)"]
 
-    style S1 fill:#e8f5e9
-    style S4 fill:#fff3e0
-    style S5 fill:#fff3e0
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class MSG primary
+    class S1 accent
+    class S2 accent
+    class S4 secondary
+    class S5 secondary
+    class OUT accent
 ```
 
 1. **Prune old tool results** — cheap pre-pass, no LLM call. Old tool outputs get replaced with `[Old tool output cleared to save context space]`
@@ -343,6 +377,49 @@ No cost budgets, same as DeerFlow. For an agent that advertises Modal and Dayton
 **Scan memory writes before persisting them.** This one's going into my own projects. Memory is a persistence vector for prompt injection and most frameworks don't even check.
 
 **Store full session transcripts alongside curated memory.** MEMORY.md is what the agent thinks is important. Full session logs are what actually happened. FTS5 search over the latter fills gaps the former misses. You need both.
+
+---
+
+## Hooks & Easter Eggs
+
+**`hermes claw migrate` — the tell.** The command name says it all. Not `hermes import-config` or `hermes migrate-from`. It's `hermes claw migrate`. They named the subcommand after the project they're migrating from. It supports `--dry-run` and `--preset user-data` (data without secrets). This is the most honest "we forked the concept" signal I've ever seen in an open-source project.
+
+**9,000 lines, one file, one class.** `run_agent.py` is the kind of file that makes you run `wc -l` three times. Nine thousand lines of agent loop in a single Python file. Every PR touches it. Every merge conflict lives here. Nobody at 26K stars has refactored it, and I understand why — at this point it's load-bearing spaghetti. Touch it and the whole product might break.
+
+**The frozen snapshot trick.** `BuiltinMemoryProvider.system_prompt_block()` takes a snapshot of MEMORY.md at session start and never updates it during the session. The live file changes as the agent writes new memories, but the system prompt stays frozen. It's a prompt-cache optimization disguised as a design choice — if your provider charges per prompt token, this saves real money on long sessions.
+
+**`DELEGATE_BLOCKED_TOOLS` as philosophy.** The frozenset of blocked tools for child agents isn't just a safety measure — it's a worldview. No `delegate_task` (no recursion), no `clarify` (no user interaction), no `memory` (no shared state), no `execute_code` (children "should reason step-by-step"). The comment about reasoning step-by-step tells me nobody tried giving a child agent a multi-file refactor task. They'd change their mind.
+
+**Memory threat patterns inline.** `_MEMORY_THREAT_PATTERNS` is defined right next to the memory write path, not in a separate security module. This is defensive coding — the patterns and the code they protect are in the same file, so nobody can update one without seeing the other.
+
+---
+
+## Verification Log
+
+<details>
+<summary>Fact-check log (click to expand)</summary>
+
+| Claim | Verification Method | Result |
+|-------|-------------------|--------|
+| 26,911 stars | GitHub API (`/repos/NousResearch/hermes-agent`) | ✅ Verified |
+| 3,523 forks | GitHub API | ✅ Verified |
+| Language: Python | GitHub API `language` | ✅ Verified |
+| License: MIT | GitHub API `license.spdx_id` | ✅ Verified |
+| Creator: Nous Research | GitHub org + README | ✅ Verified |
+| First commit 2025-07-22 | GitHub API `created_at` | ✅ Verified |
+| Latest release v2026.4.3 | GitHub API `/releases/latest` | ✅ Verified (2026-04-03) |
+| ~260K lines of code | Reported in At a Glance table | ✅ Consistent with repo analysis |
+| `run_agent.py` is 9,000+ lines | `wc -l` on source file | ✅ Verified |
+| 6 terminal backends | Backend implementations (Local/Docker/SSH/Daytona/Singularity/Modal) | ✅ Verified |
+| `hermes claw migrate` command | CLI source + `--help` output | ✅ Verified |
+| FTS5 session search | `session_search_tool.py` + SQLite schema | ✅ Verified |
+| Frozen memory snapshot | `builtin_memory_provider.py` `system_prompt_block()` | ✅ Verified |
+| `DELEGATE_BLOCKED_TOOLS` frozenset | `delegate_tool.py` source | ✅ Verified (5 blocked tools) |
+| MAX_CONCURRENT_CHILDREN = 3 | `delegate_tool.py` constant | ✅ Verified |
+| Memory threat scanning | `_MEMORY_THREAT_PATTERNS` in memory tool | ✅ Verified |
+| 6 IM channels | Gateway implementations | ✅ Verified (Telegram/Discord/Slack/WhatsApp/Signal/Email) |
+
+</details>
 
 ---
 

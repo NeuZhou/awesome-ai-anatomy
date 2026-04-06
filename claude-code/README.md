@@ -40,8 +40,11 @@
 - [Stuff Worth Stealing](#stuff-worth-stealing)
 - [Limitations & Potential Issues](#limitations--potential-issues)
 - [Comparison with Alternatives](#comparison-with-alternatives)
+- [Cross-Project Comparison](#cross-project-comparison)
 - [Key Takeaways](#key-takeaways)
+- [Hooks & Easter Eggs](#hooks--easter-eggs)
 - [How the Source Became Public](#how-the-source-became-public)
+- [Verification Log](#verification-log)
 
 ---
 
@@ -84,9 +87,18 @@ graph TB
         L3 --> L4["L4: Autocompact<br/>Full compression"]
     end
 
-    style Core fill:#1a1a2e,stroke:#e94560,color:#fff
-    style Context fill:#16213e,stroke:#0f3460,color:#fff
-    style Tools fill:#0f3460,stroke:#533483,color:#fff
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class CLI primary
+    class Loop secondary
+    class Pre secondary
+    class Exec accent
+    class Bash accent
+    class MCP accent
 ```
 
 ---
@@ -141,10 +153,17 @@ graph LR
     L2 -->|"still too long"| L3["L3: CONTEXT_COLLAPSE<br/>📦 Structured archival<br/>Git-commit-log style summaries"]
     L3 -->|"still too long"| L4["L4: Autocompact<br/>💣 Full compression<br/>Last resort, brute force"]
 
-    style L1 fill:#2ecc71,color:#fff
-    style L2 fill:#3498db,color:#fff
-    style L3 fill:#f39c12,color:#fff
-    style L4 fill:#e74c3c,color:#fff
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class Start primary
+    class L1 accent
+    class L2 accent
+    class L3 warn
+    class L4 warn
 ```
 
 **The design principle:** Lossless before lossy. Local before global.
@@ -271,10 +290,18 @@ graph TD
     W1 -.-|"❌ Cannot spawn sub-workers"| X1["No TeamCreate"]
     W2 -.-|"❌ No infinite nesting"| X2["No TeamCreate"]
 
-    style Main fill:#e94560,color:#fff
-    style W1 fill:#533483,color:#fff
-    style W2 fill:#533483,color:#fff
-    style W3 fill:#533483,color:#fff
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class Main primary
+    class W1 secondary
+    class W2 secondary
+    class W3 secondary
+    class X1 warn
+    class X2 warn
 ```
 
 Workers cannot create sub-workers - prevents resource explosion. Three backends: tmux panes, in-process, remote.
@@ -337,6 +364,26 @@ For coding tasks, **continuity matters more than retrieval**. You need coherent 
 
 ---
 
+## Cross-Project Comparison
+
+| Feature | Claude Code | DeerFlow 2.0 | Goose | OpenClaw |
+|---------|-------------|-------------|-------|----------|
+| Language | TypeScript | Python + TS | Rust | TypeScript |
+| LOC | ~510K | ~180K | ~200K | ~50K (est.) |
+| Agent Loop | Single 1,729-line file | LangGraph + 14 middlewares | Extension-based | Event-driven |
+| Context Management | 4-layer cascade (surgical) | Summarization middleware | Auto-compact (80%) | Configurable compaction |
+| Tool Architecture | `buildTool()` functional (40+) | LangGraph tools | MCP-native extensions | MCP + Skills |
+| Sub-agents | Workers (flat, no nesting) | ThreadPool (depth 1) | subagent_handler | Configurable |
+| Provider Lock-in | Anthropic only | Any (via LangGraph) | None (30+ providers) | Any (via config) |
+| Feature Flags | Compile-time (Bun) + runtime (GrowthBook) | Runtime only | Cargo features | Runtime config |
+| Terminal UI | React + Ink | No (web UI) | Electron desktop | Terminal + web |
+| Security Model | Sandbox + allowlist | Advisory only | 5-inspector pipeline | Command approval |
+| License | Proprietary | MIT | Apache-2.0 | MIT |
+
+Claude Code is the most complex and most opinionated of the four — it controls the full stack from UI to API calls. The trade-off is Anthropic lock-in and a proprietary license. DeerFlow offers the most middleware extensibility, Goose the broadest provider support, and OpenClaw the lightest footprint.
+
+---
+
 ## Stuff Worth Stealing
 
 ### 1. The 4-Layer Context Cascade
@@ -390,6 +437,20 @@ Each tool is a plain object with schema, permissions, execution, UI rendering, a
 
 ---
 
+## Hooks & Easter Eggs
+
+**18 virtual pet species with hex-encoded names.** The `Buddy` system hides species names behind `String.fromCharCode()` calls — duck, goose, blob, cat, dragon, octopus, owl, penguin, turtle, snail, ghost, axolotl, capybara, cactus, robot, rabbit, mushroom, chonk. One collides with an internal model codename canary. RPG stats (DEBUGGING, PATIENCE, CHAOS, WISDOM, SNARK), 5 rarity tiers, 1% shiny variants, and hats. All this in a coding agent.
+
+**KAIROS autonomous mode.** Buried in the feature flags is a mode called KAIROS that enables fully autonomous operation — the agent runs without human approval for tool calls. The name isn't random: Kairos (καιρός) is the Greek concept of "the right moment." Someone on the team has a classics background.
+
+**Anti-distillation fake tools.** The source contains tool definitions that don't actually do anything — they exist to poison training data if a competitor tries to distill Claude Code's behavior by recording its tool calls. If you see a tool call to something that sounds plausible but isn't in the official documentation, it might be a canary.
+
+**The `tengu_` prefix.** Every runtime feature gate is prefixed `tengu_` — Japanese for a supernatural creature (天狗, heavenly dog). It's the internal codename for the Claude Code project. You'll find it in every `checkStatsigFeatureGate` call.
+
+**`ABLATION_BASELINE` mode.** A compile-time flag that disables thinking, compaction, auto-memory, and background tasks simultaneously. This isn't a debug tool — it's a research methodology. They can quantify exactly what each feature contributes by measuring performance with it stripped out. Research lab building a product, not a product company doing research.
+
+---
+
 ## How the Source Became Public
 
 npm publish included `.map` files → `.map` referenced a source zip on Cloudflare R2 → R2 URL had no access control. That's it.
@@ -412,6 +473,32 @@ npm publish included `.map` files → `.map` referenced a source zip on Cloudfla
 - 🔬 Comparison with alternatives
 
 **Next up:** ByteDance DeerFlow, LangChain, Dify
+
+---
+
+## Verification Log
+
+<details>
+<summary>Fact-check log (click to expand)</summary>
+
+| Claim | Verification Method | Result |
+|-------|-------------------|--------|
+| 109,558 stars | GitHub API (`/repos/anthropics/claude-code`) | ✅ Verified |
+| 18,175 forks | GitHub API | ✅ Verified |
+| ~510K lines of TypeScript | Reported in source analysis (1,903 files) | ✅ Consistent with source map analysis |
+| Language: TypeScript | Source map contents + npm package | ✅ Verified (GitHub shows Shell for wrapper scripts) |
+| License: Proprietary | No OSS license file; Anthropic terms of service | ✅ Verified |
+| First commit 2025-02-22 | GitHub API `created_at` | ✅ Verified |
+| Latest release v2.1.92 | GitHub API `/releases/latest` | ✅ Verified (2026-04-04) |
+| `query.ts` is 1,729 lines | Source map analysis | ✅ Reported across multiple independent analyses |
+| 40+ tools | `buildTool()` instances in source | ✅ Consistent with source analysis |
+| 18 virtual pet species | Buddy system in source map | ✅ Verified (duck through chonk) |
+| 4-layer context management | Source analysis (HISTORY_SNIP, Microcompact, CONTEXT_COLLAPSE, Autocompact) | ✅ Verified |
+| Bun runtime | `package.json` + source map | ✅ Verified |
+| React + Ink TUI | Dependencies in source map | ✅ Verified |
+| Feature flags: `tengu_` prefix | Runtime gate calls in source | ✅ Verified |
+
+</details>
 
 ---
 

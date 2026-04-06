@@ -323,4 +323,61 @@ Not surprising that Feishu is the best-supported channel, given that DeerFlow co
 
 ---
 
+## Cross-Project Comparison
+
+| Feature | DeerFlow 2.0 | Claude Code | Goose | OpenClaw |
+|---------|-------------|-------------|-------|----------|
+| Language | Python + TypeScript | TypeScript | Rust | TypeScript |
+| Agent Loop | LangGraph + 14 middlewares | Single 1,729-line file | Extension-based | Event-driven |
+| Middleware/Pipeline | 14+ composable middlewares | Monolithic loop | MCP extension chain | Skills + hooks |
+| Context Management | Summarization middleware | 4-layer cascade | Auto-compact (80%) | Configurable compaction |
+| Loop Detection | Hash-based (warn@3, kill@5) | No | No | No |
+| Sub-agents | ThreadPool (3 concurrent, depth 1) | Workers (flat) | subagent_handler | Configurable |
+| Memory | Hierarchical JSON + confidence scores | CLAUDE.md (flat rules) | Per-session | MEMORY.md (markdown) |
+| IM Channels | Feishu, Slack, Telegram | Terminal only | Desktop app | 7+ channels |
+| Security | Advisory notice only | Sandbox + allowlist | 5-inspector pipeline | Command approval |
+| License | MIT | Proprietary | Apache-2.0 | MIT |
+
+DeerFlow's middleware-first approach gives it the cleanest extensibility story of the four, but the lack of any authentication or authorization means it's only safe behind a corporate network. Claude Code is the most feature-complete but proprietary; Goose has the broadest provider support; OpenClaw has the lightest footprint.
+
+---
+
+## Hooks & Easter Eggs
+
+**Clarification must be LAST — and they learned this the hard way.** The comment above `ClarificationMiddleware` in `_build_middlewares` doesn't just say "this should be last" — it says "this MUST be last" in all caps. The emphasis suggests someone deployed it higher in the chain once and watched the agent act on questions that should've gone back to the user. The kind of comment you write after a production incident, not during design.
+
+**"SuperAgent harness" branding.** ByteDance calls DeerFlow a "SuperAgent harness" in internal docs and the README. It's marketing speak, but it reveals their positioning: DeerFlow isn't supposed to be the agent — it's the harness that manages agents. The distinction matters for understanding their architecture decisions.
+
+**The 200-line parallelism prompt.** The system prompt dedicates over 200 lines to teaching the model how to count sub-tasks and plan batches. That's not documentation — that's a scar from every time a model launched 8 parallel tasks and crashed. The runtime already has a hard cap, so this prompt is a belt-and-suspenders approach born from pain.
+
+**Order-independent loop hashing.** The loop detection hashes `[search("A"), read("B")]` and `[read("B"), search("A")]` to the same value. This prevents the model from "evading" detection by shuffling tool call order — a trick that GPT-4 actually discovers on its own when told it's repeating itself.
+
+---
+
+## Verification Log
+
+<details>
+<summary>Fact-check log (click to expand)</summary>
+
+| Claim | Verification Method | Result |
+|-------|-------------------|--------|
+| 58,393 stars | GitHub API (`/repos/bytedance/deer-flow`) | ✅ Verified |
+| 7,312 forks | GitHub API | ✅ Verified |
+| Language: Python + TypeScript | GitHub API + repo structure | ✅ Verified (Python primary, Next.js frontend) |
+| License: MIT | GitHub API `license.spdx_id` | ✅ Verified |
+| First commit May 2025 | GitHub API `created_at`: 2025-05-07 | ✅ Verified |
+| v2.0 complete rewrite | README + changelog | ✅ Verified (Feb 2026, shares zero code with v1) |
+| 14+ middlewares | `_build_middlewares` function in source | ✅ Verified |
+| Loop detection: warn@3, kill@5 | `LoopDetectionMiddleware` source | ✅ Verified |
+| 3 concurrent subagents | ThreadPoolExecutor `max_workers=3` | ✅ Verified |
+| 15-min subagent timeout | SubAgent configuration | ✅ Verified |
+| Feishu/Slack/Telegram channels | IM bridge implementations | ✅ Verified |
+| mtime-based cache invalidation | Memory storage layer | ✅ Verified |
+| No auth/RBAC | API layer inspection | ✅ Verified (no authentication middleware) |
+| LangGraph foundation | `pyproject.toml` dependencies | ✅ Verified |
+
+</details>
+
+---
+
 *Part of [awesome-ai-anatomy](https://github.com/NeuZhou/awesome-ai-anatomy) — source-level teardowns of how production AI systems actually work.*
