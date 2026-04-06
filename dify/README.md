@@ -73,7 +73,7 @@ What surprised me is the `graphon` library. Dify recently extracted its core gra
 
 Dify's core innovation is making the entire AI application lifecycle visual and multi-tenant. Most agent frameworks give you Python code and a CLI. Dify gives you a browser-based canvas where non-engineers can build workflows, and an admin panel where teams can manage model API keys, monitor token usage, and publish apps — all behind authentication and tenant isolation.
 
-The second thing worth noting is the **graph engine extraction**. The workflow runtime lives in `graphon`, a standalone package. The engine supports layers — middleware that wraps node execution:
+The second important piece is the **graph engine extraction**. The workflow runtime lives in `graphon`, a standalone package. The engine supports layers — middleware that wraps node execution:
 
 ```python
 # From api/core/workflow/workflow_entry.py

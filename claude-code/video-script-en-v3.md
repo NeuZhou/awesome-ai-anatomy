@@ -18,13 +18,13 @@ Let me break it down in three levels.
 
 Level 1: Smart, but you could probably guess.
 
-The terminal UI is built with React. Yes, React — in a CLI tool. They use a framework called Ink that renders React components to the terminal. Sounds crazy until you think about what Claude Code's UI actually needs to handle: multiple agents running in parallel, streaming outputs, user interrupts, permission dialogs. That's genuinely complex state management. React's declarative model is arguably the least bad option here.
+The terminal UI is built with React. Yes, React — in a CLI tool. They use a framework called Ink that renders React components to the terminal. Sounds crazy until you think about what Claude Code's UI actually needs to handle: multiple agents running in parallel, streaming outputs, user interrupts, permission dialogs. That's complex state management. React's declarative model is arguably the least bad option here.
 
 The core agent loop is a single while-true loop in one file — query.ts, 1,729 lines. Preprocess context, call the API, detect tool calls in the stream, execute them, append results, loop back. Simple in concept.
 
 But the devil is in Level 2.
 
-Level 2: The stuff that genuinely surprised me.
+Level 2: The stuff that surprised me.
 
 Context management. When conversations get long, most AI tools just truncate — chop off the oldest messages. Claude Code doesn't. It has four layers of compression, each more aggressive than the last.
 

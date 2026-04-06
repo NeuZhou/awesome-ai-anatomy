@@ -16,7 +16,7 @@ Yes, React. In a CLI tool. They use a framework called Ink that renders React co
 
 Sounds like over-engineering? Maybe. But when you have multiple agents running in parallel, streaming outputs, users interrupting at any moment — React's state model actually makes sense here.
 
-Second discovery — and this is the most elegant part: the entire agent is basically one while-true loop.
+Second discovery — and this is the cleanest part: the entire agent is basically one while-true loop.
 
 One file. query.ts. 1,729 lines. The logic: preprocess context, call Claude API with streaming, detect tool calls in the stream, execute them, append results, loop back. If no tool calls, exit.
 

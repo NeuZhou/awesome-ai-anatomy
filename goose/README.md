@@ -183,7 +183,7 @@ sequenceDiagram
 
 The reply loop inside `reply_internal` is the heart of the system. It's a `loop` (not a `for`) with a configurable maximum turns counter (default 1000, which is generous). Each iteration: build the prompt, call the provider, parse the response, categorize tool calls into frontend/backend, run them through the inspection pipeline, execute approved ones in parallel, wait for user approval on flagged ones, collect results, append to conversation, and loop.
 
-Three things worth noting:
+Three things stand out:
 
 **Compaction happens eagerly.** Before the loop even starts, the agent checks if the conversation exceeds a configurable threshold (default 80% of context window). If it does, it summarizes the history using the LLM and replaces the conversation. This is smarter than Claude Code's approach of waiting until the provider returns a context-length error — though Goose handles that fallback too with a recovery compaction path inside the loop.
 

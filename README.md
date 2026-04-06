@@ -19,10 +19,10 @@ Most "awesome" lists link to repos. We **dissect** them — architecture diagram
 ## 📋 Table of Contents
 
 - [Project Index](#-project-index)
-- [横向对比 / Cross-Project Comparison](#-横向对比--cross-project-comparison)
+- [Cross-Project Comparison](#-cross-project-comparison)
 - [What Makes This Different](#-what-makes-this-different)
 - [Each Teardown Includes](#-each-teardown-includes)
-- [Video Series](#-video-series)
+- [Coming Next](#️-coming-next)
 - [Contributing](#-contributing)
 - [Stay Updated](#-stay-updated)
 
@@ -47,7 +47,7 @@ Most "awesome" lists link to repos. We **dissect** them — architecture diagram
 
 ---
 
-## 🆚 横向对比 / Cross-Project Comparison
+## 🆚 Cross-Project Comparison
 
 We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 10 projects:
 
@@ -79,24 +79,24 @@ We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side anal
 
 ```
 📄 README.md          — Full architecture analysis + design decisions
-📊 *.mmd              — Mermaid diagram source files
-🎬 video-script-*.md  — Video scripts (Chinese + English)
-🖼️ slides-guide.md    — Slide deck content guide
+📊 *.mmd              — Mermaid diagram source files (select teardowns)
+🎬 video-script-*.md  — Video scripts (select teardowns)
+🖼️ slides-guide.md    — Slide deck content guide (select teardowns)
 ⚠️ Problems found     — Bugs, code smells, architectural risks
 🆚 Comparisons        — How it stacks up against alternatives
 ```
 
 ---
 
-## 🎬 Video Series
+Video walkthroughs coming soon — follow [@NeuZhou](https://x.com/NeuZhou) on Twitter for updates.
 
-Watch the video versions:
+---
 
-| Platform | Language | Link |
-|----------|----------|------|
-| **B站** | 🇨🇳 Chinese | [Agent零号](https://www.bilibili.com/) |
-| **YouTube** | 🇺🇸 English | Coming soon |
-| **头条** | 🇨🇳 Chinese | [Agent0](https://www.toutiao.com/) |
+## 🗓️ Coming Next
+
+- [ ] Cursor — the most controversial AI IDE
+- [ ] everything-claude-code (141K ⭐) — optimizing the harness
+- [ ] agency-agents (72K ⭐) — the agent swarm
 
 ---
 
@@ -115,8 +115,11 @@ Found an error? Have a better analysis? PRs welcome!
 
 This repo is updated daily. **Star ⭐ and Watch 👁️ to follow along.**
 
+- 🐦 Twitter: [@NeuZhou](https://x.com/NeuZhou)
+- 💬 Discord: [Join the community](https://discord.gg/kAQD7Cj8)
+
 ---
 
 <p align="center">
-  <i>Built by <a href="https://github.com/NeuZhou">Agent零号</a> — daily AI architecture insights from a senior engineer's perspective.</i>
+  <i>Daily AI architecture insights from a senior engineer's perspective.</i>
 </p>

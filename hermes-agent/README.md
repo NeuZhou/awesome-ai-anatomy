@@ -1,6 +1,6 @@
 # Hermes Agent: OpenClaw's Python Twin With a Learning Loop Bolted On
 
-> Someone on HN called Hermes "the OpenClaw killer." I went and read the source code. Turns out it's less "killer" and more "Python rewrite with some genuinely good additions."
+> Someone on HN called Hermes "the OpenClaw killer." I went and read the source code. Turns out it's less "killer" and more "Python rewrite with some good additions."
 
 > **TL;DR:** Hermes Agent is OpenClaw rewritten in Python with three additions worth caring about: skills that auto-create and self-improve from experience, FTS5 session search for cross-session recall, and frozen memory snapshots that preserve your prompt cache. It also ships a `hermes claw migrate` command, which tells you everything about where the code came from.
 

@@ -27,14 +27,14 @@ flowchart TB
         UC["guard = Guard()\nguard.use(MyValidator)\nguard(llm_api, messages=...)"]
     end
 
-    subgraph GuardClass["Guard (guard.py — 578 lines)"]
+    subgraph GuardClass["Guard (guard.py — 1,076 lines)"]
         Init["__init__\nvalidators, output_schema,\napi_client, exec_opts"]
         Call["__call__ / parse / validate"]
         Execute["_execute\n→ fill_validator_map\n→ fill_validators\n→ contextvars.Context.run"]
         Exec["_exec\n→ Runner or StreamRunner"]
     end
 
-    subgraph RunnerLayer["Runner (run/runner.py — 394 lines)"]
+    subgraph RunnerLayer["Runner (run/runner.py — 457 lines)"]
         Step["step()\n1. prepare → 2. call LLM → 3. parse → 4. validate → 5. introspect"]
         ReaskLoop["Reask Loop\ndo_loop() → prepare_to_loop()\nmax num_reasks iterations"]
     end
@@ -213,7 +213,7 @@ The validation traversal is a depth-first search. For a nested JSON object, it v
 
 The `perform_correction` method in `ValidatorServiceBase` is a straightforward switch statement over the 8 `OnFailAction` variants. The `CUSTOM` option lets you pass a lambda that receives the value and the `FailResult`, which is the escape hatch for anything the built-in actions don't cover.
 
-One thing worth noting: validators run sequentially within a single property path. If you have three validators on the same field, they execute in order, and each one receives the (possibly corrected) output of the previous one. This is a pipeline, not a set of independent checks.
+One thing to note: validators run sequentially within a single property path. If you have three validators on the same field, they execute in order, and each one receives the (possibly corrected) output of the previous one. This is a pipeline, not a set of independent checks.
 
 ### The RAIL XML Spec
 

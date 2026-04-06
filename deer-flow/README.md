@@ -109,7 +109,7 @@ Three ordering constraints matter:
 
 These constraints are documented as code comments next to the `_build_middlewares` function. That's fine for now, but I've worked on systems where the middleware dependency graph got complex enough that we needed a topological sort to wire them up. With 14+ middlewares, they're getting close to that threshold.
 
-One thing I genuinely liked: each middleware handles exactly one concern. `LoopDetectionMiddleware` doesn't also try to do rate limiting. `SandboxMiddleware` doesn't try to also manage thread state. Clean separation. I've seen too many agent codebases where one giant `process_message()` function handles everything.
+One thing I liked: each middleware handles exactly one concern. `LoopDetectionMiddleware` doesn't also try to do rate limiting. `SandboxMiddleware` doesn't try to also manage thread state. Clean separation. I've seen too many agent codebases where one giant `process_message()` function handles everything.
 
 ---
 
@@ -317,7 +317,7 @@ Not surprising that Feishu is the best-supported channel, given that DeerFlow co
 
 ## Lessons Worth Stealing
 
-**If you're building an agent system, invest in a middleware chain.** It's the highest-leverage architectural decision you'll make. Every cross-cutting concern — logging, error handling, cost tracking, safety — becomes a composable, testable, removable unit. DeerFlow has 14+ of them and the codebase is remarkably clean because of it.
+**If you're building an agent system, invest in a middleware chain.** It's the highest-leverage architectural decision you'll make. Every cross-cutting concern — logging, error handling, cost tracking, safety — becomes a composable, testable, removable unit. DeerFlow has 14+ of them and the codebase is clean because of it.
 
 **Build loop detection before you need it.** Not after your agent burns through your API budget at 2am on a Saturday. DeerFlow's approach (hash tool calls, sliding window, escalating intervention) is simple enough to implement in an afternoon and will save you real money.
 

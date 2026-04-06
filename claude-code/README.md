@@ -1,7 +1,7 @@
-# 🔬 Claude Code — Architecture Anatomy
+# 🔬 Claude Code - Architecture Anatomy
 
 > **The most advanced AI coding agent in production, dissected.**
-> 510,000 lines of TypeScript. 1,903 files. The complete architecture of how Anthropic built an AI that codes autonomously — revealed through an accidental npm source map leak.
+> 510,000 lines of TypeScript. 1,903 files. The complete architecture of how Anthropic built an AI that codes autonomously - revealed through an accidental npm source map leak.
 
 > **Who is this for:** Engineers building AI agents, coding tools, or anyone curious about how a top-tier AI product is architected in production.
 
@@ -10,20 +10,30 @@
 
 > 📌 This analysis tracks Claude Code's evolution. **Star to get updates** as new versions are analyzed.
 
+## At a Glance
+
+| Metric | Value |
+|--------|-------|
+| Stars | N/A (leaked source, not an open-source release) |
+| Language | TypeScript |
+| Lines of Code | ~510K (1,903 files) |
+| Framework | Bun, React/Ink, Zod v4 |
+| License | Proprietary (Anthropic) |
+
 ---
 
 ## Table of Contents
 
 - [Architecture Overview](#architecture-overview)
-- [Tech Stack — Why These Choices](#tech-stack--why-these-choices)
+- [Tech Stack - Why These Choices](#tech-stack--why-these-choices)
 - [The Brain: Agentic Loop](#the-brain-agentic-loop)
-- [Context Management — 4 Surgical Layers](#context-management--4-surgical-layers)
+- [Context Management - 4 Surgical Layers](#context-management--4-surgical-layers)
 - [Streaming Tool Execution](#streaming-tool-execution--why-claude-code-feels-fast)
-- [Tool System — 40+ Tools, Zero Inheritance](#tool-system--40-tools-zero-inheritance)
-- [Feature Flags — Compile-time + Runtime](#feature-flags--the-most-elegant-engineering)
+- [Tool System - 40+ Tools, Zero Inheritance](#tool-system--40-tools-zero-inheritance)
+- [Feature Flags - Compile-time + Runtime](#feature-flags--the-best-engineering)
 - [Multi-Agent Coordination](#multi-agent-coordination)
 - [Unreleased Features](#unreleased-features-found-in-the-code)
-- [Design Decisions — The "Why" Analysis](#design-decisions--the-why-analysis)
+- [Design Decisions - The "Why" Analysis](#design-decisions--the-why-analysis)
 - [Limitations & Potential Issues](#limitations--potential-issues)
 - [Comparison with Alternatives](#comparison-with-alternatives)
 - [Key Takeaways](#key-takeaways)
@@ -46,7 +56,7 @@ graph TB
         SM --> Mem["Memory (.claude/)"]
     end
 
-    subgraph Core["⚡ Agentic Core (query.ts — 1,729 lines)"]
+    subgraph Core["⚡ Agentic Core (query.ts - 1,729 lines)"]
         SM --> Loop["while(true)"]
         Loop --> Pre["Preprocess<br/>(4-layer context mgmt)"]
         Pre --> API["Claude API<br/>(streaming SSE)"]
@@ -77,14 +87,14 @@ graph TB
 
 ---
 
-## Tech Stack — Why These Choices
+## Tech Stack - Why These Choices
 
 | Choice | What | Why (not obvious) |
 |--------|------|-------------------|
-| **Bun** | Runtime | 4-5x faster cold start than Node. But the real reason: compile-time macros for feature flags. `feature()` calls become dead code elimination — unreleased features physically don't exist in the binary. |
-| **React + Ink** | Terminal UI | Not for aesthetics — for state management. Multiple parallel agents, streaming outputs, user interrupts, permission dialogs. React's declarative model handles this complexity better than imperative TUI libs. |
+| **Bun** | Runtime | 4-5x faster cold start than Node. But the real reason: compile-time macros for feature flags. `feature()` calls become dead code elimination - unreleased features physically don't exist in the binary. |
+| **React + Ink** | Terminal UI | Not for aesthetics - for state management. Multiple parallel agents, streaming outputs, user interrupts, permission dialogs. React's declarative model handles this complexity better than imperative TUI libs. |
 | **TypeScript** | Language | Strict types + Zod v4 for runtime schema validation. Every tool input is validated before execution. |
-| **No class inheritance** | Architecture | 40+ tools, all pure functions via `buildTool()`. Composition over inheritance. Each tool is self-contained: schema, permissions, execution, UI rendering, context summary — all in one file. |
+| **No class inheritance** | Architecture | 40+ tools, all pure functions via `buildTool()`. Composition over inheritance. Each tool is self-contained: schema, permissions, execution, UI rendering, context summary - all in one file. |
 
 **The trade-off nobody talks about:** Bun's npm compatibility is ~99%, but that 1% means occasional native addon issues. Ink is essentially a one-person project (Vadim Demedes) with declining commit frequency. Anthropic likely maintains an internal fork.
 
@@ -116,7 +126,7 @@ If I were leading the next architecture review, I'd split it into three modules:
 
 ---
 
-## Context Management — 4 Surgical Layers
+## Core Innovation: Context Management - 4 Surgical Layers
 
 This is the most sophisticated part of the codebase. Most agents use a single "summarize and truncate" approach. Claude Code uses four mechanisms, applied in cascade:
 
@@ -135,15 +145,15 @@ graph LR
 
 **The design principle:** Lossless before lossy. Local before global.
 
-Layer 1 only removes irrelevant messages — zero information distortion. Layer 2 hides tokens at the cache level without modifying content. Layer 3 starts compressing but preserves structure. Layer 4 is the nuclear option.
+Layer 1 only removes irrelevant messages - zero information distortion. Layer 2 hides tokens at the cache level without modifying content. Layer 3 starts compressing but preserves structure. Layer 4 is the nuclear option.
 
 **What I'd add:** An attention-weighted importance scoring layer between L1 and L2. Current HISTORY_SNIP likely uses time-based heuristics (delete oldest). But a 20-turn-old message containing "never use framework X" is more important than a 2-turn-old "file saved successfully." Importance signals: reference frequency in later turns, explicit user constraints, tool results containing file paths or configs.
 
-**The hidden problem:** Compression is irreversible and unauditable. After L3/L4, the model doesn't know what it forgot. It can't say "I may have lost context on this" — it just confidently answers based on incomplete information. This is worse than forgetting; it's not knowing that you forgot.
+**The hidden problem:** Compression is irreversible and unauditable. After L3/L4, the model doesn't know what it forgot. It can't say "I may have lost context on this" - it just confidently answers based on incomplete information. This is worse than forgetting; it's not knowing that you forgot.
 
 ---
 
-## Streaming Tool Execution — Why Claude Code Feels Fast
+## Streaming Tool Execution - Why Claude Code Feels Fast
 
 ```mermaid
 sequenceDiagram
@@ -170,11 +180,11 @@ sequenceDiagram
 
 This is essentially a **reader-writer lock (RWLock)** pattern. Simple, provably correct, but not optimal. The subtle risk: if a tool is incorrectly marked as read-only but actually has side effects (e.g., a search tool that creates cache files), parallel execution could cause race conditions.
 
-Another edge case: two read tools read different parts of the same file, but an external process modifies the file between reads (user runs `git pull` in another terminal). The model sees a file state that never existed. Claude Code accepts this risk — the window is small and the model self-corrects on the next turn.
+Another edge case: two read tools read different parts of the same file, but an external process modifies the file between reads (user runs `git pull` in another terminal). The model sees a file state that never existed. Claude Code accepts this risk - the window is small and the model self-corrects on the next turn.
 
 ---
 
-## Tool System — 40+ Tools, Zero Inheritance
+## Tool System - 40+ Tools, Zero Inheritance
 
 Every tool is a `buildTool()` factory function:
 
@@ -193,9 +203,9 @@ ToolDefinition = {
 
 **Why this works at 40 tools:** Tools have almost no shared behavior worth inheriting. A file reader and a bash executor have less in common than you'd think. Shared concerns (validation, error handling) are handled by higher-order functions, not base classes.
 
-**Where it might break:** At 100+ tools with "tool families" (10 database tools sharing connection management, transaction handling, retry logic). The `buildTool()` boilerplate would balloon — 70% repeated pipeline configuration. Solution: lightweight tool factories (still functions, not classes) for tool families.
+**Where it might break:** At 100+ tools with "tool families" (10 database tools sharing connection management, transaction handling, retry logic). The `buildTool()` boilerplate would balloon - 70% repeated pipeline configuration. Solution: lightweight tool factories (still functions, not classes) for tool families.
 
-**BashTool — the most complex:**
+**BashTool - the most complex:**
 - Auto-classifies commands (search/read/write)
 - macOS: runs in `sandbox-exec` sandbox
 - Commands blocking >15s: auto-moved to background
@@ -204,7 +214,7 @@ ToolDefinition = {
 
 ---
 
-## Feature Flags — The Most Elegant Engineering
+## Feature Flags - The Best Engineering
 
 Two layers, each with a specific purpose:
 
@@ -218,12 +228,12 @@ const voiceModule = feature('VOICE_MODE')
     : null                          // Physically gone
 ```
 
-Not just disabled — **deleted from the binary**. Security researchers can't find what doesn't exist. This is why Bun was chosen over Node.
+Not just disabled - **deleted from the binary**. Security researchers can't find what doesn't exist. This is why Bun was chosen over Node.
 
 ### Runtime: A/B Testing
 
 ```javascript
-// All gates prefixed "tengu_" — Japanese for heavenly dog
+// All gates prefixed "tengu_" - Japanese for heavenly dog
 // Internal codename for the Claude Code project
 const enabled = checkStatsigFeatureGate_CACHED_MAY_BE_STALE(
     'tengu_streaming_tool_execution2'
@@ -241,7 +251,7 @@ if (feature('ABLATION_BASELINE')) {
 }
 ```
 
-This team uses research methodology in production engineering. They can quantify the impact of every feature. Most companies can't — or won't — pay this complexity tax. It's a luxury that comes from being a research lab building a product, not a product company doing research.
+This team uses research methodology in production engineering. They can quantify the impact of every feature. Most companies can't - or won't - pay this complexity tax. It's a luxury that comes from being a research lab building a product, not a product company doing research.
 
 ---
 
@@ -263,7 +273,7 @@ graph TD
     style W3 fill:#533483,color:#fff
 ```
 
-Workers cannot create sub-workers — prevents resource explosion. Three backends: tmux panes, in-process, remote.
+Workers cannot create sub-workers - prevents resource explosion. Three backends: tmux panes, in-process, remote.
 
 **My critique:** This is an artificial ceiling. Complex tasks benefit from recursive decomposition ("refactor all error handling" → per-module workers → per-file sub-workers). A depth limit + global worker budget would be more flexible than a hard ban on nesting.
 
@@ -291,7 +301,7 @@ One of these 18 names is the codename for Anthropic's next model: duck, goose, b
 
 ---
 
-## Design Decisions — The "Why" Analysis
+## Design Decisions - The "Why" Analysis
 
 ### Why not a state machine?
 
@@ -316,7 +326,7 @@ Claude Code is at 40. They made the right call for their current scale.
 | Approach | Strength | Weakness |
 |----------|----------|----------|
 | **4-layer cascade** ✅ | Importance-aware, progressive degradation | Complex, non-deterministic compression quality |
-| Sliding window | Simple, predictable | Uniform information loss — drops important early context |
+| Sliding window | Simple, predictable | Uniform information loss - drops important early context |
 | RAG retrieval | "Never forgets" | Retrieval relevance not guaranteed, adds latency, poor at maintaining conversational continuity |
 
 For coding tasks, **continuity matters more than retrieval**. You need coherent understanding of the current task flow, not keyword search over past conversations. The cascade approach is the right fit.
@@ -325,13 +335,13 @@ For coding tasks, **continuity matters more than retrieval**. You need coherent 
 
 ## Limitations & Potential Issues
 
-1. **query.ts God Object** — 1,729 lines handling everything. Merge conflicts in multi-person teams. Implicit state assumptions between distant code sections. A hidden dependencies nightmare.
+1. **query.ts God Object** - 1,729 lines handling everything. Merge conflicts in multi-person teams. Implicit state assumptions between distant code sections. A hidden dependencies nightmare.
 
-2. **Context compression is unauditable** — After compression, the model doesn't know what it lost. It can't flag "I may be missing context here." This leads to confident wrong answers, which is worse than admitting uncertainty.
+2. **Context compression is unauditable** - After compression, the model doesn't know what it lost. It can't flag "I may be missing context here." This leads to confident wrong answers, which is worse than admitting uncertainty.
 
-3. **Worker nesting prohibition** — Prevents recursive task decomposition. "Refactor all error handling in this project" ideally decomposes hierarchically. The flat worker model forces the main agent to do all decomposition, becoming a bottleneck.
+3. **Worker nesting prohibition** - Prevents recursive task decomposition. "Refactor all error handling in this project" ideally decomposes hierarchically. The flat worker model forces the main agent to do all decomposition, becoming a bottleneck.
 
-4. **Dual feature flag cognitive overhead** — Compile-time Bun macros + runtime GrowthBook gates. Engineers must decide which system each flag belongs in. Migration between systems (gradual rollout → permanent) requires code changes and redeployment.
+4. **Dual feature flag cognitive overhead** - Compile-time Bun macros + runtime GrowthBook gates. Engineers must decide which system each flag belongs in. Migration between systems (gradual rollout → permanent) requires code changes and redeployment.
 
 ---
 
@@ -351,15 +361,15 @@ For coding tasks, **continuity matters more than retrieval**. You need coherent 
 
 ## Key Takeaways
 
-1. **Context management is THE engineering challenge** — not prompts, not models. The 4-layer cascade is the most sophisticated production implementation I've seen.
+1. **Context management is THE engineering challenge** - not prompts, not models. The 4-layer cascade is the most sophisticated production implementation I've seen.
 
-2. **Stream-then-execute beats wait-then-execute** — start tool execution during model generation. The UX improvement justifies the engineering complexity.
+2. **Stream-then-execute beats wait-then-execute** - start tool execution during model generation. The UX improvement justifies the engineering complexity.
 
-3. **Functional composition > inheritance for tool systems** — at least up to ~100 tools. Keep it simple until you can't.
+3. **Functional composition > inheritance for tool systems** - at least up to ~100 tools. Keep it simple until you can't.
 
-4. **Use research methods in production** — ablation testing, quantified feature impact. Know what each feature actually contributes. Most won't. The best teams do.
+4. **Use research methods in production** - ablation testing, quantified feature impact. Know what each feature actually contributes. Most won't. The best teams do.
 
-5. **The terminal is underestimated** — React + Ink enables complex interactive UIs in a CLI. Don't limit yourself to ncurses-era thinking.
+5. **The terminal is underestimated** - React + Ink enables complex interactive UIs in a CLI. Don't limit yourself to ncurses-era thinking.
 
 ---
 
@@ -377,7 +387,7 @@ npm publish included `.map` files → `.map` referenced a source zip on Cloudfla
 
 ## About This Project
 
-**awesome-ai-anatomy** dissects the architecture of important AI projects — one project at a time.
+**awesome-ai-anatomy** dissects the architecture of important AI projects - one project at a time.
 
 - 📐 Architecture diagrams (Mermaid + hand-drawn style)
 - 🔍 Design decision analysis (why, not just what)

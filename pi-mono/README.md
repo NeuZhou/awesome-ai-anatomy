@@ -52,7 +52,7 @@ The stack is layered in a way that'll feel familiar if you've worked with game e
 
 This layering isn't just nice architecture — it's load-bearing. Because `pi-ai` is a standalone npm package, you can use it to build completely different things. The Slack bot (`pi-mom`) does exactly that: it imports the AI layer and agent core, bolts on Slack-specific tools, and runs without the TUI at all. The web UI similarly imports `pi-ai` and `pi-agent-core` as Lit-based web components.
 
-What surprised me: the dependency graph is *strict*. `pi-tui` has zero dependency on `pi-ai`. The TUI library genuinely stands alone. In a world where most agent frameworks smear LLM concerns across every layer, this discipline is rare.
+What surprised me: the dependency graph is *strict*. `pi-tui` has zero dependency on `pi-ai`. The TUI library stands alone. In a world where most agent frameworks smear LLM concerns across every layer, this discipline is rare.
 
 **Files to reference:**
 - `packages/ai/src/types.ts` — 305 lines defining the unified message/model/stream protocol

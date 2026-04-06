@@ -78,7 +78,7 @@ The heaviest file is `Page.zig` at 3,660 lines. It's the page lifecycle manager:
 
 Lightpanda's real innovation isn't any single feature — it's the aggressive decision to *not implement* most of a browser. Modern browsers have evolved into operating systems: they manage windows, render pixels, handle accessibility trees, support printing, manage GPU compositing, run service workers across tabs, and implement hundreds of Web APIs most pages never touch. Lightpanda cuts all of that. The result is a codebase that's ~91K lines where Chromium's Blink alone is over 10 million.
 
-But the specific technical achievement worth studying is the **Zig-to-V8 binding system** (`src/browser/js/bridge.zig`). This is where Lightpanda bridges its Zig-native DOM with V8's C++ expectations, and it's genuinely unusual.
+But the specific technical achievement worth studying is the **Zig-to-V8 binding system** (`src/browser/js/bridge.zig`). This is where Lightpanda bridges its Zig-native DOM with V8's C++ expectations, and it's unusual.
 
 ```zig
 // From src/browser/js/bridge.zig:31
@@ -275,7 +275,7 @@ Lightpanda makes one bet that either pays off hugely or limits it permanently: t
 
 The Zig choice is interesting. It gives them comptime generics (enabling the zero-overhead V8 bridge), predictable memory management (arenas everywhere, no GC), and control over the allocator pipeline. The downsides are real: a tiny contributor pool, unstable language spec (they're on Zig 0.15.2, which may break things between releases), and the learning curve is steep. The 328 Zig files in the codebase have a consistent style and show experienced Zig usage — this isn't someone's first rodeo with the language.
 
-The Web API coverage is the elephant in the room. They have ~60 Web API files covering DOM manipulation, events, fetch, XHR, cookies, storage, and basic CSS. But the web has *hundreds* of APIs, and every real-world page uses some subset that's hard to predict. CORS isn't implemented (tracked in issue #2015). Service Workers aren't there. WebSocket support is partial. Each missing API is a potential crash or silent failure when Playwright scripts that work on Chrome are pointed at Lightpanda. The Playwright compatibility disclaimer in their README is honest about this — "a script that works with the current version may not function correctly with a future version."
+The Web API coverage is the biggest gap. They have ~60 Web API files covering DOM manipulation, events, fetch, XHR, cookies, storage, and basic CSS. But the web has *hundreds* of APIs, and every real-world page uses some subset that's hard to predict. CORS isn't implemented (tracked in issue #2015). Service Workers aren't there. WebSocket support is partial. Each missing API is a potential crash or silent failure when Playwright scripts that work on Chrome are pointed at Lightpanda. The Playwright compatibility disclaimer in their README is honest about this — "a script that works with the current version may not function correctly with a future version."
 
 The MCP server mode is a forward-looking addition (1,733 lines). It lets AI agents talk to the browser directly using the Model Context Protocol, without going through CDP. For the AI agent use case that Lightpanda is targeting, this could matter more than CDP in the long term.
 
