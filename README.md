@@ -55,16 +55,16 @@ The 5 findings people can't stop sharing:
 
 | # | Project | Stars | Language | Lines | Key Findings | Status |
 |---|---------|-------|----------|-------|-------------|--------|
-| 001 | [**Dify**](dify/) | 136K ⭐ | Python + TS | 1.24M | Visual workflow builder, `graphon` graph engine extraction, 7+ Docker containers, 30+ vector DB support | ✅ Published |
-| 002 | [**DeerFlow**](deer-flow/) | 58K ⭐ | Python + TS | — | 14-layer middleware chain, hash-based loop detection (warn@3, kill@5), no auth/RBAC | ✅ Published |
-| 003 | [**MiroFish**](mirofish/) | 50K ⭐ | Python + Vue | 39K | LLM-driven social simulation marketed as "collective intelligence," OASIS engine wrapper, ReACT forced-tool-use | ✅ Published |
-| 004 | [**Goose**](goose/) | 37K ⭐ | Rust + TS | 198K | MCP-first extension bus, 5-inspector tool inspection pipeline, 30+ LLM providers | ✅ Published |
-| 005 | [**Pi Mono**](pi-mono/) | 32K ⭐ | TypeScript | 147K | Game-engine architecture, stealth mode (impersonates Claude Code), clean 7-package monorepo | ✅ Published |
-| 006 | [**Lightpanda**](lightpanda-browser/) | 27K ⭐ | Zig + Rust | 91K | From-scratch headless browser for AI agents, 9x faster than Chrome, Zig comptime V8 bindings | ✅ Published |
-| 007 | [**Hermes Agent**](hermes-agent/) | 26K ⭐ | Python | 260K | OpenClaw's Python twin, self-improving skill system, FTS5 session search, frozen memory snapshots | ✅ Published |
-| 008 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K ⭐ | TypeScript | 194K | 19-agent team orchestration via file-based IPC, model tier routing (Haiku→Opus), Claude Code plugin | ✅ Published |
-| 009 | [**Guardrails AI**](guardrails-ai/) | 6.6K ⭐ | Python | 18K | npm-for-validators Hub model, reask loop for LLM self-correction, 1076-line Guard God Object | ✅ Published |
-| 010 | [**Claude Code**](claude-code/) | 109K ⭐ | TypeScript | 510K | 4-layer context management, streaming tool execution, hidden pet system (18 species!), 1729-line God Object | ✅ Published |
+| 001 | [**Dify**](dify/) | 136K ⭐ | Python + TS | 1.24M | `graphon` engine, 7+ containers, 30+ vector DBs | ✅ Published |
+| 002 | [**DeerFlow**](deer-flow/) | 58K ⭐ | Python + TS | — | 14-layer middleware, hash loop kill@5, no RBAC | ✅ Published |
+| 003 | [**MiroFish**](mirofish/) | 50K ⭐ | Python + Vue | 39K | LLM social sim as "collective intelligence" | ✅ Published |
+| 004 | [**Goose**](goose/) | 37K ⭐ | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | ✅ Published |
+| 005 | [**Pi Mono**](pi-mono/) | 32K ⭐ | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | ✅ Published |
+| 006 | [**Lightpanda**](lightpanda-browser/) | 27K ⭐ | Zig + Rust | 91K | From-scratch browser for AI agents, 9× Chrome | ✅ Published |
+| 007 | [**Hermes Agent**](hermes-agent/) | 26K ⭐ | Python | 260K | Self-improving skills, FTS5 search, frozen mem | ✅ Published |
+| 008 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K ⭐ | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | ✅ Published |
+| 009 | [**Guardrails AI**](guardrails-ai/) | 6.6K ⭐ | Python | 18K | Validator Hub, reask self-correction loop | ✅ Published |
+| 010 | [**Claude Code**](claude-code/) | 109K ⭐ | TypeScript | 510K | 4-layer context, hidden pet system (18 species) | ✅ Published |
 
 > Projects sorted by GitHub stars (descending).
 
@@ -101,7 +101,7 @@ We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side anal
 ## 📐 Each Teardown Includes
 
 ```
-📄 README.md          — Full architecture analysis + design decisions
+📄 README.md          — Full source code analysis + architecture decisions
 ⚠️ Problems found     — Bugs, code smells, architectural risks
 🆚 Comparisons        — How it stacks up against alternatives
 ```
@@ -146,14 +146,17 @@ We've published 10 deep-dives covering 2.5M lines of source code. The next 10 ar
 
 ---
 
-## ⚠️ Disclaimer
+<details>
+<summary>⚠️ Disclaimer</summary>
 
 These teardowns are independent technical commentary for educational purposes. All code snippets are cited under fair use for criticism, commentary, and education. Project names and trademarks belong to their respective owners. Star counts and LOC figures are snapshots at time of writing and may have changed.
 
 If you're a project maintainer and have concerns about any content, please [open an issue](https://github.com/NeuZhou/awesome-ai-anatomy/issues/new).
 
+</details>
+
 ---
 
 <p align="center">
-  <i>Weekly AI agent architecture insights from a senior engineer's perspective.</i>
+  <i>2.5M lines read. 10 projects dissected. Updated weekly.<br>If you build AI agents, you should know how the best ones actually work.</i>
 </p>
