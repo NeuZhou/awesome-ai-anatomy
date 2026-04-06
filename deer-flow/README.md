@@ -297,6 +297,8 @@ Not surprising that Feishu is the best-supported channel, given that DeerFlow co
 
 3. **Structured memory with confidence scores.** Most agent memory is "append everything to a text file." DeerFlow actually thinks about what to remember and how confident it should be about each fact.
 
+4. **The Dangling Tool Call fixer.** This is the kind of bug that would drive you insane for hours without this middleware. When a user interrupts the agent mid-tool-call, the conversation history gets corrupted — there's an AI message saying "I called tool X" but no corresponding tool response. The next LLM call chokes on the malformed history. `DanglingToolCallMiddleware` (93 lines, `middlewares/dangling_tool_call_middleware.py`) scans for these orphaned calls and injects synthetic error responses to patch the gap. Most agent frameworks don't handle this at all — they just crash or hallucinate past the broken history. This is the kind of defensive engineering that only comes from running an agent in production and watching it fail.
+
 ---
 
 ## What I'd Push Back On
