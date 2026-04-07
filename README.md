@@ -122,8 +122,6 @@ We also have a new **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizonta
 
 ---
 
-Video walkthroughs coming soon — follow [@justboy1987](https://x.com/justboy1987) on Twitter for updates.
-
 ---
 
 ## 🗓️ Coming Next
@@ -153,9 +151,8 @@ New teardown every week. We're working through the top AI agent projects — Cur
 
 **👁️ Watch** → Get notified for every new teardown, not just the ones that trend.
 
-We've published 10 deep-dives covering 2.5M lines of source code. The next 10 are already in progress.
+We've published 11 deep-dives covering 3M+ lines of source code. The next batch is already in progress.
 
-- 🐦 Twitter: [@justboy1987](https://x.com/justboy1987) — teardown threads and findings
 - 💬 Discord: [Join the community](https://discord.gg/kAQD7Cj8) — discuss architecture decisions
 
 ---
@@ -172,5 +169,5 @@ If you're a project maintainer and have concerns about any content, please [open
 ---
 
 <p align="center">
-  <i>2.5M lines read. 10 projects dissected. Updated weekly.<br>If you build AI agents, you should know how the best ones actually work.</i>
+  <i>3M+ lines read. 11 projects dissected. Updated weekly.<br>If you build AI agents, you should know how the best ones actually work.</i>
 </p>
