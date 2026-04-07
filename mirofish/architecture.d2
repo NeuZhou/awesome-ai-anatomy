@@ -1,0 +1,58 @@
+direction: down
+
+simulation: "MiroFish Simulation" {
+  style.fill: "#faf5ff"
+  style.stroke: "#7c3aed"
+
+  runner: "Simulation Runner" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+    label: "simulation_runner.py\n(700+ lines)"
+  }
+
+  oasis: "OASIS Multi-Agent Sim" {
+    style.fill: "#8b5cf6"
+    style.font-color: "#fff"
+    label: '"Collective Intelligence"\n= LLMs role-playing humans\non a fake social network'
+  }
+
+  agents: "LLM Agents" {
+    style.fill: "#6366f1"
+    style.font-color: "#fff"
+    
+    agent1: "Agent 1\n(persona A)"
+    agent2: "Agent 2\n(persona B)"
+    agent3: "Agent N\n(persona N)"
+  }
+}
+
+pipeline: "Pipeline (sequential)" {
+  style.fill: "#fefce8"
+  style.stroke: "#d97706"
+
+  data_collect: "1. Data Collection"
+  social_sim: "2. Social Simulation"
+  report: "3. Report Generation\n(report_agent.py — 1,400 lines)"
+
+  data_collect -> social_sim -> report
+}
+
+output: "Output" {
+  style.fill: "#ecfdf5"
+  style.stroke: "#059669"
+
+  web: "Vue Frontend"
+  api: "REST API"
+  reports: "Generated Reports"
+}
+
+llm: "LLM Provider" {
+  style.fill: "#374151"
+  style.font-color: "#fff"
+}
+
+simulation.runner -> pipeline
+pipeline.social_sim -> simulation.oasis
+simulation.oasis -> simulation.agents
+simulation.agents -> llm
+pipeline.report -> output

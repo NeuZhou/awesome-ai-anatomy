@@ -1,0 +1,70 @@
+direction: down
+
+browser: "Lightpanda Browser Engine" {
+  style.fill: "#f0f4ff"
+  style.stroke: "#2563eb"
+
+  cdp: "CDP Server" {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+    label: "Chrome DevTools Protocol\n(WebSocket)"
+  }
+
+  page: "Page.zig" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+    label: "Page.zig\n(3,660 lines — god file)"
+  }
+
+  html: "HTML Parser" {
+    style.fill: "#059669"
+    style.font-color: "#fff"
+    label: "HTML Parser\n(from-scratch, Zig)"
+  }
+
+  css: "CSS Engine" {
+    style.fill: "#10b981"
+    style.font-color: "#fff"
+    label: "CSS Engine\n(cascade + specificity)"
+  }
+
+  js: "JavaScript Runtime" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+    label: "JS Runtime\n(embedded V8)"
+  }
+
+  dispatch: "Bitcast Dispatch" {
+    style.fill: "#ef4444"
+    style.font-color: "#fff"
+    label: "Bitcast Dispatch\n⚡ Zig comptime trick\nmakes Zig act like vtables"
+  }
+
+  dom: "DOM Tree" {
+    style.fill: "#f3f4f6"
+    style.stroke: "#6b7280"
+  }
+}
+
+io: "I/O Layer" {
+  style.fill: "#fefce8"
+  style.stroke: "#d97706"
+
+  network: "Network (Zig async)"
+  tls: "TLS (Rust binding)"
+}
+
+ai_agent: "AI Agent" {
+  shape: person
+  label: "AI Agent\n(via CDP)"
+}
+
+ai_agent -> browser.cdp
+browser.cdp -> browser.page
+browser.page -> browser.html
+browser.page -> browser.css
+browser.page -> browser.js
+browser.html -> browser.dom
+browser.page -> browser.dispatch
+browser.page -> io
+io.network -> io.tls

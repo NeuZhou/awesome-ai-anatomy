@@ -1,0 +1,63 @@
+direction: down
+
+user_input: "User Input\n(prompt + schema)" {
+  shape: parallelogram
+  style.fill: "#2563eb"
+  style.font-color: "#fff"
+}
+
+guard: "Guard" {
+  style.fill: "#7c3aed"
+  style.font-color: "#fff"
+  label: "Guard\n(guard.py — 1,076 lines)"
+}
+
+runner: "Runner" {
+  style.fill: "#faf5ff"
+  style.stroke: "#7c3aed"
+
+  llm_call: "LLM Call" {
+    style.fill: "#6366f1"
+    style.font-color: "#fff"
+  }
+
+  validators: "Validator Pipeline" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+
+    v1: "Validator 1"
+    v2: "Validator 2"
+    v3: "Validator N"
+  }
+
+  reask: "Reask Loop" {
+    style.fill: "#ef4444"
+    style.font-color: "#fff"
+    label: "Reask Loop\n(self-correction)"
+  }
+
+  llm_call -> validators
+  validators -> reask: "validation failed"
+  reask -> llm_call: "retry with feedback"
+}
+
+hub: "Validator Hub" {
+  style.fill: "#ecfdf5"
+  style.stroke: "#059669"
+  label: "Validator Hub\n(community validators\ninstallable via CLI)"
+
+  builtin: "Built-in\n(regex, type, range)"
+  custom: "Custom\n(ML-based, LLM-based)"
+  community: "Community\n(from Hub)"
+}
+
+output: "Validated Output" {
+  shape: parallelogram
+  style.fill: "#059669"
+  style.font-color: "#fff"
+}
+
+user_input -> guard
+guard -> runner
+runner -> hub
+runner.validators -> output: "validation passed"

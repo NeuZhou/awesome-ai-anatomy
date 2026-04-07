@@ -1,0 +1,69 @@
+direction: down
+
+nginx: "Nginx Reverse Proxy :80" {
+  style.fill: "#374151"
+  style.font-color: "#fff"
+}
+
+user: User / Browser {
+  shape: person
+}
+
+api: "API Server" {
+  style.fill: "#2563eb"
+  style.font-color: "#fff"
+  label: "API Server\n(Flask + Gunicorn :5001)"
+}
+
+web: "Next.js Frontend" {
+  style.fill: "#3b82f6"
+  style.font-color: "#fff"
+  label: "Next.js Frontend\n(:3000)"
+}
+
+worker: "Worker" {
+  style.fill: "#7c3aed"
+  style.font-color: "#fff"
+  label: "Celery Worker\n(async tasks)"
+}
+
+graphon: "graphon Engine" {
+  style.fill: "#d97706"
+  style.font-color: "#fff"
+  label: "graphon Engine\n(DAG execution)"
+
+  workflow: Workflow Runner
+  node_exec: Node Executor
+  middleware: Middleware Layers
+  
+  workflow -> middleware
+  middleware -> node_exec
+}
+
+plugin: "Plugin Daemon" {
+  style.fill: "#059669"
+  style.font-color: "#fff"
+  label: "Plugin Daemon\n(separate process :5003)"
+}
+
+db: "Data Layer" {
+  style.fill: "#f3f4f6"
+  style.stroke: "#6b7280"
+  
+  pg: PostgreSQL
+  redis: Redis
+  vector: "Vector DB\n(30+ supported)"
+  storage: "Object Storage\n(S3/Azure/local)"
+}
+
+user -> nginx
+nginx -> api: "/api/*"
+nginx -> web: static
+api -> worker: "task queue"
+api -> graphon
+worker -> graphon
+graphon -> plugin: "tool calls"
+api -> db.pg
+api -> db.redis
+graphon -> db.vector
+graphon -> db.storage

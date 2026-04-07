@@ -1,0 +1,62 @@
+direction: down
+
+monorepo: "pi-mono Monorepo" {
+  style.fill: "#f0f4ff"
+  style.stroke: "#2563eb"
+
+  ai: "@mariozechner/pi-ai" {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+    label: "@mariozechner/pi-ai\nUnified LLM API (37K lines)"
+  }
+
+  agent: "@mariozechner/pi-agent-core" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+    label: "Agent Core\nAgent Loop + State (3K lines)"
+  }
+
+  canvas: "@mariozechner/pi-canvas" {
+    style.fill: "#059669"
+    style.font-color: "#fff"
+    label: "Canvas System\nHTML Canvas rendering"
+  }
+
+  apps: "App Layer" {
+    style.fill: "#fefce8"
+    style.stroke: "#d97706"
+
+    cli: "CLI App"
+    web: "Web App"
+    discord: "Discord Bot"
+  }
+}
+
+stealth: "Stealth Mode" {
+  style.fill: "#ef4444"
+  style.font-color: "#fff"
+  label: "Stealth Mode\n⚠️ Impersonates Claude Code\nFakes tool names to dodge\nrate limits"
+}
+
+gameloop: "Game-Engine Architecture" {
+  style.fill: "#d97706"
+  style.font-color: "#fff"
+  label: "Game-Engine Loop\nfixed-timestep update cycle\nentity-component style"
+}
+
+providers: "LLM Providers" {
+  style.fill: "#f3f4f6"
+  style.stroke: "#6b7280"
+
+  anthropic: Anthropic
+  openai: OpenAI
+  google: Google
+  local: Local Models
+}
+
+monorepo.apps -> monorepo.agent
+monorepo.agent -> monorepo.ai
+monorepo.agent -> monorepo.canvas
+monorepo.ai -> providers
+monorepo.ai -> stealth: "optional"
+monorepo.agent -> gameloop: "architecture pattern"

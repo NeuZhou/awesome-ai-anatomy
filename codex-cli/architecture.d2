@@ -1,0 +1,87 @@
+direction: down
+
+entry: "Entry Layer" {
+  style.fill: "#f0f4ff"
+  style.stroke: "#2563eb"
+
+  cli: "codex CLI" {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+    label: "codex CLI\n(Clap parser)"
+  }
+  mcp: "codex mcp" {
+    style.fill: "#3b82f6"
+    style.font-color: "#fff"
+    label: "codex mcp\n(MCP server mode)"
+  }
+  app: "codex app" {
+    style.fill: "#60a5fa"
+    style.font-color: "#fff"
+    label: "Desktop App"
+  }
+}
+
+core: "Core Layer (Rust)" {
+  style.fill: "#fefce8"
+  style.stroke: "#d97706"
+
+  proto: "Protocol (queue-pair)" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+    label: "Queue-Pair Protocol\n(Op → Event channels)"
+  }
+
+  agent_loop: "Agent Loop" {
+    style.fill: "#f59e0b"
+    style.font-color: "#fff"
+  }
+
+  guardian: "Guardian AI" {
+    style.fill: "#ef4444"
+    style.font-color: "#fff"
+    label: "Guardian AI\n⚠️ Separate LLM judges\nwhether to approve\ntool calls"
+  }
+
+  config: "Config + Policy"
+}
+
+sandbox: "Sandbox Layer" {
+  style.fill: "#faf5ff"
+  style.stroke: "#7c3aed"
+
+  macos: "macOS\n(sandbox-exec)" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+  }
+  linux: "Linux\n(Landlock + seccomp)" {
+    style.fill: "#8b5cf6"
+    style.font-color: "#fff"
+  }
+  windows: "Windows\n(Job Objects)" {
+    style.fill: "#a78bfa"
+    style.font-color: "#fff"
+  }
+}
+
+tools: "Tools" {
+  style.fill: "#ecfdf5"
+  style.stroke: "#059669"
+
+  shell: "Shell Exec"
+  file_ops: "File Read/Write"
+  apply_patch: "Apply Patch"
+}
+
+llm: "OpenAI API" {
+  style.fill: "#374151"
+  style.font-color: "#fff"
+}
+
+entry.cli -> core.proto
+entry.mcp -> core.proto
+entry.app -> core.proto
+core.proto -> core.agent_loop
+core.agent_loop -> core.guardian: "tool approval"
+core.agent_loop -> llm
+core.agent_loop -> sandbox
+sandbox -> tools

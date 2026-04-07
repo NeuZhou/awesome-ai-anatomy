@@ -1,0 +1,68 @@
+direction: down
+
+user: User {
+  shape: person
+}
+
+nginx: "Nginx :2026" {
+  style.fill: "#374151"
+  style.font-color: "#fff"
+}
+
+frontend: "Next.js Frontend" {
+  style.fill: "#3b82f6"
+  style.font-color: "#fff"
+}
+
+gateway: "Gateway API :8001" {
+  style.fill: "#2563eb"
+  style.font-color: "#fff"
+}
+
+langgraph: "LangGraph Server :2024" {
+  style.fill: "#7c3aed"
+  style.font-color: "#fff"
+
+  middleware: "14-Layer Middleware Chain" {
+    style.fill: "#8b5cf6"
+    style.font-color: "#fff"
+
+    clarification: Clarification
+    loop_detect: "Loop Detection\n(hash kill@5)"
+    cost: Cost Tracking
+    rate_limit: Rate Limiting
+  }
+
+  coordinator: "Coordinator Node" {
+    style.fill: "#6366f1"
+    style.font-color: "#fff"
+  }
+
+  workers: "Worker Nodes" {
+    style.fill: "#059669"
+    style.font-color: "#fff"
+    
+    researcher: Researcher
+    coder: Coder
+    reporter: Reporter
+  }
+
+  coordinator -> workers
+}
+
+tools: "Tool Layer" {
+  style.fill: "#ecfdf5"
+  style.stroke: "#059669"
+
+  tavily: Tavily Search
+  crawl4ai: Crawl4AI
+  python: Python REPL
+}
+
+user -> nginx
+nginx -> frontend: static
+nginx -> gateway: "/api/*"
+nginx -> langgraph: "/api/langgraph/*"
+gateway -> langgraph
+langgraph.middleware -> langgraph.coordinator
+langgraph.workers -> tools

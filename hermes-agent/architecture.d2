@@ -1,0 +1,71 @@
+direction: down
+
+core: "Hermes Agent Core" {
+  style.fill: "#faf5ff"
+  style.stroke: "#7c3aed"
+
+  run_agent: "run_agent.py" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+    label: "run_agent.py\n(9,000+ lines — god file)"
+  }
+
+  loop: "while(true) Agent Loop" {
+    style.fill: "#6366f1"
+    style.font-color: "#fff"
+  }
+
+  skills: "Self-Improving Skills" {
+    style.fill: "#059669"
+    style.font-color: "#fff"
+    label: "Skill System\n(auto-evolving)"
+  }
+
+  delegate: "Delegate Tool\n(sub-agent)" {
+    style.fill: "#10b981"
+    style.font-color: "#fff"
+  }
+}
+
+memory: "Memory System" {
+  style.fill: "#fff7ed"
+  style.stroke: "#d97706"
+
+  frozen: "Frozen Memory" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+    label: "Frozen Snapshots\n(immutable context)"
+  }
+
+  fts5: "FTS5 Search" {
+    style.fill: "#f59e0b"
+    label: "SQLite FTS5\n(full-text search)"
+  }
+
+  working: "Working Memory" {
+    label: "Working Memory\n(session-scoped)"
+  }
+}
+
+tools: "Tool Layer" {
+  style.fill: "#ecfdf5"
+  style.stroke: "#059669"
+
+  bash: Shell
+  file: File I/O
+  web: Web Browse
+  code: Code Exec
+}
+
+llm: "LLM Provider" {
+  style.fill: "#374151"
+  style.font-color: "#fff"
+}
+
+core.run_agent -> core.loop
+core.loop -> core.skills
+core.loop -> core.delegate
+core.loop -> memory
+memory.frozen -> memory.fts5
+core.loop -> tools
+core.loop -> llm

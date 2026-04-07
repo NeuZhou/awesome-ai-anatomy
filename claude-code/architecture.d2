@@ -1,0 +1,128 @@
+direction: down
+
+entry: CLI Entry {
+  style.fill: "#f0f4ff"
+  style.stroke: "#2563eb"
+
+  cli: claude CLI {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+    label: "claude CLI\n(Bun runtime)"
+  }
+  app: Main App {
+    style.fill: "#3b82f6"
+    style.font-color: "#fff"
+    label: "Main App\n(React/Ink TUI)"
+  }
+  cli -> app: lazy import()
+}
+
+session: Session Layer {
+  style.fill: "#faf5ff"
+  style.stroke: "#7c3aed"
+
+  sm: Session Manager {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+  }
+  auth: Auth {
+    label: "Auth\n(OAuth / API Key\nBedrock / Vertex)"
+  }
+  config: Config + Feature Flags
+  mem: Memory (.claude/)
+
+  sm -> auth
+  sm -> config
+  sm -> mem
+}
+
+core: "Agentic Core (query.ts — 1,729 lines)" {
+  style.fill: "#fefce8"
+  style.stroke: "#d97706"
+
+  loop: while(true) {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+    style.bold: true
+  }
+  pre: Preprocess {
+    label: "Preprocess\n(4-layer context mgmt)"
+    style.fill: "#8b5cf6"
+    style.font-color: "#fff"
+  }
+  api: Claude API {
+    label: "Claude API\n(streaming SSE)"
+    style.fill: "#6366f1"
+    style.font-color: "#fff"
+  }
+  parse: Parse Response {
+    label: "Parse Response\n(detect tool_use)"
+  }
+  exec: StreamingToolExecutor {
+    label: "StreamingToolExecutor\n(parallel execution)"
+    style.fill: "#059669"
+    style.font-color: "#fff"
+  }
+
+  loop -> pre
+  pre -> api
+  api -> parse
+  parse -> exec
+  exec -> loop: "results → messages"
+}
+
+tools: "Tool System (40+)" {
+  style.fill: "#ecfdf5"
+  style.stroke: "#059669"
+
+  bash: BashTool {
+    label: "BashTool\n(sandbox, timeout)"
+    style.fill: "#059669"
+    style.font-color: "#fff"
+  }
+  file: FileRead/Write
+  search: Search/Grep
+  mcp: MCP Bridges {
+    style.fill: "#10b981"
+    style.font-color: "#fff"
+  }
+  agent: Agent Spawn
+}
+
+context: "Context Management" {
+  style.fill: "#fff7ed"
+  style.stroke: "#d97706"
+
+  l1: "L1: HISTORY_SNIP" {
+    label: "L1: HISTORY_SNIP\nSurgical deletion"
+    style.fill: "#fbbf24"
+  }
+  l2: "L2: Microcompact" {
+    label: "L2: Microcompact\nCache-level editing"
+    style.fill: "#f59e0b"
+  }
+  l3: "L3: CONTEXT_COLLAPSE" {
+    label: "L3: CONTEXT_COLLAPSE\nStructured archival"
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+  }
+  l4: "L4: Autocompact" {
+    label: "L4: Autocompact\nFull compression"
+    style.fill: "#b45309"
+    style.font-color: "#fff"
+  }
+
+  l1 -> l2: still too long
+  l2 -> l3: still too long
+  l3 -> l4: last resort
+}
+
+# Cross-container connections
+entry.app -> session.sm
+session.sm -> core.loop
+core.exec -> tools.bash
+core.exec -> tools.file
+core.exec -> tools.search
+core.exec -> tools.mcp
+core.exec -> tools.agent
+core.pre -> context.l1

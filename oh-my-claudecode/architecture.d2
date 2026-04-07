@@ -1,0 +1,66 @@
+direction: down
+
+orchestrator: "Phase Controller" {
+  style.fill: "#7c3aed"
+  style.font-color: "#fff"
+  label: "Phase Controller\n(infers state from task distribution)"
+}
+
+phases: "Pipeline Phases" {
+  style.fill: "#faf5ff"
+  style.stroke: "#7c3aed"
+
+  plan: "1. Plan" {
+    style.fill: "#8b5cf6"
+    style.font-color: "#fff"
+  }
+  exec: "2. Execute" {
+    style.fill: "#6366f1"
+    style.font-color: "#fff"
+  }
+  verify: "3. Verify" {
+    style.fill: "#4f46e5"
+    style.font-color: "#fff"
+  }
+  fix: "4. Fix" {
+    style.fill: "#4338ca"
+    style.font-color: "#fff"
+  }
+
+  plan -> exec -> verify -> fix
+  fix -> exec: "retry"
+}
+
+team: "19-Agent Team" {
+  style.fill: "#fefce8"
+  style.stroke: "#d97706"
+
+  lead: "Lead Agent\n(Opus)" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+  }
+  worker1: "Worker 1\n(Haiku)"
+  worker2: "Worker 2\n(Haiku)"
+  worker3: "Worker N\n(Haiku)"
+
+  lead -> worker1
+  lead -> worker2
+  lead -> worker3
+}
+
+ipc: "File IPC" {
+  style.fill: "#ecfdf5"
+  style.stroke: "#059669"
+  label: "File IPC\n(dispatch queue on disk\nno sockets, no shared memory)"
+}
+
+routing: "Haiku → Opus Routing" {
+  style.fill: "#ef4444"
+  style.font-color: "#fff"
+  label: "Model Routing\nHaiku for grunt work\nOpus for hard decisions"
+}
+
+orchestrator -> phases
+phases -> team
+team -> ipc
+team.lead -> routing

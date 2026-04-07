@@ -1,0 +1,75 @@
+direction: down
+
+entry: "Entry Points" {
+  style.fill: "#f0f4ff"
+  style.stroke: "#2563eb"
+
+  cli: "goose CLI" {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+    label: "goose CLI\n(goose-cli crate)"
+  }
+  desktop: "Desktop App" {
+    style.fill: "#3b82f6"
+    style.font-color: "#fff"
+    label: "Desktop App\n(Electron + React)"
+  }
+}
+
+server: "goose-server (Axum)" {
+  style.fill: "#faf5ff"
+  style.stroke: "#7c3aed"
+
+  api: "REST + WebSocket API" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+  }
+  session_mgr: "Session Manager\n(SQLite-backed)"
+}
+
+core: "goose crate — The Agent" {
+  style.fill: "#fefce8"
+  style.stroke: "#d97706"
+
+  agent: "Agent struct" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+  }
+  prompt_mgr: Prompt Manager
+  ext_mgr: Extension Manager
+  inspection: "Tool Inspection Pipeline" {
+    label: "Tool Inspection Pipeline\n(Security / Egress / Adversary\nPermission / Repetition)"
+    style.fill: "#ef4444"
+    style.font-color: "#fff"
+  }
+  context: "Context Management\n(auto-compact + summarization)"
+  providers: "Provider Registry\n(30+ providers)" {
+    style.fill: "#059669"
+    style.font-color: "#fff"
+  }
+
+  agent -> prompt_mgr
+  agent -> ext_mgr
+  agent -> inspection
+  agent -> context
+  agent -> providers
+}
+
+extensions: "Extension Layer (MCP)" {
+  style.fill: "#ecfdf5"
+  style.stroke: "#059669"
+
+  platform: "Platform Extensions\n(developer, analyze, todo)"
+  builtin: "Builtin MCP Servers\n(memory, computercontroller)"
+  external: "External MCP Servers\n(stdio | streamable-http)"
+  frontend: "Frontend Tools\n(desktop-only)"
+}
+
+entry.cli -> server.api
+entry.desktop -> server.api
+server.api -> server.session_mgr
+server.api -> core.agent
+core.ext_mgr -> extensions.platform
+core.ext_mgr -> extensions.builtin
+core.ext_mgr -> extensions.external
+core.ext_mgr -> extensions.frontend
