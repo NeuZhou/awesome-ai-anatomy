@@ -58,23 +58,23 @@ The second important piece is the **graph engine extraction**. The workflow runt
 ```python
 # From api/core/workflow/workflow_entry.py
 self.graph_engine = GraphEngine(
-    workflow_id=workflow_id,
-    graph=graph,
-    graph_runtime_state=graph_runtime_state,
-    command_channel=command_channel,
-    config=GraphEngineConfig(
-        min_workers=dify_config.GRAPH_ENGINE_MIN_WORKERS,
-        max_workers=dify_config.GRAPH_ENGINE_MAX_WORKERS,
-        scale_up_threshold=dify_config.GRAPH_ENGINE_SCALE_UP_THRESHOLD,
-        scale_down_idle_time=dify_config.GRAPH_ENGINE_SCALE_DOWN_IDLE_TIME,
-    ),
-    child_engine_builder=self._child_engine_builder,
+ workflow_id=workflow_id,
+ graph=graph,
+ graph_runtime_state=graph_runtime_state,
+ command_channel=command_channel,
+ config=GraphEngineConfig(
+ min_workers=dify_config.GRAPH_ENGINE_MIN_WORKERS,
+ max_workers=dify_config.GRAPH_ENGINE_MAX_WORKERS,
+ scale_up_threshold=dify_config.GRAPH_ENGINE_SCALE_UP_THRESHOLD,
+ scale_down_idle_time=dify_config.GRAPH_ENGINE_SCALE_DOWN_IDLE_TIME,
+ ),
+ child_engine_builder=self._child_engine_builder,
 )
 
 # Layers stack like middleware
 limits_layer = ExecutionLimitsLayer(
-    max_steps=dify_config.WORKFLOW_MAX_EXECUTION_STEPS,
-    max_time=dify_config.WORKFLOW_MAX_EXECUTION_TIME
+ max_steps=dify_config.WORKFLOW_MAX_EXECUTION_STEPS,
+ max_time=dify_config.WORKFLOW_MAX_EXECUTION_TIME
 )
 self.graph_engine.layer(limits_layer)
 self.graph_engine.layer(LLMQuotaLayer())
@@ -87,25 +87,25 @@ The node factory is where things get busy. `DifyNodeFactory.create_node()` is a 
 ```python
 # From api/core/workflow/node_factory.py
 node_init_kwargs_factories: Mapping[NodeType, Callable[[], dict[str, object]]] = {
-    BuiltinNodeTypes.CODE: lambda: {
-        "code_executor": self._code_executor,
-        "code_limits": self._code_limits,
-    },
-    BuiltinNodeTypes.LLM: lambda: self._build_llm_compatible_node_init_kwargs(
-        node_class=node_class,
-        node_data=node_data,
-        wrap_model_instance=True,
-        include_http_client=True,
-        include_llm_file_saver=True,
-        # ... 4 more boolean flags
-    ),
-    BuiltinNodeTypes.AGENT: lambda: {
-        "strategy_resolver": self._agent_strategy_resolver,
-        "presentation_provider": self._agent_strategy_presentation_provider,
-        "runtime_support": self._agent_runtime_support,
-        "message_transformer": self._agent_message_transformer,
-    },
-    # ... 8 more node types
+ BuiltinNodeTypes.CODE: lambda: {
+ "code_executor": self._code_executor,
+ "code_limits": self._code_limits,
+ },
+ BuiltinNodeTypes.LLM: lambda: self._build_llm_compatible_node_init_kwargs(
+ node_class=node_class,
+ node_data=node_data,
+ wrap_model_instance=True,
+ include_http_client=True,
+ include_llm_file_saver=True,
+ # ... 4 more boolean flags
+ ),
+ BuiltinNodeTypes.AGENT: lambda: {
+ "strategy_resolver": self._agent_strategy_resolver,
+ "presentation_provider": self._agent_strategy_presentation_provider,
+ "runtime_support": self._agent_runtime_support,
+ "message_transformer": self._agent_message_transformer,
+ },
+ # ... 8 more node types
 }
 ```
 
@@ -176,18 +176,18 @@ The plugin daemon handles:
 ```python
 # From api/core/plugin/impl/plugin.py
 class PluginInstaller(BasePluginClient):
-    def fetch_plugin_readme(self, tenant_id: str, plugin_unique_identifier: str, language: str) -> str:
-        response = self._request_with_plugin_daemon_response(
-            "GET",
-            f"plugin/{tenant_id}/management/fetch/readme",
-            PluginReadmeResponse,
-            params={
-                "tenant_id": tenant_id,
-                "plugin_unique_identifier": plugin_unique_identifier,
-                "language": language,
-            },
-        )
-        return response.content
+ def fetch_plugin_readme(self, tenant_id: str, plugin_unique_identifier: str, language: str) -> str:
+ response = self._request_with_plugin_daemon_response(
+ "GET",
+ f"plugin/{tenant_id}/management/fetch/readme",
+ PluginReadmeResponse,
+ params={
+ "tenant_id": tenant_id,
+ "plugin_unique_identifier": plugin_unique_identifier,
+ "language": language,
+ },
+ )
+ return response.content
 ```
 
 Every plugin API call goes through the daemon. This adds latency (HTTP round-trip per call) but provides process isolation — a misbehaving plugin can't crash the main API. The tradeoff compared to in-process plugin systems (like DeerFlow's middleware or Hermes's skills) is that you get safety at the cost of speed and deployment complexity. You now have another service to monitor, another log stream to watch, another container to resource-limit.
@@ -245,15 +245,15 @@ The `graphon` layer system is a clean pattern for extending workflow execution w
 # From api/core/workflow/workflow_entry.py
 # Execution limits as a layer — clean separation of concerns
 limits_layer = ExecutionLimitsLayer(
-    max_steps=dify_config.WORKFLOW_MAX_EXECUTION_STEPS,
-    max_time=dify_config.WORKFLOW_MAX_EXECUTION_TIME
+ max_steps=dify_config.WORKFLOW_MAX_EXECUTION_STEPS,
+ max_time=dify_config.WORKFLOW_MAX_EXECUTION_TIME
 )
 self.graph_engine.layer(limits_layer)
 self.graph_engine.layer(LLMQuotaLayer())
 
 # Observability as a layer — only added when OTel is enabled
 if dify_config.ENABLE_OTEL or is_instrument_flag_enabled():
-    self.graph_engine.layer(ObservabilityLayer())
+ self.graph_engine.layer(ObservabilityLayer())
 ```
 
 This is similar to DeerFlow's middleware chain but without the strict ordering problem. Layers observe events rather than modify the message pipeline, which makes ordering less fragile.
@@ -271,31 +271,31 @@ When a workflow hits an iteration or loop node, it doesn't hack a loop into the 
 ```python
 # From api/core/workflow/workflow_entry.py
 class _WorkflowChildEngineBuilder:
-    def build_child_engine(
-        self,
-        *,
-        workflow_id: str,
-        graph_init_params: GraphInitParams,
-        parent_graph_runtime_state: GraphRuntimeState,
-        root_node_id: str,
-        variable_pool: VariablePool | None = None,
-    ) -> GraphEngine:
-        child_graph_runtime_state = GraphRuntimeState(
-            variable_pool=variable_pool if variable_pool is not None else parent_graph_runtime_state.variable_pool,
-            start_at=time.perf_counter(),
-            execution_context=parent_graph_runtime_state.execution_context,
-        )
-        # ... builds a fresh engine with only child-safe layers
-        child_engine = GraphEngine(
-            workflow_id=workflow_id,
-            graph=child_graph,
-            graph_runtime_state=child_graph_runtime_state,
-            command_channel=command_channel,
-            config=config,
-            child_engine_builder=self,
-        )
-        child_engine.layer(LLMQuotaLayer())
-        return child_engine
+ def build_child_engine(
+ self,
+ *,
+ workflow_id: str,
+ graph_init_params: GraphInitParams,
+ parent_graph_runtime_state: GraphRuntimeState,
+ root_node_id: str,
+ variable_pool: VariablePool | None = None,
+ ) -> GraphEngine:
+ child_graph_runtime_state = GraphRuntimeState(
+ variable_pool=variable_pool if variable_pool is not None else parent_graph_runtime_state.variable_pool,
+ start_at=time.perf_counter(),
+ execution_context=parent_graph_runtime_state.execution_context,
+ )
+ # ... builds a fresh engine with only child-safe layers
+ child_engine = GraphEngine(
+ workflow_id=workflow_id,
+ graph=child_graph,
+ graph_runtime_state=child_graph_runtime_state,
+ command_channel=command_channel,
+ config=config,
+ child_engine_builder=self,
+ )
+ child_engine.layer(LLMQuotaLayer())
+ return child_engine
 ```
 
 Child engines get their own variable pools but share the parent's execution context. This is a clean way to handle nested execution — each iteration has isolated state but shared resource tracking.
