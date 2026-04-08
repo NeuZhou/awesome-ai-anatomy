@@ -68,6 +68,9 @@
 ## Architecture Overview
 
 
+
+![Architecture Overview](codex-cli-1.png)
+
 **The key architectural insight:** Codex CLI is built as a **queue-pair** system. The `Codex` struct exposes a `Sender<Submission>` and a `Receiver<Event>`. You push operations in, you receive events out. Everything else — model calls, tool execution, sandbox management, approval flows — happens inside this async loop. This makes the system composable: the TUI, App Server, and MCP Server are all just different frontends submitting to the same queue.
 
 ---
