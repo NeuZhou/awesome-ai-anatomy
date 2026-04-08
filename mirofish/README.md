@@ -19,6 +19,16 @@ What MiroFish does, in plain terms: you feed it a document (news article, policy
 
 ---
 
+## Overall Rating
+
+| Dimension | Grade | Notes |
+|-----------|-------|-------|
+| Architecture | C+ | Core simulation outsourced to OASIS (camel-ai); MiroFish is a Flask wrapper with 5+ sequential LLM call points |
+| Code Quality | C | 38.8K LOC; encoding hacks for Windows (force UTF-8 at startup), OASIS integration is brittle |
+| Security | D | No input sanitization on user-uploaded documents fed directly to LLM prompts; no auth layer |
+| Documentation | C | README markets "collective intelligence" but the code is LLM role-playing with no algorithmic backing |
+| **Overall** | **C** | **50K stars for a Flask+OASIS wrapper; the "simulation to prediction" leap has no methodological support** |
+
 ## Architecture
 
 ![Architecture](architecture.png)

@@ -21,6 +21,16 @@ The pitch: 9x faster than Chrome, 16x less memory, instant startup. The reality:
 
 ---
 
+## Overall Rating
+
+| Dimension | Grade | Notes |
+|-----------|-------|-------|
+| Architecture | A | From-scratch browser: Zig parser to V8 to CDP, no Chromium dependency. html5ever via Rust FFI for correct HTML parsing |
+| Code Quality | A | 90K Zig LOC, bitcast dispatch for tagged unions avoids vtable overhead; Go test runner for CDP conformance |
+| Security | B | BoringSSL for TLS, but no process isolation — single-process model means a V8 exploit owns the host |
+| Documentation | B | Architecture is inferable from code structure; no formal spec for which CDP commands are supported vs stubbed |
+| **Overall** | **A-** | **Building a browser from scratch in Zig is a legitimate technical achievement; 9x/16x benchmarks are real but scope-limited** |
+
 ## Architecture
 
 ![Architecture](architecture.png)

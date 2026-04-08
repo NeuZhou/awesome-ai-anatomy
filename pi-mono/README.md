@@ -19,6 +19,16 @@ Pi is a monorepo of seven npm packages that together form a full stack for build
 
 ---
 
+## Overall Rating
+
+| Dimension | Grade | Notes |
+|-----------|-------|-------|
+| Architecture | B+ | 7 npm packages, game-engine layering (pi-ai as renderer abstraction, pi-agent-core as game loop) |
+| Code Quality | B | 147K LOC across 583 .ts files; lazy provider loading borrowed from texture streaming patterns |
+| Security | C | "Stealth mode" impersonates Claude Code's tool names to dodge rate limits — ToS violation risk |
+| Documentation | B- | shittycodingagent.ai is honest about scope; internal package boundaries need better docs |
+| **Overall** | **B** | **Game-engine architecture applied to LLM agents is a fresh perspective; stealth mode is a liability** |
+
 ## Architecture
 
 ![Architecture](architecture.png)

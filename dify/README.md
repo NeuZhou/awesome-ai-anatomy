@@ -19,6 +19,16 @@ Dify is a platform for building AI applications through a visual drag-and-drop i
 
 ---
 
+## Overall Rating
+
+| Dimension | Grade | Notes |
+|-----------|-------|-------|
+| Architecture | B+ | Graphon engine extracted to standalone PyPI package; 7+ Docker containers and 1600-line docker-compose is real operational overhead |
+| Code Quality | B | 1.28M LOC across Python+TypeScript; graph engine is clean, but plugin daemon adds a second process boundary to debug |
+| Security | B- | SSRF proxy (Squid) is good, but code sandbox isolation relies on a separate Go process with limited audit surface |
+| Documentation | A | End-user docs are thorough; 30+ vector DB integrations each documented |
+| **Overall** | **B+** | **Most feature-complete open-source AI platform; complexity cost is high — graphon extraction was the right call** |
+
 ## Architecture
 
 ![Architecture](architecture.png)

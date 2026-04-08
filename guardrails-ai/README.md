@@ -19,6 +19,16 @@ Guardrails AI wraps LLM API calls and validates the output against a schema you 
 
 ---
 
+## Overall Rating
+
+| Dimension | Grade | Notes |
+|-----------|-------|-------|
+| Architecture | B+ | Single responsibility: validate LLM output against schemas. Validator Hub (pip-install from git) is a distribution model worth noting |
+| Code Quality | B+ | 18K LOC in 178 files; Guard class (1076 lines) holds too much state but the reask loop logic is well-separated |
+| Security | B | Validators pip-install from git URLs — supply chain risk if Hub packages are compromised |
+| Documentation | A- | API docs and validator catalog are thorough; internal reask loop mechanics less documented |
+| **Overall** | **B+** | **Focused scope, reask loop is the key innovation; 1076-line Guard class needs decomposition** |
+
 ## Architecture
 
 ![Architecture](architecture.png)

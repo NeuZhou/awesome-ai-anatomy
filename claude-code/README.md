@@ -24,6 +24,18 @@
 
 ---
 
+## Overall Rating
+
+| Dimension | Grade | Notes |
+|-----------|-------|-------|
+| Architecture | A | 4-layer context management, 40+ tools as pure functions via buildTool(), streaming tool execution |
+| Code Quality | A- | 510K LOC with Zod v4 schemas throughout, but the 1729-line core loop is a god object |
+| Security | B+ | Per-tool permission model works, pet system bypasses normal trust boundaries |
+| Documentation | A | Internal docs cover feature flags, tool contracts, and context cascade in detail |
+| **Overall** | **A-** | **Production-proven at scale; the core loop needs splitting and the pet system needs rethinking** |
+
+---
+
 ## Table of Contents
 
 - [At a Glance](#at-a-glance)

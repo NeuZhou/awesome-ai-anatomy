@@ -20,6 +20,16 @@ DeerFlow is an orchestration layer that lets one LLM manage sub-agents, run sand
 
 ---
 
+## Overall Rating
+
+| Dimension | Grade | Notes |
+|-----------|-------|-------|
+| Architecture | B | 14-layer middleware chain is a clean pattern but order-dependent; LangGraph dependency couples tightly |
+| Code Quality | B- | DanglingToolCallMiddleware patches orphan tool calls instead of preventing them |
+| Security | C+ | No auth, no RBAC; deploy on a public IP and anyone can execute code in the sandbox |
+| Documentation | B | v2.0 rewrite docs exist, middleware ordering is not documented outside the code |
+| **Overall** | **B-** | **Middleware chain and hash-based loop detection are worth studying; zero access control is a blocker for production** |
+
 ## Architecture
 
 ![Architecture](architecture.png)

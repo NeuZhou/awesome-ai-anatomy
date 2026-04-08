@@ -20,6 +20,16 @@ If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SO
 
 ---
 
+## Overall Rating
+
+| Dimension | Grade | Notes |
+|-----------|-------|-------|
+| Architecture | B | OpenClaw clone structure (SOUL.md/MEMORY.md/AGENTS.md) with FTS5 session search and frozen memory snapshots added |
+| Code Quality | B- | 9000-line single-file agent loop; subagents can't run code or write memory, limiting real utility |
+| Security | C | No sandboxing for tool execution; subagent restrictions are too conservative to be useful |
+| Documentation | B- | Self-improving skill system is documented, but migration path from OpenClaw is under-specified |
+| **Overall** | **B-** | **Self-improving skills and frozen memory snapshots are novel; 9000-line god file and hobbled subagents hold it back** |
+
 ## Architecture
 
 ![Architecture](architecture.png)

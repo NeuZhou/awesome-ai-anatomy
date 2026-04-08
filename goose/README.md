@@ -19,6 +19,16 @@ Goose is an on-machine AI agent that runs shell commands, edits files, manages e
 
 ---
 
+## Overall Rating
+
+| Dimension | Grade | Notes |
+|-----------|-------|-------|
+| Architecture | A- | MCP as first-class extension protocol; agent loop is thin, extensions do the real work |
+| Code Quality | A | 124K Rust LOC with Tokio async, clean crate boundaries, Axum HTTP layer |
+| Security | B+ | Extension sandboxing via MCP process isolation; no per-tool permission model like Codex |
+| Documentation | B+ | README and extension API docs cover the surface; internal architecture requires code reading |
+| **Overall** | **A-** | **MCP-first design is forward-looking; 30+ provider support via registry pattern is well-executed** |
+
 ## Architecture
 
 ![Architecture](architecture.png)
