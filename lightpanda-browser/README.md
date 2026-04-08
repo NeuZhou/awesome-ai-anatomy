@@ -33,13 +33,10 @@ The pitch: 9x faster than Chrome, 16x less memory, instant startup. The reality:
 
 ## Architecture
 
+
+![Architecture](lightpanda-browser-1.png)
+
 ![Architecture](architecture.png)
-
-<!-- Additional architecture diagrams -->
-
-![Diagram 1](lightpanda-browser-1.png)
-
-
 ![Diagram 2](lightpanda-browser-2.png)
 
 
@@ -101,6 +98,9 @@ This matters because it means adding a new Web API is a single-file operation: w
 
 ### 1. The CDP Integer Dispatch Trick
 
+
+![1. The CDP Integer Dispatch Trick](lightpanda-browser-2.png)
+
 The CDP domain dispatcher in `CDP.zig` uses a pattern I haven't seen before. Instead of a hash map or string comparison chain, it converts domain names into fixed-width integers and uses a switch statement:
 
 ```zig
@@ -139,6 +139,9 @@ Is this worth the cleverness? For a hot path that processes every CDP message, a
 Each domain handler follows the same structure — it receives a `Command`, parses domain-specific params, executes against the browser state, and sends back results. The 15 implemented domains are: Accessibility, Browser, CSS, DOM, Emulation, Fetch, Input, Inspector, Log, LP (proprietary), Network, Page, Performance, Runtime, Security, Storage, and Target.
 
 ### 2. The html5ever FFI: Zig ↔ Rust ↔ Zig
+
+
+![2. The html5ever FFI: Zig ↔ Rust ↔ Zig](lightpanda-browser-3.png)
 
 Lightpanda doesn't write its own HTML parser. It delegates to Servo's `html5ever`, a mature, spec-compliant HTML5 parser written in Rust. The FFI boundary is surprisingly clean — and surprisingly callback-heavy.
 
