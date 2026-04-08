@@ -31,13 +31,10 @@ Guardrails AI wraps LLM API calls and validates the output against a schema you 
 
 ## Architecture
 
+
+![Architecture](guardrails-ai-1.png)
+
 ![Architecture](architecture.png)
-
-<!-- Additional architecture diagrams -->
-
-![Diagram 1](guardrails-ai-1.png)
-
-
 ![Diagram 2](guardrails-ai-2.png)
 
 
@@ -134,6 +131,9 @@ This is where the `OnFailAction` enum comes in — `REASK` triggers the loop, `F
 
 ### The Validator Pipeline
 
+
+
+![The Validator Pipeline](guardrails-ai-2.png)
 
 The validation traversal is a depth-first search. For a nested JSON object, it validates leaf nodes first and bubbles up. The code in `SequentialValidatorService.validate()` is recursive — for Lists, it iterates items; for Dicts, it iterates keys. Each node gets its own set of validators looked up from the `validator_map` by JSON path.
 
