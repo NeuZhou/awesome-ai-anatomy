@@ -32,13 +32,10 @@ If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SO
 
 ## Architecture
 
+
+![Architecture](hermes-agent-1.png)
+
 ![Architecture](architecture.png)
-
-<!-- Additional architecture diagrams -->
-
-![Diagram 1](hermes-agent-1.png)
-
-
 ![Diagram 2](hermes-agent-2.png)
 
 
@@ -57,6 +54,9 @@ The entire agent loop lives in one file: `run_agent.py` at 9,000+ lines. I ran `
 ---
 
 ## The Learning Loop: The One Thing That's Actually New
+
+
+![The Learning Loop: The One Thing That's Actually New](hermes-agent-2.png)
 
 The marketing says "self-improving." I was skeptical. But after reading the skill manager code, I'll admit: the implementation is more solid than I expected. The learning loop has three components:
 
@@ -94,6 +94,9 @@ The agent periodically nudges itself to persist knowledge. The `BuiltinMemoryPro
 
 ```python
 # From builtin_memory_provider.py
+
+![From builtin_memory_provider.py](hermes-agent-3.png)
+
 def system_prompt_block(self) -> str:
     """Uses the frozen snapshot captured at load time.
     This ensures the system prompt stays stable throughout a session
@@ -112,6 +115,9 @@ Hermes's delegation system is more restrictive than DeerFlow's, and I think that
 
 ```python
 # From delegate_tool.py
+
+![From delegate_tool.py](hermes-agent-4.png)
+
 DELEGATE_BLOCKED_TOOLS = frozenset([
     "delegate_task",   # no recursive delegation
     "clarify",         # no user interaction
@@ -137,6 +143,9 @@ The no-memory-writes constraint is worth calling out. In DeerFlow, subagents sha
 ---
 
 ## Context Compression
+
+
+![Context Compression](hermes-agent-5.png)
 
 I spent a while on the `ContextCompressor` because I've burned money on context overflow before. This module does it right — five-step algorithm:
 
