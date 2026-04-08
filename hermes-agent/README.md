@@ -34,60 +34,6 @@ If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SO
 
 ![Architecture](architecture.png)
 
-<details>
-<summary>Mermaid source (click to expand)</summary>
-
-```mermaid
-flowchart LR
-    subgraph Entry["Entry Points"]
-        CLI["hermes CLI (TUI)"]
-        GW["Gateway\n(Telegram/Discord/Slack/\nWhatsApp/Signal)"]
-    end
-
-    CLI --> AGENT["AIAgent\n(run_agent.py — 9,000+ lines)"]
-    GW --> AGENT
-
-    AGENT --> MM["MemoryManager"]
-    AGENT --> TM["Tool Registry\n(40+ tools)"]
-    AGENT --> SM["Skill System"]
-    AGENT --> CC["ContextCompressor"]
-    AGENT --> DT["Delegate Tool\n(SubAgents)"]
-
-    MM --> BM["BuiltinMemory\n(MEMORY.md + USER.md)"]
-    MM --> EP["External Provider\n(Honcho, etc.)"]
-
-    TM --> TER["Terminal Backends\n(Local/Docker/SSH/\nDaytona/Singularity/Modal)"]
-    TM --> WEB["Web Tools\n(Search/Fetch/Browser)"]
-    TM --> MCP["MCP Servers"]
-    TM --> FILE["File Operations"]
-
-    SM --> SC["Skill Creator\n(auto-creates from experience)"]
-    SM --> SH["Skills Hub\n(agentskills.io)"]
-    SM --> SG["Skills Guard\n(security scanner)"]
-
-    DT --> CHILD1["Child Agent 1"]
-    DT --> CHILD2["Child Agent 2"]
-    DT --> CHILD3["Child Agent 3"]
-
-    AGENT --> CRON["Cron Scheduler"]
-    AGENT --> SS["Session Search\n(FTS5 + LLM summary)"]
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class CLI primary
-    class GW primary
-    class AGENT secondary
-    class SM accent
-    class MM accent
-    class SS accent
-    class SG warn
-```
-
-</details>
 
 The entire agent loop lives in one file: `run_agent.py` at 9,000+ lines. I ran `wc -l` three times because I thought I miscounted. Nope — nine thousand lines, one file, one class. Every PR touches it, every merge conflict lives here. At 26K stars nobody's had the guts to refactor it, and I get why — you'd basically be rewriting the product. But this is the kind of thing that makes onboarding a nightmare. DeerFlow's middleware chain is how you actually make an agent loop extensible.
 
@@ -97,30 +43,6 @@ The entire agent loop lives in one file: `run_agent.py` at 9,000+ lines. I ran `
 
 The marketing says "self-improving." I was skeptical. But after reading the skill manager code, I'll admit: the implementation is more solid than I expected. The learning loop has three components:
 
-```mermaid
-flowchart LR
-    TASK["Complex Task\nCompleted"] --> CREATE["Auto-Create Skill\n(SKILL.md)"]
-    CREATE --> SCAN1["Security Scan\n(skills_guard.py)"]
-    SCAN1 -->|pass| ACTIVATE["Skill Activated"]
-    ACTIVATE --> USE["Skill Used\nNext Time"]
-    USE --> PATCH["Agent Patches Skill\n(find-and-replace)"]
-    PATCH --> SCAN2["Re-Scan Security"]
-    SCAN2 -->|pass| IMPROVED["Improved Skill"]
-    IMPROVED --> USE
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class TASK primary
-    class CREATE secondary
-    class ACTIVATE accent
-    class IMPROVED accent
-    class SCAN1 warn
-    class SCAN2 warn
-```
 
 ### 1. Autonomous Skill Creation
 
@@ -164,29 +86,6 @@ def system_prompt_block(self) -> str:
 
 This avoids recompiling the system prompt every time the agent writes a memory entry. If your provider charges for prompt tokens and you have a 4K-word MEMORY.md, this saves real money over a long session.
 
-```mermaid
-flowchart LR
-    subgraph Session["Current Session"]
-        SYS["System Prompt\n(frozen snapshot)"] --> LLM["LLM"]
-        LLM --> MT["memory tool\n(add/replace/remove)"]
-        MT --> DISK["MEMORY.md\n(live updates)"]
-    end
-
-    subgraph Next["Next Session"]
-        DISK --> SYS2["System Prompt\n(new snapshot)"]
-    end
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class SYS primary
-    class LLM secondary
-    class DISK accent
-    class SYS2 primary
-```
 
 ---
 
@@ -215,30 +114,6 @@ Key design decisions:
 3. **No user interaction** — children can't ask clarifying questions
 4. **No code execution** — children "should reason step-by-step, not write scripts"
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant P as Parent Agent
-    participant C1 as Child 1
-    participant C2 as Child 2
-    participant C3 as Child 3
-
-    U->>P: Complex task
-    P->>P: Decompose into sub-tasks
-
-    par Max 3 concurrent
-        P->>C1: task + restricted toolset
-        P->>C2: task + restricted toolset
-        P->>C3: task + restricted toolset
-    end
-
-    Note over C1,C3: No memory writes\nNo delegation\nNo user interaction
-
-    C1-->>P: Summary result
-    C2-->>P: Summary result
-    C3-->>P: Summary result
-    P->>U: Synthesized answer
-```
 
 The no-memory-writes constraint is worth calling out. In DeerFlow, subagents share the parent's thread state. In Hermes, they're fully isolated. This prevents a class of bugs where two children simultaneously try to update MEMORY.md, but it also means children can't benefit from each other's discoveries within a single turn.
 
@@ -248,28 +123,6 @@ The no-memory-writes constraint is worth calling out. In DeerFlow, subagents sha
 
 I spent a while on the `ContextCompressor` because I've burned money on context overflow before. This module does it right — five-step algorithm:
 
-```mermaid
-flowchart LR
-    MSG["Message History\n(approaching limit)"] --> S1["Step 1: Prune Tool Results\n(cheap, no LLM)"]
-    S1 --> S2["Step 2: Protect Head\n(system prompt + 1st exchange)"]
-    S2 --> S3["Step 3: Protect Tail\n(last ~20K tokens verbatim)"]
-    S3 --> S4["Step 4: Summarize Middle\n(Goal/Progress/Decisions/Files/Next)"]
-    S4 --> S5["Step 5: Iterative Update\n(refine prev summary, don't regenerate)"]
-    S5 --> OUT["Compressed Context\n(head + summary + tail)"]
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class MSG primary
-    class S1 accent
-    class S2 accent
-    class S4 secondary
-    class S5 secondary
-    class OUT accent
-```
 
 1. **Prune old tool results** — cheap pre-pass, no LLM call. Old tool outputs get replaced with `[Old tool output cleared to save context space]`
 2. **Protect the head** — system prompt + first exchange are never summarized
