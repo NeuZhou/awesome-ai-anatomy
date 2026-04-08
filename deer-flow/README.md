@@ -36,54 +36,6 @@ DeerFlow is an orchestration layer that lets one LLM manage sub-agents, run sand
 
 The system runs two backend services behind Nginx:
 
-<details>
-<summary>Mermaid source (click to expand)</summary>
-
-```mermaid
-flowchart LR
-    User([User]) --> Nginx[Nginx :2026]
-    Nginx -->|/api/langgraph/*| LG[LangGraph Server :2024]
-    Nginx -->|/api/*| GW[Gateway API :8001]
-    Nginx -->|static| FE[Next.js Frontend]
-
-    subgraph LG[LangGraph Server]
-        direction TB
-        MSG[Message In] --> MW["Middleware Chain\n14+ middlewares"]
-        MW --> LLM[LLM Call]
-        LLM --> TD[Tool Dispatch]
-        TD --> SA[SubAgent Pool]
-        TD --> SB[Sandbox]
-        TD --> MCP[MCP Servers]
-        SA --> RES[Response Out]
-        SB --> RES
-        MCP --> RES
-        LLM --> RES
-    end
-
-    subgraph GW[Gateway API]
-        direction TB
-        MOD[Models Config]
-        SKL[Skills CRUD]
-        MEM[Memory Endpoints]
-        UPL[Uploads & Artifacts]
-        MCPC[MCP Config]
-    end
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class User primary
-    class MW secondary
-    class LLM secondary
-    class SA accent
-    class SB accent
-    class MCP accent
-```
-
-</details>
 
 The split is straightforward: LangGraph Server handles the stateful agent loop (can run for hours on a single task). Gateway API is stateless REST for everything else — model config, skill management, memory, file uploads.
 
@@ -95,43 +47,6 @@ I've seen this pattern before in ad-serving systems — separate the hot path fr
 
 This is the most interesting engineering decision in the codebase. Every message passes through 14+ middlewares in strict order. Get the order wrong and you get subtle bugs.
 
-```mermaid
-flowchart LR
-    IN(["Message In"]) --> TD["ThreadDataMiddleware\ncreates per-thread dirs"]
-    TD --> UP["UploadsMiddleware\ninjects new files"]
-    UP --> SB["SandboxMiddleware\nacquires sandbox env"]
-    SB --> SA["SandboxAuditMiddleware\nlogs file ops"]
-    SA --> DT["DanglingToolCallMiddleware\npatches orphan calls"]
-    DT --> LE["LLMErrorHandlingMiddleware\nretry with backoff"]
-    LE --> TE["ToolErrorHandlingMiddleware\nexceptions to ToolMessages"]
-    TE --> SU["SummarizationMiddleware\ncompress when near limit"]
-    SU --> TODO["TodoMiddleware\ntask tracking in plan mode"]
-    TODO --> TU["TokenUsageMiddleware\ncost monitoring"]
-    TU --> TI["TitleMiddleware\nauto-title after 1st exchange"]
-    TI --> ME["MemoryMiddleware\nqueue for async extraction"]
-    ME --> VI["ViewImageMiddleware\ninject images for vision models"]
-    VI --> LD["LoopDetectionMiddleware\nwarn at 3, kill at 5 repeats"]
-    LD --> SL["SubagentLimitMiddleware\ncap parallel tasks"]
-    SL --> CL["ClarificationMiddleware\nMUST BE LAST"]
-    CL --> OUT(["To LLM"])
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class TD accent
-    class SB accent
-    class SA accent
-    class LE warn
-    class TE warn
-    class DT warn
-    class LD secondary
-    class SL secondary
-    class CL secondary
-
-```
 
 The color coding: 🔵 infrastructure, 🟠 error handling, 🔴 safety.
 
@@ -158,39 +73,6 @@ _scheduler_pool = ThreadPoolExecutor(max_workers=3, thread_name_prefix="subagent
 _execution_pool = ThreadPoolExecutor(max_workers=3, thread_name_prefix="subagent-exec-")
 ```
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant LA as Lead Agent
-    participant SP as Scheduler Pool
-    participant EP as Executor Pool
-
-    U->>LA: "Compare AWS, Azure, GCP, Alibaba, Oracle"
-    LA->>LA: Decompose: 5 sub-tasks, limit is 3/turn
-
-    par Batch 1 (3 concurrent)
-        LA->>SP: task("AWS analysis")
-        LA->>SP: task("Azure analysis")
-        LA->>SP: task("GCP analysis")
-        SP->>EP: Execute SubAgent 1
-        SP->>EP: Execute SubAgent 2
-        SP->>EP: Execute SubAgent 3
-    end
-
-    EP-->>LA: Results (batch 1)
-
-    par Batch 2 (2 remaining)
-        LA->>SP: task("Alibaba analysis")
-        LA->>SP: task("Oracle analysis")
-        SP->>EP: Execute SubAgent 4
-        SP->>EP: Execute SubAgent 5
-    end
-
-    EP-->>LA: Results (batch 2)
-    LA->>U: Synthesized comparison
-
-    Note over SP,EP: 15-min timeout per subagent\nMax 3 concurrent
-```
 
 The batching is enforced at two levels: `SubagentLimitMiddleware` silently truncates excess `task()` calls, and the system prompt has 200+ lines teaching the model to count sub-tasks and plan batches.
 
@@ -233,35 +115,6 @@ Compared to OpenClaw's flat `MEMORY.md` or Claude Code's `CLAUDE.md` rules file,
 | Confidence | Per-fact 0-1 scores | No | No |
 | Multi-agent | Per-agent isolated memory | Per-workspace | Per-project |
 
-```mermaid
-flowchart LR
-    CONV(["Conversation"]) --> MM["MemoryMiddleware\ndebounce and queue"]
-    MM --> LLM["LLM Extraction\ncheap model"]
-    LLM --> CAT{Categorize}
-    CAT --> |work| WC[workContext]
-    CAT --> |personal| PC[personalContext]
-    CAT --> |top-of-mind| TOM[topOfMind]
-    CAT --> |fact| F["facts + confidence scores"]
-    CAT --> |history| H[history.recentMonths]
-
-    JSON[(memory.json)] --> SYS[System Prompt Injection]
-    WC --> JSON
-    PC --> JSON
-    TOM --> JSON
-    F --> JSON
-    H --> JSON
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class CONV primary
-    class MM secondary
-    class LLM secondary
-    class JSON accent
-```
 
 The debounced update design is smart — you don't want an LLM call after every single message. But the underlying storage is a single JSON file with `mtime`-based cache invalidation. I didn't see any file locking in the storage layer. If two concurrent threads try to update memory at the same time, I'd bet real money you get a corrupted JSON file. For single-user local deployment this is fine. Multi-tenant? You'd need to rip out the storage layer entirely.
 
@@ -271,28 +124,6 @@ The debounced update design is smart — you don't want an LLM call after every 
 
 This is one of those features that sounds boring until your agent burns $200 in API calls because it's stuck calling the same tool in a loop. I've been there.
 
-```mermaid
-stateDiagram-v2
-    [*] --> Normal
-    Normal --> Normal : unique tool hash
-    Normal --> Warning : same hash ×3
-    Warning --> Normal : different hash
-    Warning --> HardStop : same hash ×5
-    HardStop --> [*] : thread ends
-
-    note right of Warning
-        Injects "you are repeating yourself"
-        system message (once per hash)
-    end note
-    note right of HardStop
-        Strips ALL tool_calls
-        Forces text-only response
-    end note
-    note left of Normal
-        Window: last 20 calls
-        LRU: 100 threads max
-    end note
-```
 
 The hash is order-independent — `[search("A"), read("B")]` and `[read("B"), search("A")]` produce the same hash. Nice touch. Prevents the model from "evading" detection by shuffling call order.
 
