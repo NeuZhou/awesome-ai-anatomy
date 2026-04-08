@@ -36,55 +36,6 @@ The weird part: it also spawns Codex and Gemini CLI workers alongside Claude. So
 
 ![Architecture](architecture.png)
 
-<details>
-<summary>Mermaid source (click to expand)</summary>
-
-```mermaid
-flowchart LR
-    subgraph CC["Claude Code (Host)"]
-        OMC["OMC Plugin Layer"]
-        OMC --> SKILL["Skill System\n(auto-inject)"]
-        OMC --> AGENTS["19 Agent Definitions\n(architect/designer/critic/...)"]
-        OMC --> ROUTER["Smart Model Router\n(Haiku→simple, Opus→complex)"]
-    end
-
-    subgraph TEAM["Team Orchestration"]
-        LEAD["Lead Agent"] --> PHASE["Phase Controller\n(plan→exec→verify→fix)"]
-        PHASE --> DISPATCH["Dispatch Queue\n(file-based, locked)"]
-        DISPATCH --> W1["Worker 1\n(tmux pane)"]
-        DISPATCH --> W2["Worker 2\n(tmux pane)"]
-        DISPATCH --> W3["Worker 3\n(tmux pane)"]
-        W1 --> INBOX["Inbox/Outbox\n(.omc/state/team/)"]
-        W2 --> INBOX
-        W3 --> INBOX
-        INBOX --> LEAD
-    end
-
-    subgraph MULTI["Multi-Model Workers"]
-        CLAUDE["claude CLI"]
-        CODEX["codex CLI"]
-        GEMINI["gemini CLI"]
-    end
-
-    W1 --> CLAUDE
-    W2 --> CODEX
-    W3 --> GEMINI
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class OMC primary
-    class LEAD secondary
-    class DISPATCH secondary
-    class CLAUDE accent
-    class CODEX accent
-    class GEMINI accent
-```
-
-</details>
 
 ## File-Based IPC: The Most Interesting Design Decision
 
@@ -127,46 +78,6 @@ I've used this pattern in distributed systems before (specifically, job queues w
 
 OMC defines 19 agent roles with model tier assignments:
 
-```mermaid
-flowchart LR
-    subgraph OPUS["Opus Tier (Complex Reasoning)"]
-        CR["code-reviewer"]
-    end
-    
-    subgraph SONNET["Sonnet Tier (Balanced)"]
-        AR["architect"]
-        DE["designer"]  
-        WR["writer"]
-        AN["analyst"]
-        EX["executor"]
-        PL["planner"]
-        QA["qa-tester"]
-        SC["scientist"]
-        DB["debugger"]
-        VR["verifier"]
-        TE["test-engineer"]
-        SR["security-reviewer"]
-        TR["tracer"]
-        EXP["explore"]
-    end
-
-    subgraph HAIKU["Haiku Tier (Fast/Cheap)"]
-        CT["critic"]
-        DS["doc-specialist"]
-    end
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class CR warn
-    class AR secondary
-    class PL secondary
-    class CT accent
-    class DS accent
-```
 
 The model routing is the interesting part: simple tasks get Haiku (cheap), complex reasoning gets Opus (expensive), everything else gets Sonnet. The `critic` agent specifically uses Haiku because criticism doesn't need deep reasoning — it just needs to point out problems.
 
@@ -178,26 +89,6 @@ Each agent's prompt is loaded from a Markdown file in `/agents/*.md`, which mean
 
 Team mode runs as a staged pipeline with retry loops:
 
-```mermaid
-stateDiagram-v2
-    [*] --> planning
-    planning --> executing : tasks assigned
-    executing --> executing : some tasks complete, others queued
-    executing --> fixing : task failed, retries remaining
-    fixing --> executing : retry submitted
-    fixing --> failed : all retries exhausted
-    executing --> completed : all tasks done
-    completed --> [*]
-    failed --> [*]
-
-    note right of planning
-        team-plan → team-prd → assign
-    end note
-    note right of fixing
-        permanentlyFailed tasks tracked
-        via metadata.permanentlyFailed
-    end note
-```
 
 The phase controller infers the current phase from task status distribution — no explicit state machine transitions. It looks at how many tasks are pending/in_progress/completed/failed and figures out what phase the team is in. A subtle but important detail: tasks with `metadata.permanentlyFailed === true` have status `completed` but are counted as failed. This prevents the pipeline from reporting success when some tasks actually failed.
 
