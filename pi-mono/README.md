@@ -31,13 +31,10 @@ Pi is a monorepo of seven npm packages that together form a full stack for build
 
 ## Architecture
 
+
+![Architecture](pi-mono-1.png)
+
 ![Architecture](architecture.png)
-
-<!-- Additional architecture diagrams -->
-
-![Diagram 1](pi-mono-1.png)
-
-
 ![Diagram 2](pi-mono-2.png)
 
 
@@ -124,6 +121,9 @@ The author even links to a history tracker for Claude Code's prompts (`https://c
 ### The Agent Loop — Scene-Graph-Style Event Pumping
 
 
+
+![The Agent Loop — Scene-Graph-Style Event Pumping](pi-mono-2.png)
+
 If you squint, this is a game loop. Every "frame" (turn):
 
 1. Poll input (steering messages — the user typing while the agent is working)
@@ -148,6 +148,9 @@ This maps directly to how game engines handle input buffering — you don't proc
 
 ### The Extension System — "Everything is a Plugin" Done Right
 
+
+
+![The Extension System — "Everything is a Plugin" Done Right](pi-mono-3.png)
 
 Pi's extension system has more event types than most agent frameworks have total API surface. Extensions can:
 
