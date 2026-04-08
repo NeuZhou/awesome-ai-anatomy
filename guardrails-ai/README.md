@@ -33,74 +33,6 @@ Guardrails AI wraps LLM API calls and validates the output against a schema you 
 
 ![Architecture](architecture.png)
 
-<details>
-<summary>Mermaid source (click to expand)</summary>
-
-```mermaid
-flowchart LR
-    subgraph UserCode["Your Application"]
-        UC["guard = Guard()\nguard.use(MyValidator)\nguard(llm_api, messages=...)"]
-    end
-
-    subgraph GuardClass["Guard (guard.py — 1,076 lines)"]
-        Init["__init__\nvalidators, output_schema,\napi_client, exec_opts"]
-        Call["__call__ / parse / validate"]
-        Execute["_execute\n→ fill_validator_map\n→ fill_validators\n→ contextvars.Context.run"]
-        Exec["_exec\n→ Runner or StreamRunner"]
-    end
-
-    subgraph RunnerLayer["Runner (run/runner.py — 457 lines)"]
-        Step["step()\n1. prepare → 2. call LLM → 3. parse → 4. validate → 5. introspect"]
-        ReaskLoop["Reask Loop\ndo_loop() → prepare_to_loop()\nmax num_reasks iterations"]
-    end
-
-    subgraph ValidatorService["Validator Service"]
-        VS["validator_service/__init__.py\nvalidate() → sync or async path"]
-        SeqVS["SequentialValidatorService\nDFS tree traversal\nrun_validators() per node"]
-        AsyncVS["AsyncValidatorService\nasyncio parallel execution"]
-    end
-
-    subgraph ValidatorLayer["Validator Instances"]
-        V1["Validator._validate(value, metadata)\n→ PassResult / FailResult"]
-        V2["OnFailAction:\nreask | fix | filter | refrain\nnoop | exception | custom"]
-    end
-
-    subgraph HubSystem["Hub Ecosystem"]
-        Install["guardrails.install('hub://guardrails/regex_match')\npip install from git"]
-        Registry["hub_registry.json\nlocal validator manifest"]
-        Remote["Remote Inference\nHub-hosted ML models"]
-    end
-
-    UC --> Call
-    Call --> Execute
-    Execute --> Exec
-    Exec --> Step
-    Step --> ReaskLoop
-    Step --> VS
-    VS --> SeqVS
-    VS --> AsyncVS
-    SeqVS --> V1
-    AsyncVS --> V1
-    V1 --> V2
-    Install --> Registry
-    Registry -.->|"import_module"| V1
-    V1 -.->|"use_local=False"| Remote
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class UC primary
-    class Call secondary
-    class Step secondary
-    class V1 accent
-    class V2 warn
-    class Install accent
-```
-
-</details>
 
 The whole thing flows through a single central class: `Guard`. It holds your validators, your output schema, your execution history, your API client, your telemetry config — everything. When you call it, it builds a `Runner`, which loops through LLM calls and validation steps until the output passes or the reask budget runs out.
 
@@ -194,50 +126,6 @@ This is where the `OnFailAction` enum comes in — `REASK` triggers the loop, `F
 
 ### The Validator Pipeline
 
-```mermaid
-sequenceDiagram
-    participant App as Your Code
-    participant Guard as Guard
-    participant Runner as Runner
-    participant LLM as LLM API
-    participant VS as ValidatorService
-    participant Val as Validator
-
-    App->>Guard: guard(llm_api, messages=[...])
-    Guard->>Guard: _fill_validator_map()
-    Guard->>Runner: new Runner(schema, validators, api)
-    
-    loop Reask Loop (max num_reasks)
-        Runner->>LLM: call(messages)
-        LLM-->>Runner: raw output string
-        Runner->>Runner: parse(output) → Dict/List/str
-        Runner->>VS: validate(parsed, metadata, validator_map)
-        
-        loop DFS Tree Traversal
-            VS->>VS: validate children first (List items, Dict keys)
-            VS->>Val: run_validators(value, metadata)
-            Val->>Val: _validate(value, metadata)
-            alt PassResult
-                Val-->>VS: PassResult (optional value_override)
-            else FailResult
-                Val-->>VS: FailResult (error_message, fix_value)
-                VS->>VS: perform_correction(result, value, validator)
-                Note over VS: REASK = FieldReAsk object\nFIX = use fix_value\nEXCEPTION = raise\nFILTER = Filter sentinel\nREFRAIN = Refrain sentinel
-            end
-        end
-        
-        VS-->>Runner: validated_output
-        Runner->>Runner: introspect → gather ReAsk objects
-        
-        alt No ReAsks or budget exhausted
-            Runner-->>Guard: Call log
-        else Has ReAsks
-            Runner->>Runner: prepare_to_loop → new prompt with errors
-        end
-    end
-    
-    Guard-->>App: ValidationOutcome(validated_output, raw_output, passed)
-```
 
 The validation traversal is a depth-first search. For a nested JSON object, it validates leaf nodes first and bubbles up. The code in `SequentialValidatorService.validate()` is recursive — for Lists, it iterates items; for Dicts, it iterates keys. Each node gets its own set of validators looked up from the `validator_map` by JSON path.
 
