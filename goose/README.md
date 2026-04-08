@@ -69,20 +69,20 @@ Most agent frameworks have "tools." Goose has six distinct extension types, all 
 #[derive(Debug, Clone, Deserialize, Serialize, ToSchema, PartialEq)]
 #[serde(tag = "type")]
 pub enum ExtensionConfig {
-    #[serde(rename = "sse")]
-    Sse { ... },                    // Legacy SSE (deprecated, kept for compat)
-    #[serde(rename = "stdio")]
-    Stdio { cmd, args, envs, ... }, // Child process via stdin/stdout
-    #[serde(rename = "builtin")]
-    Builtin { name, ... },          // In-process MCP server (memory, visualiser)
-    #[serde(rename = "platform")]
-    Platform { name, ... },         // In-process with agent context access
-    #[serde(rename = "streamable_http")]
-    StreamableHttp { uri, ... },    // Remote MCP via HTTP
-    #[serde(rename = "frontend")]
-    Frontend { tools, ... },        // UI-provided tools (desktop only)
-    #[serde(rename = "inline_python")]
-    InlinePython { code, ... },     // Python code run via uvx
+ #[serde(rename = "sse")]
+ Sse { ... }, // Legacy SSE (deprecated, kept for compat)
+ #[serde(rename = "stdio")]
+ Stdio { cmd, args, envs, ... }, // Child process via stdin/stdout
+ #[serde(rename = "builtin")]
+ Builtin { name, ... }, // In-process MCP server (memory, visualiser)
+ #[serde(rename = "platform")]
+ Platform { name, ... }, // In-process with agent context access
+ #[serde(rename = "streamable_http")]
+ StreamableHttp { uri, ... }, // Remote MCP via HTTP
+ #[serde(rename = "frontend")]
+ Frontend { tools, ... }, // UI-provided tools (desktop only)
+ #[serde(rename = "inline_python")]
+ InlinePython { code, ... }, // Python code run via uvx
 }
 ```
 
@@ -93,18 +93,18 @@ This matters because it lets them ship a monolithic binary that still behaves li
 ```rust
 // From crates/goose/src/agents/agent.rs:210
 fn create_tool_inspection_manager(
-    permission_manager: Arc<PermissionManager>,
-    provider: SharedProvider,
+ permission_manager: Arc<PermissionManager>,
+ provider: SharedProvider,
 ) -> ToolInspectionManager {
-    let mut tool_inspection_manager = ToolInspectionManager::new();
-    tool_inspection_manager.add_inspector(Box::new(SecurityInspector::new()));
-    tool_inspection_manager.add_inspector(Box::new(EgressInspector::new()));
-    tool_inspection_manager.add_inspector(Box::new(AdversaryInspector::new(provider.clone())));
-    tool_inspection_manager.add_inspector(Box::new(PermissionInspector::new(
-        permission_manager, provider,
-    )));
-    tool_inspection_manager.add_inspector(Box::new(RepetitionInspector::new(None)));
-    tool_inspection_manager
+ let mut tool_inspection_manager = ToolInspectionManager::new();
+ tool_inspection_manager.add_inspector(Box::new(SecurityInspector::new()));
+ tool_inspection_manager.add_inspector(Box::new(EgressInspector::new()));
+ tool_inspection_manager.add_inspector(Box::new(AdversaryInspector::new(provider.clone())));
+ tool_inspection_manager.add_inspector(Box::new(PermissionInspector::new(
+ permission_manager, provider,
+ )));
+ tool_inspection_manager.add_inspector(Box::new(RepetitionInspector::new(None)));
+ tool_inspection_manager
 }
 ```
 
@@ -150,19 +150,19 @@ Goose supports 30+ LLM providers through a trait-based abstraction:
 // From crates/goose/src/providers/base.rs (simplified)
 #[async_trait]
 pub trait Provider: Send + Sync + Debug {
-    fn get_name(&self) -> &str;
-    fn get_model_config(&self) -> ModelConfig;
+ fn get_name(&self) -> &str;
+ fn get_model_config(&self) -> ModelConfig;
 
-    async fn stream(
-        &self,
-        model_config: &ModelConfig,
-        session_id: &str,
-        system: &str,
-        messages: &[Message],
-        tools: &[Tool],
-    ) -> Result<MessageStream, ProviderError>;
+ async fn stream(
+ &self,
+ model_config: &ModelConfig,
+ session_id: &str,
+ system: &str,
+ messages: &[Message],
+ tools: &[Tool],
+ ) -> Result<MessageStream, ProviderError>;
 
-    // Default implementations for complete(), permission routing, etc.
+ // Default implementations for complete(), permission routing, etc.
 }
 ```
 
@@ -217,11 +217,11 @@ Goose sits between Claude Code and OpenClaw in terms of complexity. It's more op
 ```json
 // From crates/goose/src/providers/declarative/deepseek.json
 {
-  "name": "deepseek",
-  "api_base": "https://api.deepseek.com",
-  "api_key_env": "DEEPSEEK_API_KEY",
-  "default_model": "deepseek-chat",
-  "models": ["deepseek-chat", "deepseek-reasoner"]
+ "name": "deepseek",
+ "api_base": "https://api.deepseek.com",
+ "api_key_env": "DEEPSEEK_API_KEY",
+ "default_model": "deepseek-chat",
+ "models": ["deepseek-chat", "deepseek-reasoner"]
 }
 ```
 
@@ -232,12 +232,12 @@ Adding a new OpenAI-compatible provider without writing any code — just a JSON
 ```rust
 // From crates/goose/src/agents/extension.rs:81
 const DISALLOWED_KEYS: [&'static str; 31] = [
-    "PATH", "PATHEXT", "SystemRoot",       // Binary path manipulation
-    "LD_LIBRARY_PATH", "LD_PRELOAD",       // Dynamic linker hijacking
-    "DYLD_INSERT_LIBRARIES",               // macOS injection
-    "PYTHONPATH", "NODE_OPTIONS",          // Runtime hijacking
-    "APPINIT_DLLS", "ComSpec",             // Windows process hijacking
-    // ... 21 more
+ "PATH", "PATHEXT", "SystemRoot", // Binary path manipulation
+ "LD_LIBRARY_PATH", "LD_PRELOAD", // Dynamic linker hijacking
+ "DYLD_INSERT_LIBRARIES", // macOS injection
+ "PYTHONPATH", "NODE_OPTIONS", // Runtime hijacking
+ "APPINIT_DLLS", "ComSpec", // Windows process hijacking
+ // ... 21 more
 ];
 ```
 
