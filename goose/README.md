@@ -31,13 +31,10 @@ Goose is an on-machine AI agent that runs shell commands, edits files, manages e
 
 ## Architecture
 
+
+![Architecture](goose-1.png)
+
 ![Architecture](architecture.png)
-
-<!-- Additional architecture diagrams -->
-
-![Diagram 1](goose-1.png)
-
-
 ![Diagram 2](goose-2.png)
 
 
@@ -120,6 +117,9 @@ Five inspectors, each implementing the `ToolInspector` trait, each producing `In
 ### The Agent Loop
 
 
+
+![The Agent Loop](goose-2.png)
+
 The reply loop inside `reply_internal` is the heart of the system. It's a `loop` (not a `for`) with a configurable maximum turns counter (default 1000, which is generous). Each iteration: build the prompt, call the provider, parse the response, categorize tool calls into frontend/backend, run them through the inspection pipeline, execute approved ones in parallel, wait for user approval on flagged ones, collect results, append to conversation, and loop.
 
 Three things stand out:
@@ -132,6 +132,9 @@ Three things stand out:
 
 ### The Extension Manager
 
+
+
+![The Extension Manager](goose-3.png)
 
 The `ExtensionManager` maintains a `HashMap<String, Extension>` protected by a `tokio::sync::Mutex`. Each `Extension` wraps a `McpClientBox` (which is `Arc<dyn McpClientTrait>`) plus its config and server info. Tools are cached with an atomic counter for cache invalidation — `tools_cache_version` bumps every time an extension is added or removed, and the cached `Arc<Vec<Tool>>` is only rebuilt when stale.
 
