@@ -65,15 +65,15 @@ I've seen this pattern before in ad-serving systems — separate the hot path fr
 This is the most interesting engineering decision in the codebase. Every message passes through 14+ middlewares in strict order. Get the order wrong and you get subtle bugs.
 
 
-The color coding: 🔵 infrastructure, 🟠 error handling, 🔴 safety.
+The color coding: infrastructure, error handling, safety.
 
 Three ordering constraints matter:
 
-> ⚠️ **ThreadDataMiddleware must run first** — everything downstream needs a thread_id to function.
+> **ThreadDataMiddleware must run first** — everything downstream needs a thread_id to function.
 >
-> ⚠️ **SummarizationMiddleware must run before MemoryMiddleware** — otherwise you might summarize away content that memory extraction hasn't processed yet.
+> **SummarizationMiddleware must run before MemoryMiddleware** — otherwise you might summarize away content that memory extraction hasn't processed yet.
 >
-> ⚠️ **ClarificationMiddleware must be last** — if it's not, a downstream middleware might act on something that should've been sent back to the user as a question.
+> **ClarificationMiddleware must be last** — if it's not, a downstream middleware might act on something that should've been sent back to the user as a question.
 
 These constraints are documented as code comments next to the `_build_middlewares` function. That's fine for now, but I've worked on systems where the middleware dependency graph got complex enough that we needed a topological sort to wire them up. With 14+ middlewares, they're getting close to that threshold.
 
@@ -111,20 +111,20 @@ The memory schema is actually well-designed:
 
 ```json
 {
-  "version": "1.0",
-  "user": {
-    "workContext": {"summary": "...", "updatedAt": "..."},
-    "personalContext": {"summary": "...", "updatedAt": "..."},
-    "topOfMind": {"summary": "...", "updatedAt": "..."}
-  },
-  "history": {
-    "recentMonths": {"summary": "..."},
-    "earlierContext": {"summary": "..."},
-    "longTermBackground": {"summary": "..."}
-  },
-  "facts": [
-    {"id": "...", "content": "...", "category": "...", "confidence": 0.9}
-  ]
+ "version": "1.0",
+ "user": {
+ "workContext": {"summary": "...", "updatedAt": "..."},
+ "personalContext": {"summary": "...", "updatedAt": "..."},
+ "topOfMind": {"summary": "...", "updatedAt": "..."}
+ },
+ "history": {
+ "recentMonths": {"summary": "..."},
+ "earlierContext": {"summary": "..."},
+ "longTermBackground": {"summary": "..."}
+ },
+ "facts": [
+ {"id": "...", "content": "...", "category": "...", "confidence": 0.9}
+ ]
 }
 ```
 
@@ -160,10 +160,10 @@ The hash is order-independent — `[search("A"), read("B")]` and `[read("B"), se
 Every thread gets an isolated filesystem through virtual path translation:
 
 ```
-/mnt/user-data/workspace/  →  ~/.deerflow/threads/{thread_id}/workspace/
-/mnt/user-data/uploads/    →  ~/.deerflow/threads/{thread_id}/uploads/
-/mnt/user-data/outputs/    →  ~/.deerflow/threads/{thread_id}/outputs/
-/mnt/skills/               →  deer-flow/skills/
+/mnt/user-data/workspace/ → ~/.deerflow/threads/{thread_id}/workspace/
+/mnt/user-data/uploads/ → ~/.deerflow/threads/{thread_id}/uploads/
+/mnt/user-data/outputs/ → ~/.deerflow/threads/{thread_id}/outputs/
+/mnt/skills/ → deer-flow/skills/
 ```
 
 Two providers: `LocalSandboxProvider` (filesystem isolation, bash disabled for safety) and `AioSandboxProvider` (full Docker container, bash enabled).
