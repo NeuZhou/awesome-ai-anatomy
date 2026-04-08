@@ -34,13 +34,10 @@ The weird part: it also spawns Codex and Gemini CLI workers alongside Claude. So
 
 ## Architecture
 
+
+![Architecture](oh-my-claudecode-1.png)
+
 ![Architecture](architecture.png)
-
-<!-- Additional architecture diagrams -->
-
-![Diagram 1](oh-my-claudecode-1.png)
-
-
 ![Diagram 2](oh-my-claudecode-2.png)
 
 
@@ -87,6 +84,9 @@ I've used this pattern in distributed systems before (specifically, job queues w
 
 ## 19 Specialized Agents
 
+
+![19 Specialized Agents](oh-my-claudecode-2.png)
+
 OMC defines 19 agent roles with model tier assignments:
 
 
@@ -97,6 +97,9 @@ Each agent's prompt is loaded from a Markdown file in `/agents/*.md`, which mean
 ---
 
 ## Team Pipeline: plan → exec → verify → fix
+
+
+![Team Pipeline: plan → exec → verify → fix](oh-my-claudecode-3.png)
 
 Team mode runs as a staged pipeline with retry loops:
 
