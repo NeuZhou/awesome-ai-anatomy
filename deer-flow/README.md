@@ -32,13 +32,10 @@ DeerFlow is an orchestration layer that lets one LLM manage sub-agents, run sand
 
 ## Architecture
 
+
+![Architecture](deer-flow-1.png)
+
 ![Architecture](architecture.png)
-
-<!-- Additional architecture diagrams -->
-
-![Diagram 1](deer-flow-1.png)
-
-
 ![Diagram 2](deer-flow-2.png)
 
 
@@ -62,6 +59,9 @@ I've seen this pattern before in ad-serving systems — separate the hot path fr
 
 ## The Middleware Chain
 
+
+![The Middleware Chain](deer-flow-2.png)
+
 This is the most interesting engineering decision in the codebase. Every message passes through 14+ middlewares in strict order. Get the order wrong and you get subtle bugs.
 
 
@@ -83,6 +83,9 @@ One thing I liked: each middleware handles exactly one concern. `LoopDetectionMi
 
 ## SubAgent System
 
+
+![SubAgent System](deer-flow-3.png)
+
 The parallel execution design is solid. Two thread pools:
 
 ```python
@@ -100,6 +103,9 @@ That prompt section is... a lot. It's the kind of thing you write when you've be
 ---
 
 ## Memory System
+
+
+![Memory System](deer-flow-4.png)
 
 The memory schema is actually well-designed:
 
@@ -138,6 +144,9 @@ The debounced update design is smart — you don't want an LLM call after every 
 ---
 
 ## Loop Detection
+
+
+![Loop Detection](deer-flow-5.png)
 
 This is one of those features that sounds boring until your agent burns $200 in API calls because it's stuck calling the same tool in a loop. I've been there.
 
