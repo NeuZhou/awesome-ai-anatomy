@@ -61,61 +61,6 @@ Cline is a VS Code extension that puts an AI coding agent in your sidebar. You d
 
 *Architecture diagram ([source .d2](architecture.d2)) — Red highlights the 3,756-line God Object at the center of the system. Dashed red line shows the polling-based approval flow between Task and the VS Code webview.*
 
-<details>
-<summary>Mermaid version (click to expand)</summary>
-
-```mermaid
-graph LR
-    subgraph Entry["VS Code Extension"]
-        Ext["extension.ts\n(activate/deactivate)"]
-        Common["common.ts\n(cross-platform init)"]
-    end
-
-    subgraph Core["Core Extension"]
-        Ctrl["Controller\nsrc/core/controller/index.ts"]
-        Task["Task (GOD OBJECT)\nsrc/core/task/index.ts\n3,756 lines"]
-        ToolExec["ToolExecutor\nsrc/core/task/ToolExecutor.ts"]
-        Coord["ToolExecutorCoordinator\n28 registered handlers"]
-        State["StateManager\n(file-backed storage)"]
-    end
-
-    subgraph Providers["API Providers (40+)"]
-        Anthropic["Anthropic"]
-        OpenRouter["OpenRouter"]
-        Gemini["Gemini"]
-        OpenAI["OpenAI"]
-        Bedrock["AWS Bedrock"]
-        Ollama["Ollama"]
-        More["...35 more"]
-    end
-
-    subgraph Services["Services"]
-        MCP["McpHub\n(MCP servers)"]
-        Browser["BrowserSession\n(Puppeteer)"]
-        Hooks["Hook System\n(shell scripts)"]
-    end
-
-    subgraph Context["Context & Prompts"]
-        CtxMgr["ContextManager\n(truncation)"]
-        Prompts["PromptRegistry\n(variant system)"]
-        Rules["ClineRules\n(.clinerules/)"]
-        Skills["Skills\n(SKILL.md discovery)"]
-    end
-
-    Ext --> Common --> Ctrl
-    Ctrl --> Task
-    Task --> ToolExec --> Coord
-    Task --> CtxMgr
-    Task --> Prompts
-    Task -.-> MCP
-    Task -.-> Browser
-    Task -.-> Hooks
-    Coord --> Anthropic & OpenRouter & Gemini & OpenAI & Bedrock & Ollama & More
-    Ctrl --> State
-    Prompts --> Rules & Skills
-```
-
-</details>
 
 The architecture is a four-layer hierarchy: **Extension → Controller → Task → ToolExecutor**. The VS Code extension entry point (`extension.ts`, 440 lines) sets up the host provider and registers commands. `common.ts` handles cross-platform initialization. The `Controller` manages task lifecycle, MCP servers, auth, and state. The `Task` class is where 80% of the complexity lives — it orchestrates the entire agent loop, streaming, context management, hooks, checkpoints, and tool execution.
 
@@ -153,49 +98,6 @@ For comparison: Claude Code's equivalent is `query.ts` at 1,729 lines. Goose's a
 
 ## The Agent Loop: How It Actually Works
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant C as Controller
-    participant T as Task
-    participant API as LLM Provider
-    participant TE as ToolExecutor
-    participant TC as ToolCoordinator
-
-    U->>C: Submit task
-    C->>T: new Task(params) + startTask()
-    T->>T: Run hooks (TaskStart, UserPromptSubmit)
-    
-    loop initiateTaskLoop (while !abort)
-        T->>T: loadContext() - parse mentions, slash commands
-        T->>T: getEnvironmentDetails() - tabs, files, terminals
-        T->>T: Build system prompt (PromptRegistry)
-        T->>API: createMessage(system, history, tools)
-        
-        loop Stream chunks
-            API-->>T: text / reasoning / tool_calls chunks
-            T->>T: parseAssistantMessageV2()
-            T->>T: scheduleAssistantPresentation()
-        end
-        
-        T->>T: presentAssistantMessage()
-        
-        alt Tool use detected
-            T->>TE: executeTool(block)
-            TE->>TC: coordinator.execute(config, block)
-            TC->>TC: handler.execute(config, block)
-            TC-->>TE: ToolResponse
-            TE-->>T: Push to userMessageContent
-            T->>T: recursivelyMakeClineRequests(userMessageContent)
-        else No tools used
-            T->>T: Push noToolsUsed message
-            T->>T: consecutiveMistakeCount++
-        else attempt_completion
-            T->>U: Show completion result
-            U-->>T: Accept or provide feedback
-        end
-    end
-```
 
 The core loop pattern:
 
