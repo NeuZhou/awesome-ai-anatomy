@@ -1,4 +1,4 @@
-# 🔬 OpenAI Codex CLI: 549K Lines of Rust, a Guardian AI That Reviews Its Own AI, and the Most Paranoid Sandbox in Any Coding Agent
+# OpenAI Codex CLI: 549K Lines of Rust, a Guardian AI That Reviews Its Own AI, and the Most Paranoid Sandbox in Any Coding Agent
 
 > **The first production Rust-native AI coding agent, dissected.**
 > 549,000 lines of Rust across 1,389 files. 88 workspace crates. A three-layer sandbox that runs on macOS, Linux, and Windows. All open source under Apache-2.0.
@@ -8,7 +8,7 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/openai/codex/blob/main/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/openai/codex/blob/main/docs/contributing.md)
 
-> 📌 This analysis is based on the public open-source repository at [github.com/openai/codex](https://github.com/openai/codex).
+> This analysis is based on the public open-source repository at [github.com/openai/codex](https://github.com/openai/codex).
 
 ## At a Glance
 
@@ -42,19 +42,19 @@
 - [At a Glance](#at-a-glance)
 - [Architecture Overview](#architecture-overview)
 - [Core Module Analysis](#core-module-analysis)
-  - [codex-core — The Brain](#codex-core--the-brain-176k-lines)
-  - [codex-tui — Terminal UI](#codex-tui--terminal-ui-112k-lines)
-  - [codex-cli — Entry Point](#codex-cli--entry-point-5k-lines)
-  - [Tool System — codex-tools + core/tools](#tool-system--codex-tools--coretools)
-  - [Sandbox Stack — Three-Platform Security](#sandbox-stack--three-platform-security)
-  - [Hook System — Lifecycle Interception](#hook-system--lifecycle-interception)
-  - [Skills System — Markdown-Driven Extensions](#skills-system--markdown-driven-extensions)
-  - [Protocol — The Contract Layer](#protocol--the-contract-layer)
-  - [MCP Integration — Model Context Protocol](#mcp-integration--model-context-protocol)
-  - [Exec & Exec-Server — Process Execution](#exec--exec-server--process-execution)
-  - [Guardian — AI Reviews AI](#guardian--ai-reviews-ai)
-  - [Network Proxy — MITM for Safety](#network-proxy--mitm-for-safety)
-  - [App Server — Multi-Client Architecture](#app-server--multi-client-architecture)
+ - [codex-core — The Brain](#codex-core--the-brain-176k-lines)
+ - [codex-tui — Terminal UI](#codex-tui--terminal-ui-112k-lines)
+ - [codex-cli — Entry Point](#codex-cli--entry-point-5k-lines)
+ - [Tool System — codex-tools + core/tools](#tool-system--codex-tools--coretools)
+ - [Sandbox Stack — Three-Platform Security](#sandbox-stack--three-platform-security)
+ - [Hook System — Lifecycle Interception](#hook-system--lifecycle-interception)
+ - [Skills System — Markdown-Driven Extensions](#skills-system--markdown-driven-extensions)
+ - [Protocol — The Contract Layer](#protocol--the-contract-layer)
+ - [MCP Integration — Model Context Protocol](#mcp-integration--model-context-protocol)
+ - [Exec & Exec-Server — Process Execution](#exec--exec-server--process-execution)
+ - [Guardian — AI Reviews AI](#guardian--ai-reviews-ai)
+ - [Network Proxy — MITM for Safety](#network-proxy--mitm-for-safety)
+ - [App Server — Multi-Client Architecture](#app-server--multi-client-architecture)
 - [Design Decisions (ADR)](#design-decisions-adr)
 - [Comparison with Claude Code](#comparison-with-claude-code)
 - [Security Analysis](#security-analysis)
@@ -92,22 +92,22 @@ The central type is `Codex` in `codex-rs/core/src/codex.rs` — a 7,786-line fil
 
 ```
 Codex::spawn() {
-    ① Initialize auth, config, skills, plugins, MCP
-    ② Enter submission loop:
-       match submission {
-           Op::UserInput → start_turn()
-           Op::Compact → run_compact_task()  
-           Op::Interrupt → cancel current turn
-           Op::Shutdown → graceful exit
-       }
-    ③ start_turn():
-       - Build context (ContextManager + initial injections)  
-       - Stream from ModelClient (SSE or WebSocket)
-       - For each response item:
-         - Text → emit to UI
-         - ToolCall → dispatch via ToolRouter
-       - Tool results → append to context → next model call
-       - No tools? → turn complete
+ ① Initialize auth, config, skills, plugins, MCP
+ ② Enter submission loop:
+ match submission {
+ Op::UserInput → start_turn()
+ Op::Compact → run_compact_task() 
+ Op::Interrupt → cancel current turn
+ Op::Shutdown → graceful exit
+ }
+ ③ start_turn():
+ - Build context (ContextManager + initial injections) 
+ - Stream from ModelClient (SSE or WebSocket)
+ - For each response item:
+ - Text → emit to UI
+ - ToolCall → dispatch via ToolRouter
+ - Tool results → append to context → next model call
+ - No tools? → turn complete
 }
 ```
 
@@ -130,11 +130,11 @@ Codex::spawn() {
 ```rust
 // codex-rs/core/src/codex.rs
 pub struct Codex {
-    tx_sub: Sender<Submission>,     // push operations
-    rx_event: Receiver<Event>,       // receive events
-    agent_status: watch::Receiver<AgentStatus>,
-    session: Arc<Session>,           // shared state
-    session_loop_termination: Shared<BoxFuture<'static, ()>>,
+ tx_sub: Sender<Submission>, // push operations
+ rx_event: Receiver<Event>, // receive events
+ agent_status: watch::Receiver<AgentStatus>,
+ session: Arc<Session>, // shared state
+ session_loop_termination: Shared<BoxFuture<'static, ()>>,
 }
 ```
 
@@ -198,12 +198,12 @@ The tool system uses a **three-layer architecture**:
 ```rust
 // codex-rs/core/src/tools/registry.rs
 pub trait ToolHandler: Send + Sync {
-    type Output: ToolOutput + 'static;
-    fn kind(&self) -> ToolKind;               // Function or MCP
-    fn is_mutating(&self, inv: &ToolInvocation) -> bool;
-    fn handle(&self, invocation: ToolInvocation) -> BoxFuture<Result<Self::Output>>;
-    fn pre_tool_use_payload(&self, ...) -> Option<PreToolUsePayload>;
-    fn post_tool_use_payload(&self, ...) -> Option<PostToolUsePayload>;
+ type Output: ToolOutput + 'static;
+ fn kind(&self) -> ToolKind; // Function or MCP
+ fn is_mutating(&self, inv: &ToolInvocation) -> bool;
+ fn handle(&self, invocation: ToolInvocation) -> BoxFuture<Result<Self::Output>>;
+ fn pre_tool_use_payload(&self, ...) -> Option<PreToolUsePayload>;
+ fn post_tool_use_payload(&self, ...) -> Option<PostToolUsePayload>;
 }
 ```
 
@@ -292,12 +292,12 @@ Unified API that selects the right sandbox per platform:
 
 ```rust
 pub fn get_platform_sandbox(windows_sandbox_enabled: bool) -> Option<SandboxType> {
-    if cfg!(target_os = "macos")   { Some(SandboxType::MacosSeatbelt) }
-    else if cfg!(target_os = "linux")   { Some(SandboxType::LinuxSeccomp) }
-    else if cfg!(target_os = "windows") {
-        if windows_sandbox_enabled { Some(SandboxType::WindowsRestrictedToken) }
-        else { None }
-    } else { None }
+ if cfg!(target_os = "macos") { Some(SandboxType::MacosSeatbelt) }
+ else if cfg!(target_os = "linux") { Some(SandboxType::LinuxSeccomp) }
+ else if cfg!(target_os = "windows") {
+ if windows_sandbox_enabled { Some(SandboxType::WindowsRestrictedToken) }
+ else { None }
+ } else { None }
 }
 ```
 
@@ -336,14 +336,14 @@ Skills are markdown files (`SKILLS.md`) that inject instructions into the model'
 ```rust
 // codex-rs/core-skills/src/model.rs
 pub struct SkillMetadata {
-    pub name: String,
-    pub description: String,
-    pub short_description: Option<String>,
-    pub interface: Option<SkillInterface>,
-    pub dependencies: Option<SkillDependencies>,
-    pub policy: Option<SkillPolicy>,
-    pub path_to_skills_md: PathBuf,
-    pub scope: SkillScope,
+ pub name: String,
+ pub description: String,
+ pub short_description: Option<String>,
+ pub interface: Option<SkillInterface>,
+ pub dependencies: Option<SkillDependencies>,
+ pub policy: Option<SkillPolicy>,
+ pub path_to_skills_md: PathBuf,
+ pub scope: SkillScope,
 }
 ```
 
@@ -396,10 +396,10 @@ Two execution modes:
 
 1. **`codex exec`** — Headless single-prompt execution. Runs a prompt, streams tool calls, outputs result. Supports `--json` for structured JSONL output.
 2. **`exec-server`** — A persistent daemon that manages sandboxed environments. Provides a client-server API for:
-   - Process spawning and management
-   - File system operations (read, write, copy, mkdir, remove)
-   - PTY allocation
-   - Output streaming
+ - Process spawning and management
+ - File system operations (read, write, copy, mkdir, remove)
+ - PTY allocation
+ - Output streaming
 
 The exec-server enables **remote execution** — Codex can run commands on a different machine (or in a container) via its RPC protocol, while the core engine runs locally. This is the foundation for cloud-based execution (referenced by `cloud-tasks` and `cloud-tasks-client` crates).
 
@@ -545,11 +545,11 @@ Codex CLI's security model is **defense in depth** with four layers:
 
 ```
 Layer 1: Approval Policy (user consent)
-    ↓
+ ↓
 Layer 2: Guardian AI Review (automated risk assessment)
-    ↓  
+ ↓ 
 Layer 3: OS Sandbox (filesystem + process isolation)
-    ↓
+ ↓
 Layer 4: Network Proxy (traffic interception + domain filtering)
 ```
 
@@ -558,10 +558,10 @@ Layer 4: Network Proxy (traffic interception + domain filtering)
 ```rust
 // codex-rs/protocol/src/protocol.rs
 pub enum AskForApproval {
-    Never,         // Full auto (dangerous)
-    OnFailure,     // Auto-approve, ask on failure
-    UnlessSafe,    // Auto-approve known-safe commands
-    Always,        // Always ask (safest)
+ Never, // Full auto (dangerous)
+ OnFailure, // Auto-approve, ask on failure
+ UnlessSafe, // Auto-approve known-safe commands
+ Always, // Always ask (safest)
 }
 ```
 
@@ -644,10 +644,10 @@ Instead of binary approve/deny, use a **separate, cheaper AI model** to risk-sco
 ```rust
 // Risk scoring with structured output
 struct GuardianAssessment {
-    risk_level: RiskLevel,  // Low, Medium, High, Critical
-    risk_score: u8,          // 0-100
-    rationale: String,
-    evidence: Vec<GuardianEvidence>,
+ risk_level: RiskLevel, // Low, Medium, High, Critical
+ risk_score: u8, // 0-100
+ rationale: String,
+ evidence: Vec<GuardianEvidence>,
 }
 // Auto-approve if risk_score < 80
 ```
@@ -660,8 +660,8 @@ Decouple the agent core from its frontends via typed message channels:
 
 ```rust
 struct Agent {
-    tx: Sender<Command>,    // push commands
-    rx: Receiver<Event>,    // receive events
+ tx: Sender<Command>, // push commands
+ rx: Receiver<Event>, // receive events
 }
 ```
 
@@ -673,9 +673,9 @@ Try the tightest sandbox first. If it fails, retry with looser constraints — w
 
 ```
 Attempt 1: Full sandbox (filesystem + network restricted)
-  → Permission denied?
+ → Permission denied?
 Attempt 2: Filesystem sandbox only (network allowed)
-  → Still fails?
+ → Still fails?
 Attempt 3: Report failure to model for alternative approach
 ```
 
@@ -688,10 +688,10 @@ Ship one binary that behaves differently based on its executable name:
 ```rust
 // If invoked as "codex-linux-sandbox", skip CLI parsing and go straight to sandbox
 fn main() {
-    arg0_dispatch_or_else(|paths| {
-        if paths.matches("codex-linux-sandbox") { sandbox::run_main() }
-        else { cli::run_main() }
-    })
+ arg0_dispatch_or_else(|paths| {
+ if paths.matches("codex-linux-sandbox") { sandbox::run_main() }
+ else { cli::run_main() }
+ })
 }
 ```
 
@@ -701,7 +701,7 @@ fn main() {
 
 Instead of trying to block network at the syscall level (fragile, platform-specific), run a **local MITM proxy** and force all traffic through it. You get:
 - Domain-level visibility
-- Request/response logging  
+- Request/response logging 
 - Policy enforcement at the application layer
 
 **Steal this for:** Any sandboxed execution environment where you need network auditing.
@@ -717,11 +717,11 @@ This avoids the "summarize everything at once" problem that degrades quality as 
 
 ```rust
 pub enum Stage {
-    UnderDevelopment,  // Internal only
-    Experimental { name, description, announcement },  // User-visible opt-in
-    Stable,            // Default on, flag kept for rollback
-    Deprecated,        // Warn on use
-    Removed,           // Flag accepted but ignored
+ UnderDevelopment, // Internal only
+ Experimental { name, description, announcement }, // User-visible opt-in
+ Stable, // Default on, flag kept for rollback
+ Deprecated, // Warn on use
+ Removed, // Flag accepted but ignored
 }
 ```
 
@@ -801,43 +801,43 @@ Claude Code has more sophisticated context management (4 layers vs 1). Codex CLI
 
 ```
 codex-rs/
-├── cli/                    # CLI entry point (Clap)
-├── tui/                    # Terminal UI (Ratatui)
-├── core/                   # Core engine (the "brain")
-│   ├── src/
-│   │   ├── codex.rs        # Main Codex struct (7,786 lines)
-│   │   ├── client.rs       # Model API client (SSE + WebSocket)
-│   │   ├── compact.rs      # Context compaction
-│   │   ├── tools/          # Tool system (router, handlers, orchestrator)
-│   │   ├── guardian/       # AI auto-approval
-│   │   ├── memories/       # Memory extraction pipeline
-│   │   ├── context_manager/ # History + token tracking
-│   │   ├── agent/          # Multi-agent registry
-│   │   ├── plugins/        # Plugin system
-│   │   ├── config/         # Configuration management
-│   │   └── unified_exec/   # PTY-backed persistent shells
-├── tools/                  # Tool definitions (data only)
-├── protocol/               # Typed protocol (the contract)
-├── sandboxing/             # Cross-platform sandbox manager
-├── linux-sandbox/          # Linux sandbox binary (Landlock+bwrap+seccomp)
-├── windows-sandbox-rs/     # Windows sandbox (RestrictedToken+ACL)
-├── hooks/                  # Lifecycle hook system
-├── skills/                 # System skills installer
-├── core-skills/            # Skills loader + injection
-├── codex-mcp/              # MCP client connections
-├── mcp-server/             # Codex-as-MCP-server
-├── exec/                   # Headless execution mode
-├── exec-server/            # Remote execution daemon
-├── app-server/             # JSON-RPC multi-client server
-├── app-server-protocol/    # App server message types
-├── network-proxy/          # MITM network proxy
-├── features/               # Feature flag system
-├── state/                  # SQLite state persistence
-├── config/                 # Configuration loading
-├── login/                  # Auth (OAuth + API key)
-├── codex-api/              # OpenAI API client
-├── rollout/                # Session recording
-├── otel/                   # OpenTelemetry instrumentation
+├── cli/ # CLI entry point (Clap)
+├── tui/ # Terminal UI (Ratatui)
+├── core/ # Core engine (the "brain")
+│ ├── src/
+│ │ ├── codex.rs # Main Codex struct (7,786 lines)
+│ │ ├── client.rs # Model API client (SSE + WebSocket)
+│ │ ├── compact.rs # Context compaction
+│ │ ├── tools/ # Tool system (router, handlers, orchestrator)
+│ │ ├── guardian/ # AI auto-approval
+│ │ ├── memories/ # Memory extraction pipeline
+│ │ ├── context_manager/ # History + token tracking
+│ │ ├── agent/ # Multi-agent registry
+│ │ ├── plugins/ # Plugin system
+│ │ ├── config/ # Configuration management
+│ │ └── unified_exec/ # PTY-backed persistent shells
+├── tools/ # Tool definitions (data only)
+├── protocol/ # Typed protocol (the contract)
+├── sandboxing/ # Cross-platform sandbox manager
+├── linux-sandbox/ # Linux sandbox binary (Landlock+bwrap+seccomp)
+├── windows-sandbox-rs/ # Windows sandbox (RestrictedToken+ACL)
+├── hooks/ # Lifecycle hook system
+├── skills/ # System skills installer
+├── core-skills/ # Skills loader + injection
+├── codex-mcp/ # MCP client connections
+├── mcp-server/ # Codex-as-MCP-server
+├── exec/ # Headless execution mode
+├── exec-server/ # Remote execution daemon
+├── app-server/ # JSON-RPC multi-client server
+├── app-server-protocol/ # App server message types
+├── network-proxy/ # MITM network proxy
+├── features/ # Feature flag system
+├── state/ # SQLite state persistence
+├── config/ # Configuration loading
+├── login/ # Auth (OAuth + API key)
+├── codex-api/ # OpenAI API client
+├── rollout/ # Session recording
+├── otel/ # OpenTelemetry instrumentation
 └── ... (60+ utility crates)
 ```
 
