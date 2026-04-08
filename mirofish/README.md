@@ -66,35 +66,35 @@ The most interesting design is the "secondary retrieval" mechanism during profil
 ```python
 # From backend/app/services/oasis_profile_generator.py:283
 def _search_zep_for_entity(self, entity: EntityNode) -> Dict[str, Any]:
-    """
-    Use Zep graph hybrid search to retrieve rich entity information
-    """
-    comprehensive_query = t('progress.zepSearchQuery', name=entity_name)
-    
-    def search_edges():
-        """Search edges (facts/relationships) - with retry"""
-        return self.zep_client.graph.search(
-            query=comprehensive_query,
-            graph_id=self.graph_id,
-            limit=30,
-            scope="edges",
-            reranker="rrf"
-        )
-    
-    def search_nodes():
-        """Search nodes (entity summaries) - with retry"""
-        return self.zep_client.graph.search(
-            query=comprehensive_query,
-            graph_id=self.graph_id,
-            limit=20,
-            scope="nodes",
-            reranker="rrf"
-        )
-    
-    # Parallel execution of edges and nodes search
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        edge_future = executor.submit(search_edges)
-        node_future = executor.submit(search_nodes)
+ """
+ Use Zep graph hybrid search to retrieve rich entity information
+ """
+ comprehensive_query = t('progress.zepSearchQuery', name=entity_name)
+ 
+ def search_edges():
+ """Search edges (facts/relationships) - with retry"""
+ return self.zep_client.graph.search(
+ query=comprehensive_query,
+ graph_id=self.graph_id,
+ limit=30,
+ scope="edges",
+ reranker="rrf"
+ )
+ 
+ def search_nodes():
+ """Search nodes (entity summaries) - with retry"""
+ return self.zep_client.graph.search(
+ query=comprehensive_query,
+ graph_id=self.graph_id,
+ limit=20,
+ scope="nodes",
+ reranker="rrf"
+ )
+ 
+ # Parallel execution of edges and nodes search
+ with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+ edge_future = executor.submit(search_edges)
+ node_future = executor.submit(search_nodes)
 ```
 
 Before generating each entity's persona, it runs parallel queries against Zep's graph search API for related "edges" (factual relationships) and "nodes" (entity summaries), then stuffs the retrieved context into the LLM prompt. This means generated personas aren't made up from thin air — they're backed by graph data. Practical approach.
@@ -107,9 +107,9 @@ Another notable design is the ReportAgent's ReACT loop — it requires the LLM t
 unused_tools = all_tools - used_tools
 unused_hint = ""
 if unused_tools and tool_calls_count < self.MAX_TOOL_CALLS_PER_SECTION:
-    unused_hint = REACT_UNUSED_TOOLS_HINT.format(
-        unused_list="、".join(unused_tools)
-    )
+ unused_hint = REACT_UNUSED_TOOLS_HINT.format(
+ unused_list="、".join(unused_tools)
+ )
 ```
 
 This "force multiple tool usage" strategy adds an extra layer of constraint beyond vanilla ReACT — it prevents the LLM from using just one retrieval method and calling it a day.
@@ -150,11 +150,11 @@ import builtins
 _original_open = builtins.open
 
 def _utf8_open(file, mode='r', buffering=-1, encoding=None, errors=None, 
-               newline=None, closefd=True, opener=None):
-    if encoding is None and 'b' not in mode:
-        encoding = 'utf-8'
-    return _original_open(file, mode, buffering, encoding, errors, 
-                          newline, closefd, opener)
+ newline=None, closefd=True, opener=None):
+ if encoding is None and 'b' not in mode:
+ encoding = 'utf-8'
+ return _original_open(file, mode, buffering, encoding, errors, 
+ newline, closefd, opener)
 
 builtins.open = _utf8_open
 ```
@@ -212,9 +212,9 @@ Each platform's action log writes to an independent `actions.jsonl` file, and th
 # From backend/app/services/simulation_runner.py:317
 # Read Twitter action log
 if os.path.exists(twitter_actions_log):
-    twitter_position = cls._read_action_log(
-        twitter_actions_log, twitter_position, state, "twitter"
-    )
+ twitter_position = cls._read_action_log(
+ twitter_actions_log, twitter_position, state, "twitter"
+ )
 ```
 
 Simple, reliable, recoverable. If the simulation crashes mid-run, restart picks up from the last file position.
@@ -226,10 +226,10 @@ ReportAgent doesn't just implement a ReACT loop — it adds "minimum 3 tool call
 ```python
 # From backend/app/services/report_agent.py:636
 if tool_calls_count < min_tool_calls:
-    unused_tools = all_tools - used_tools
-    unused_hint = (
-        f"(These tools haven't been used yet, try them: {', '.join(unused_tools)})"
-    ) if unused_tools else ""
+ unused_tools = all_tools - used_tools
+ unused_hint = (
+ f"(These tools haven't been used yet, try them: {', '.join(unused_tools)})"
+ ) if unused_tools else ""
 ```
 
 **3. Entity-to-agent type differentiation strategy**
