@@ -65,16 +65,16 @@ Pi doesn't use an LLM SDK wrapper library like Vercel AI or LiteLLM. It defines 
 ```typescript
 // From packages/ai/src/types.ts:9-11
 export type KnownApi =
-    | "openai-completions"
-    | "mistral-conversations"
-    | "openai-responses"
-    | "azure-openai-responses"
-    | "openai-codex-responses"
-    | "anthropic-messages"
-    | "bedrock-converse-stream"
-    | "google-generative-ai"
-    | "google-gemini-cli"
-    | "google-vertex";
+ | "openai-completions"
+ | "mistral-conversations"
+ | "openai-responses"
+ | "azure-openai-responses"
+ | "openai-codex-responses"
+ | "anthropic-messages"
+ | "bedrock-converse-stream"
+ | "google-generative-ai"
+ | "google-gemini-cli"
+ | "google-vertex";
 ```
 
 Each provider is loaded lazily via dynamic import. The first time you call `streamSimple()` for, say, Anthropic, it dynamically imports `./anthropic.js`, caches the module, and forwards the stream. If you never use Google, that provider code never loads.
@@ -82,11 +82,11 @@ Each provider is loaded lazily via dynamic import. The first time you call `stre
 ```typescript
 // From packages/ai/src/providers/register-builtins.ts (simplified)
 function loadAnthropicProviderModule() {
-    anthropicProviderModulePromise ||= import("./anthropic.js").then((module) => ({
-        stream: module.streamAnthropic,
-        streamSimple: module.streamSimpleAnthropic,
-    }));
-    return anthropicProviderModulePromise;
+ anthropicProviderModulePromise ||= import("./anthropic.js").then((module) => ({
+ stream: module.streamAnthropic,
+ streamSimple: module.streamSimpleAnthropic,
+ }));
+ return anthropicProviderModulePromise;
 }
 ```
 
@@ -103,10 +103,10 @@ const claudeCodeVersion = "2.1.75";
 
 // Claude Code 2.x tool names (canonical casing)
 const claudeCodeTools = [
-    "Read", "Write", "Edit", "Bash", "Grep", "Glob",
-    "AskUserQuestion", "EnterPlanMode", "ExitPlanMode",
-    "KillShell", "NotebookEdit", "Skill", "Task",
-    "TaskOutput", "TodoWrite", "WebFetch", "WebSearch",
+ "Read", "Write", "Edit", "Bash", "Grep", "Glob",
+ "AskUserQuestion", "EnterPlanMode", "ExitPlanMode",
+ "KillShell", "NotebookEdit", "Skill", "Task",
+ "TaskOutput", "TodoWrite", "WebFetch", "WebSearch",
 ];
 ```
 
@@ -136,11 +136,11 @@ The steering/follow-up queue system is the standout design here. Most coding age
 // From packages/agent/src/agent.ts:110-114
 /** Queue a message to be injected after the current assistant turn finishes. */
 steer(message: AgentMessage): void {
-    this.steeringQueue.enqueue(message);
+ this.steeringQueue.enqueue(message);
 }
 /** Queue a message to run only after the agent would otherwise stop. */
 followUp(message: AgentMessage): void {
-    this.followUpQueue.enqueue(message);
+ this.followUpQueue.enqueue(message);
 }
 ```
 
@@ -166,12 +166,12 @@ The `ToolDefinition` type is worth examining because it shows how deeply the TUI
 ```typescript
 // From packages/coding-agent/src/core/extensions/types.ts (simplified)
 export interface ToolDefinition<TParams, TDetails, TState> {
-    name: string;
-    description: string;
-    parameters: TParams;  // TypeBox schema
-    execute(toolCallId, params, signal, onUpdate, ctx): Promise<AgentToolResult<TDetails>>;
-    renderCall?: (args, theme, context) => Component;  // TUI renderer
-    renderResult?: (result, options, theme, context) => Component;
+ name: string;
+ description: string;
+ parameters: TParams; // TypeBox schema
+ execute(toolCallId, params, signal, onUpdate, ctx): Promise<AgentToolResult<TDetails>>;
+ renderCall?: (args, theme, context) => Component; // TUI renderer
+ renderResult?: (result, options, theme, context) => Component;
 }
 ```
 
@@ -185,11 +185,11 @@ Pi tracks token usage across turns and compacts automatically when it approaches
 // From packages/coding-agent/src/core/extensions/types.ts
 /** Fired before context compaction (can be cancelled or customized) */
 export interface SessionBeforeCompactEvent {
-    type: "session_before_compact";
-    preparation: CompactionPreparation;
-    branchEntries: SessionEntry[];
-    customInstructions?: string;
-    signal: AbortSignal;
+ type: "session_before_compact";
+ preparation: CompactionPreparation;
+ branchEntries: SessionEntry[];
+ customInstructions?: string;
+ signal: AbortSignal;
 }
 ```
 
@@ -239,11 +239,11 @@ The dynamic import + promise caching pattern for provider modules is reusable an
 // From packages/ai/src/providers/register-builtins.ts
 let modulePromise: Promise<Module> | undefined;
 function loadModule() {
-    modulePromise ||= import("./provider.js").then(m => ({
-        stream: m.streamFn,
-        streamSimple: m.streamSimpleFn,
-    }));
-    return modulePromise;
+ modulePromise ||= import("./provider.js").then(m => ({
+ stream: m.streamFn,
+ streamSimple: m.streamSimpleFn,
+ }));
+ return modulePromise;
 }
 ```
 
