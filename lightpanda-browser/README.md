@@ -68,23 +68,23 @@ But the specific technical achievement worth studying is the **Zig-to-V8 binding
 ```zig
 // From src/browser/js/bridge.zig:31
 pub fn Builder(comptime T: type) type {
-    return struct {
-        pub const @"type" = T;
-        pub const ClassId = u16;
+ return struct {
+ pub const @"type" = T;
+ pub const ClassId = u16;
 
-        pub fn constructor(comptime func: anytype, comptime opts: Constructor.Opts) Constructor {
-            return Constructor.init(T, func, opts);
-        }
+ pub fn constructor(comptime func: anytype, comptime opts: Constructor.Opts) Constructor {
+ return Constructor.init(T, func, opts);
+ }
 
-        pub fn accessor(comptime getter: anytype, comptime setter: anytype, comptime opts: Caller.Function.Opts) Accessor {
-            return Accessor.init(T, getter, setter, opts);
-        }
+ pub fn accessor(comptime getter: anytype, comptime setter: anytype, comptime opts: Caller.Function.Opts) Accessor {
+ return Accessor.init(T, getter, setter, opts);
+ }
 
-        pub fn function(comptime func: anytype, comptime opts: Caller.Function.Opts) Function {
-            return Function.init(T, func, opts);
-        }
-        // ...
-    };
+ pub fn function(comptime func: anytype, comptime opts: Caller.Function.Opts) Function {
+ return Function.init(T, func, opts);
+ }
+ // ...
+ };
 }
 ```
 
@@ -106,28 +106,28 @@ The CDP domain dispatcher in `CDP.zig` uses a pattern I haven't seen before. Ins
 ```zig
 // From src/cdp/CDP.zig:152-179
 fn dispatchCommand(command: *Command, method: []const u8) !void {
-    const domain = blk: {
-        const i = std.mem.indexOfScalarPos(u8, method, 0, '.') orelse {
-            return error.InvalidMethod;
-        };
-        command.input.action = method[i + 1 ..];
-        break :blk method[0..i];
-    };
+ const domain = blk: {
+ const i = std.mem.indexOfScalarPos(u8, method, 0, '.') orelse {
+ return error.InvalidMethod;
+ };
+ command.input.action = method[i + 1 ..];
+ break :blk method[0..i];
+ };
 
-    switch (domain.len) {
-        3 => switch (@as(u24, @bitCast(domain[0..3].*))) {
-            asUint(u24, "DOM") => return @import("domains/dom.zig").processMessage(command),
-            asUint(u24, "Log") => return @import("domains/log.zig").processMessage(command),
-            asUint(u24, "CSS") => return @import("domains/css.zig").processMessage(command),
-            else => {},
-        },
-        4 => switch (@as(u32, @bitCast(domain[0..4].*))) {
-            asUint(u32, "Page") => return @import("domains/page.zig").processMessage(command),
-            else => {},
-        },
-        // ... up to 13-character domains
-    }
-    return error.UnknownDomain;
+ switch (domain.len) {
+ 3 => switch (@as(u24, @bitCast(domain[0..3].*))) {
+ asUint(u24, "DOM") => return @import("domains/dom.zig").processMessage(command),
+ asUint(u24, "Log") => return @import("domains/log.zig").processMessage(command),
+ asUint(u24, "CSS") => return @import("domains/css.zig").processMessage(command),
+ else => {},
+ },
+ 4 => switch (@as(u32, @bitCast(domain[0..4].*))) {
+ asUint(u32, "Page") => return @import("domains/page.zig").processMessage(command),
+ else => {},
+ },
+ // ... up to 13-character domains
+ }
+ return error.UnknownDomain;
 }
 ```
 
@@ -149,16 +149,16 @@ Lightpanda doesn't write its own HTML parser. It delegates to Servo's `html5ever
 // From src/html5ever/lib.rs:35-55
 #[no_mangle]
 pub extern "C" fn html5ever_parse_document(
-    html: *mut c_uchar,
-    len: usize,
-    document: Ref,
-    ctx: Ref,
-    create_element_callback: CreateElementCallback,
-    get_data_callback: GetDataCallback,
-    append_callback: AppendCallback,
-    parse_error_callback: ParseErrorCallback,
-    pop_callback: PopCallback,
-    // ... 9 more callbacks
+ html: *mut c_uchar,
+ len: usize,
+ document: Ref,
+ ctx: Ref,
+ create_element_callback: CreateElementCallback,
+ get_data_callback: GetDataCallback,
+ append_callback: AppendCallback,
+ parse_error_callback: ParseErrorCallback,
+ pop_callback: PopCallback,
+ // ... 9 more callbacks
 ) -> () {
 ```
 
@@ -178,11 +178,11 @@ The `Env.zig` file is the V8 wrapper. It manages a single `Isolate` (V8's isolat
 ```zig
 // From src/browser/Browser.zig:64-74
 pub fn runMacrotasks(self: *Browser) !void {
-    const env = &self.env;
-    try self.env.runMacrotasks();
-    env.pumpMessageLoop();
-    // either of the above could have queued more microtasks
-    env.runMicrotasks();
+ const env = &self.env;
+ try self.env.runMacrotasks();
+ env.pumpMessageLoop();
+ // either of the above could have queued more microtasks
+ env.runMicrotasks();
 }
 ```
 
@@ -220,12 +220,12 @@ The `Notification.zig` is an internal pub/sub system that decouples browser comp
 event_listeners: EventListeners,
 
 const EventListeners = struct {
-    page_remove: List = .{},
-    page_created: List = .{},
-    page_navigate: List = .{},
-    page_navigated: List = .{},
-    page_network_idle: List = .{},
-    // ...14 event types total
+ page_remove: List = .{},
+ page_created: List = .{},
+ page_navigate: List = .{},
+ page_navigated: List = .{},
+ page_network_idle: List = .{},
+ // ...14 event types total
 };
 ```
 
