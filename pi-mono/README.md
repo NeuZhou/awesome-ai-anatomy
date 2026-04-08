@@ -33,44 +33,6 @@ Pi is a monorepo of seven npm packages that together form a full stack for build
 
 ![Architecture](architecture.png)
 
-<details>
-<summary>Mermaid source (click to expand)</summary>
-
-```mermaid
-graph LR
-    subgraph "pi-mono Monorepo"
-        AI["@mariozechner/pi-ai\nUnified LLM API\n37K lines"]
-        AGENT["@mariozechner/pi-agent-core\nAgent Loop and State\n3K lines"]
-        CA["@mariozechner/pi-coding-agent\nCoding Agent CLI\n69K lines"]
-        TUI["@mariozechner/pi-tui\nTerminal UI Library\n18K lines"]
-        WEBUI["@mariozechner/pi-web-ui\nWeb Components\n14K lines"]
-        MOM["@mariozechner/pi-mom\nSlack Bot\n4K lines"]
-        PODS["@mariozechner/pi-pods\nvLLM Pod Manager\n2K lines"]
-    end
-
-    AI --> AGENT
-    AGENT --> CA
-    TUI --> CA
-    AI --> WEBUI
-    AGENT --> WEBUI
-    AI --> MOM
-    CA --> MOM
-    AI --> PODS
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class AI primary
-    class AGENT secondary
-    class CA secondary
-    class TUI accent
-    class WEBUI accent
-```
-
-</details>
 
 The stack is layered in a way that'll feel familiar if you've worked with game engines: `pi-ai` is the renderer abstraction (swap OpenGL for Anthropic), `pi-agent-core` is the game loop (stream→toolcall→execute→repeat), `pi-tui` is the scene graph (differential rendering, component hierarchy), and `pi-coding-agent` is the actual game (all the content, modes, UI).
 
@@ -150,35 +112,6 @@ The author even links to a history tracker for Claude Code's prompts (`https://c
 
 ### The Agent Loop — Scene-Graph-Style Event Pumping
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Agent
-    participant AgentLoop as Agent Loop
-    participant LLM
-    participant Tools
-
-    User->>Agent: prompt - fix the bug
-    Agent->>AgentLoop: runAgentLoop(messages, context, config)
-
-    rect rgb(30, 40, 50)
-    note right of AgentLoop: Repeats until no more tool calls
-        AgentLoop->>LLM: streamAssistantResponse()
-        LLM-->>AgentLoop: AssistantMessage with tool calls
-        AgentLoop-->>Agent: message_start, message_update, message_end
-
-        alt Has tool calls
-            AgentLoop->>Tools: executeToolCalls()
-            Tools-->>AgentLoop: ToolResultMessage[]
-            AgentLoop-->>Agent: tool_execution_start/end
-        end
-
-        AgentLoop->>AgentLoop: Check steering queue
-        AgentLoop->>AgentLoop: Check follow-up queue
-    end
-
-    AgentLoop-->>Agent: agent_end
-```
 
 If you squint, this is a game loop. Every "frame" (turn):
 
@@ -204,40 +137,6 @@ This maps directly to how game engines handle input buffering — you don't proc
 
 ### The Extension System — "Everything is a Plugin" Done Right
 
-```mermaid
-graph LR
-    subgraph "Extension Lifecycle"
-        LOAD["Extension Loader\nDynamic import()"]
-        REG["Registration Phase\npi.on(), pi.registerTool()"]
-        BIND["Binding Phase\nUI context, commands"]
-        RUN["Runtime Phase\nEvent emission"]
-    end
-
-    LOAD --> REG --> BIND --> RUN
-
-    subgraph "Extension API Surface"
-        EVENTS["30+ Event Types\nsession_start, tool_call, etc."]
-        TOOLS["Custom Tools\nToolDefinition + TUI renderer"]
-        CMDS["Slash Commands\n/command handler"]
-        PROVIDERS["Custom Providers\nregisterProvider()"]
-    end
-
-    RUN --> EVENTS
-    RUN --> TOOLS
-    RUN --> CMDS
-    RUN --> PROVIDERS
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class LOAD primary
-    class RUN secondary
-    class EVENTS accent
-    class TOOLS accent
-```
 
 Pi's extension system has more event types than most agent frameworks have total API surface. Extensions can:
 
