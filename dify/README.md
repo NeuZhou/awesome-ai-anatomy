@@ -33,6 +33,17 @@ Dify is a platform for building AI applications through a visual drag-and-drop i
 
 ![Architecture](architecture.png)
 
+<!-- Additional architecture diagrams -->
+
+![Diagram 1](dify-1.png)
+
+
+![Diagram 2](dify-2.png)
+
+
+![Diagram 3](dify-3.png)
+
+
 
 The first thing that hits you is the service count. Dify's `docker-compose.yaml` is 1,600 lines. The core deployment is 7 containers: API server, Celery worker, Celery beat, Next.js frontend, Redis, PostgreSQL, and Nginx. Then you add a code sandbox (Go-based, isolated execution environment), a plugin daemon (separate process for running third-party plugins), and an SSRF proxy (Squid, to prevent server-side request forgery from user-submitted HTTP nodes). On top of that, you pick a vector database — and the list of supported options is staggering: Weaviate, Qdrant, pgvector, Milvus, Chroma, Elasticsearch, OpenSearch, OceanBase, TiDB, Oracle, and about 15 more.
 
