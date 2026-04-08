@@ -33,18 +33,7 @@ Dify is a platform for building AI applications through a visual drag-and-drop i
 
 ![Architecture](architecture.png)
 
-<!-- Additional architecture diagrams -->
-
-![Diagram 1](dify-1.png)
-
-
-![Diagram 2](dify-2.png)
-
-
-![Diagram 3](dify-3.png)
-
-
-
+![Architecture Detail](dify-1.png)
 The first thing that hits you is the service count. Dify's `docker-compose.yaml` is 1,600 lines. The core deployment is 7 containers: API server, Celery worker, Celery beat, Next.js frontend, Redis, PostgreSQL, and Nginx. Then you add a code sandbox (Go-based, isolated execution environment), a plugin daemon (separate process for running third-party plugins), and an SSRF proxy (Squid, to prevent server-side request forgery from user-submitted HTTP nodes). On top of that, you pick a vector database — and the list of supported options is staggering: Weaviate, Qdrant, pgvector, Milvus, Chroma, Elasticsearch, OpenSearch, OceanBase, TiDB, Oracle, and about 15 more.
 
 This is not a one-person `pip install` project. This is a platform that expects a DevOps team. The tradeoff is obvious: you get production-grade infrastructure out of the box, but the operational overhead is high. I tried counting the environment variables in docker-compose — I stopped at 400.
@@ -126,6 +115,9 @@ node_init_kwargs_factories: Mapping[NodeType, Callable[[], dict[str, object]]] =
 
 ### Workflow Engine
 
+
+![Workflow Engine](dify-2.png)
+
 The workflow engine is built on top of ReactFlow (frontend) and `graphon` (backend). Users drag nodes onto a canvas in the browser, connect them with edges, and the frontend sends a JSON graph structure to the API.
 
 
@@ -152,6 +144,9 @@ The supported node types tell you a lot about what Dify considers a "workflow":
 The iteration node is interesting: it doesn't just loop — it builds a child `GraphEngine` with its own runtime state. That means each loop iteration gets fresh variable scopes. The downside is cost: if you iterate over 50 items, you spawn 50 mini-engines. The `MAX_ITERATIONS_NUM=99` config and `LOOP_NODE_MAX_COUNT=100` limits exist for a reason.
 
 ### RAG Pipeline
+
+
+![RAG Pipeline](dify-3.png)
 
 Dify's RAG implementation is the most comprehensive I've seen in an open-source project. The pipeline covers the full lifecycle from document ingestion to retrieval.
 
