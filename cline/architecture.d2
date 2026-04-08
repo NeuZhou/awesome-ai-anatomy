@@ -1,0 +1,181 @@
+direction: down
+
+entry: VS Code Extension {
+  style.fill: "#f0f4ff"
+  style.stroke: "#2563eb"
+
+  ext: extension.ts {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+    label: "extension.ts\n(activate/deactivate)"
+  }
+  common: common.ts {
+    style.fill: "#3b82f6"
+    style.font-color: "#fff"
+    label: "common.ts\n(cross-platform init)"
+  }
+  ext -> common
+}
+
+controller: Controller Layer {
+  style.fill: "#faf5ff"
+  style.stroke: "#7c3aed"
+
+  ctrl: Controller {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+    label: "Controller\n(task lifecycle, auth, state)"
+  }
+  state: StateManager {
+    label: "StateManager\n(file-backed storage)"
+  }
+  mcp: McpHub {
+    label: "McpHub (1,700 lines)\n(tools, resources, OAuth)"
+    style.fill: "#8b5cf6"
+    style.font-color: "#fff"
+  }
+
+  ctrl -> state
+  ctrl -> mcp
+}
+
+core: "GOD OBJECT — Task (3,756 lines)" {
+  style.fill: "#fef2f2"
+  style.stroke: "#dc2626"
+  style.font-color: "#dc2626"
+  style.bold: true
+
+  loop: recursivelyMakeClineRequests {
+    style.fill: "#dc2626"
+    style.font-color: "#fff"
+    style.bold: true
+    label: "recursivelyMakeClineRequests\n(~600 lines, recursive)"
+  }
+  stream: StreamChunkCoordinator {
+    label: "StreamChunkCoordinator\n(text/reasoning/tool_calls)"
+    style.fill: "#ef4444"
+    style.font-color: "#fff"
+  }
+  ctx: ContextManager {
+    label: "ContextManager (1,300 lines)\n(truncation, not summarization)"
+    style.fill: "#f87171"
+    style.font-color: "#fff"
+  }
+  hooks: Hook System {
+    label: "Hook System\n(8 lifecycle hooks, shell scripts)"
+    style.fill: "#fca5a5"
+  }
+  focus: Focus Chain {
+    label: "Focus Chain\n(markdown todo tracker)"
+  }
+  ask: "ask()/say() polling" {
+    label: "ask()/say()\npWaitFor 100ms polling"
+    style.fill: "#fecaca"
+  }
+
+  loop -> stream
+  stream -> ctx
+  loop -> hooks
+  loop -> focus
+  loop -> ask
+}
+
+tools: "Tool System (28 tools)" {
+  style.fill: "#ecfdf5"
+  style.stroke: "#059669"
+
+  executor: ToolExecutor {
+    label: "ToolExecutor\n(30+ constructor params\n15 callback functions)"
+    style.fill: "#059669"
+    style.font-color: "#fff"
+  }
+  coord: ToolExecutorCoordinator {
+    label: "ToolExecutorCoordinator\n(handler registry)"
+    style.fill: "#10b981"
+    style.font-color: "#fff"
+  }
+
+  file: "File Ops (7)" {
+    label: "read/write/replace\napply_patch/list/search"
+  }
+  cmd: execute_command
+  browser: browser_action {
+    label: "browser_action\n(Puppeteer, vision-based)"
+  }
+  subagent: use_subagents {
+    label: "use_subagents\n(in-process, depth 1)"
+  }
+
+  executor -> coord
+  coord -> file
+  coord -> cmd
+  coord -> browser
+  coord -> subagent
+}
+
+providers: "API Providers (40+)" {
+  style.fill: "#fffbeb"
+  style.stroke: "#d97706"
+
+  factory: buildApiHandler {
+    label: "buildApiHandler\n(300-line switch)"
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+  }
+  anthropic: Anthropic {
+    style.fill: "#f59e0b"
+    style.font-color: "#fff"
+  }
+  openrouter: OpenRouter
+  gemini: Gemini
+  openai: OpenAI
+  bedrock: AWS Bedrock
+  ollama: Ollama
+  more: "...35 more" {
+    style.fill: "#fde68a"
+  }
+
+  factory -> anthropic
+  factory -> openrouter
+  factory -> gemini
+  factory -> openai
+  factory -> bedrock
+  factory -> ollama
+  factory -> more
+}
+
+prompts: "Prompt System" {
+  style.fill: "#f0fdf4"
+  style.stroke: "#16a34a"
+
+  registry: PromptRegistry {
+    label: "PromptRegistry\n(variant selection)"
+    style.fill: "#16a34a"
+    style.font-color: "#fff"
+  }
+  variants: "Variants (10+)" {
+    label: "next-gen / native / devstral\ngemini-3 / gpt-5 / generic"
+  }
+  rules: "Rules (.clinerules/)" {
+    label: "Rules\n(global + local + cursor\n+ windsurf + agents.md)"
+  }
+  skills: Skills {
+    label: "Skills\n(SKILL.md discovery)"
+  }
+
+  registry -> variants
+  registry -> rules
+  registry -> skills
+}
+
+# Connections between layers
+entry.common -> controller.ctrl
+controller.ctrl -> core.loop: "new Task(20+ params)"
+core.loop -> tools.executor
+core.stream -> providers.factory: "createMessage()"
+core.loop -> prompts.registry
+core.ask -> entry.ext: "webview polling\n(shared mutable state)" {
+  style.stroke: "#dc2626"
+  style.stroke-dash: 3
+}
+tools.coord -> controller.mcp: "use_mcp_tool"
