@@ -1,0 +1,27 @@
+name: mirofish
+full_name: mirofish-ai/mirofish
+stars: 50223
+forks: 7385
+language: Python + Vue.js
+framework: Flask + OASIS (camel-ai) + Zep Cloud
+loc: ~38800  # 20K Python + 18.8K Vue/JS
+license: AGPL-3.0
+teardown_date: 2026-04-05
+teardown_path: mirofish/README.md
+patterns_found:
+  - subagent-delegation  # multi-agent social simulation via OASIS
+anti_patterns_found:
+  - god-file  # report_agent.py is 1400+ lines mixing logging, data classes, prompts, ReACT loop
+  - no-cost-budget
+key_innovations:
+  - "End-to-end document-to-simulation pipeline: extract entities, generate personas, simulate social interactions, produce reports"
+  - "Secondary retrieval from Zep graph (parallel edge + node search) before persona generation"
+  - "ReACT report generation with forced multi-tool usage (min 3, max 5 calls per chapter)"
+  - "Dual-platform parallel simulation with independent action logs per platform"
+key_criticisms:
+  - "Core simulation engine is OASIS (camel-ai), not MiroFish's own code"
+  - "No test files in the repository"
+  - "No prediction accuracy evaluation, no benchmarks, no backtesting"
+  - "'Collective intelligence' label is misleading; the system is LLM role-play simulation, not algorithmic collective intelligence"
+  - "50K stars with ~60 source files and <40K LOC; star-to-code ratio is unusual"
+  - "report_agent.py mixes logging classes, data classes, prompt constants, and business logic in one file"

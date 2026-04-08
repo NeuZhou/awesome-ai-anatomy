@@ -1,0 +1,24 @@
+name: lightpanda
+full_name: lightpanda-io/browser
+stars: 27287
+forks: 1120
+language: Zig + Rust
+framework: V8 (JS engine) + html5ever (parser) + libcurl (HTTP) + BoringSSL
+loc: ~91000  # 91K Zig + 744 Rust FFI
+license: AGPL-3.0
+teardown_date: 2026-04-05
+teardown_path: lightpanda-browser/README.md
+patterns_found: []
+anti_patterns_found: []
+key_innovations:
+  - "From-scratch headless browser in Zig; no CSS rendering, no paint pipeline, DOM-only"
+  - "9x faster than Chrome, 16x less memory (benchmarked on 933 pages, EC2 m5.large)"
+  - "Bitcast trick for zero-overhead V8 binding via Zig comptime generics"
+  - "CDP + MCP dual protocol support (MCP server is 1733 lines)"
+  - "Page.zig at 3660 lines handles full page lifecycle without framework overhead"
+key_criticisms:
+  - "Web API coverage limited to ~60 APIs; missing CORS, Service Workers, partial WebSocket"
+  - "Single-connection-per-server limitation; concurrent scraping requires multiple instances"
+  - "Zig language instability (0.15.2) means breaking changes between releases"
+  - "Small contributor pool due to Zig's niche adoption"
+  - "No CSS layout or screenshot capability; scripts relying on visual state will fail"

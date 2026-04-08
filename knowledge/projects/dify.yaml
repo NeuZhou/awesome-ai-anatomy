@@ -1,0 +1,27 @@
+name: dify
+full_name: langgenius/dify
+stars: 136306
+forks: 21259
+language: Python + TypeScript
+framework: Flask/Gunicorn + Celery + Next.js + ReactFlow + graphon
+loc: ~1283000  # 513K Python + 770K TypeScript
+license: Modified Apache 2.0 (commercial use >1M users requires license)
+teardown_date: 2026-04-05
+teardown_path: dify/README.md
+patterns_found:
+  - middleware-chain  # graphon layer system for execution limits, quota, observability
+  - subagent-delegation  # agent nodes in workflows
+anti_patterns_found:
+  - no-cost-budget
+key_innovations:
+  - "graphon: standalone PyPI package for DAG execution with layer-based middleware"
+  - "Visual drag-and-drop workflow editor with 10+ node types including human-in-the-loop"
+  - "30+ vector database adapters for RAG pipeline"
+  - "Plugin daemon runs as separate process for multi-tenant isolation"
+  - "7+ Docker container deployment with sandboxed code execution and SSRF proxy"
+key_criticisms:
+  - "Minimal deployment is 7 containers; full deployment needs 9-10"
+  - "docker-compose.yaml is 1600 lines with 400+ environment variables"
+  - "30+ vector DB support feels like checkbox-driven development; each adapter is a maintenance liability"
+  - "Modified Apache 2.0 license is not truly open source"
+  - "Node factory is a 150-line method mapping node types to initialization kwargs"

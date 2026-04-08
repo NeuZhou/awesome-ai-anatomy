@@ -1,0 +1,26 @@
+name: oh-my-claudecode
+full_name: anthropics/oh-my-claudecode
+stars: 24423
+forks: 2230
+language: TypeScript
+framework: Claude Code plugin + tmux + file-based IPC
+loc: ~194000
+license: MIT
+teardown_date: 2026-04-05
+teardown_path: oh-my-claudecode/README.md
+patterns_found:
+  - subagent-delegation  # 19 specialized agents with lead/worker pattern
+  - memory-frozen-snapshot  # file-based inbox/outbox state
+anti_patterns_found:
+  - god-file  # 125 TypeScript files in team/ directory, some with ad-hoc naming
+key_innovations:
+  - "File-based IPC with mkdir-based locking (O_EXCL) for cross-process agent coordination"
+  - "19-agent team with plan-exec-verify-fix pipeline"
+  - "Multi-model coordination: Claude + Codex + Gemini CLI workers in tmux panes"
+  - "Model tier routing: Haiku for cheap tasks (critic), Opus for complex tasks (code-reviewer)"
+  - "Agent prompts loaded from .md files, editable without touching TypeScript"
+key_criticisms:
+  - "Plugin depends on Claude Code internals; one Anthropic release could break everything"
+  - "194K lines for a Claude Code plugin is large; 125 files in team/ with names suggesting rapid iteration without cleanup"
+  - "19 agent definitions are mostly thin wrappers around different system prompts"
+  - "No abstraction layer insulating from upstream Claude Code API changes"

@@ -1,0 +1,25 @@
+name: guardrails-ai
+full_name: guardrails-ai/guardrails
+stars: 6635
+forks: 561
+language: Python
+framework: Pydantic v2 + LiteLLM + OpenTelemetry + lxml
+loc: ~18000  # 178 Python files
+license: Apache-2.0
+teardown_date: 2026-04-05
+teardown_path: guardrails-ai/README.md
+patterns_found:
+  - middleware-chain  # onion-shaped Guard > Runner > ValidatorService > Validator
+anti_patterns_found:
+  - god-file  # Guard class is 1076 lines, 10 init params, 18 instance variables
+key_innovations:
+  - "Validator Hub: pip-installable validators from git with local registry (npm model for LLM constraints)"
+  - "Reask self-correction loop with 8 OnFailAction variants (reask, fix, filter, refrain, noop, exception, fix_reask, custom)"
+  - "Streaming validation via chunk accumulation at sentence boundaries"
+  - "DFS traversal of nested schemas with per-path validator maps"
+key_criticisms:
+  - "Guard class is a kitchen-sink object: schema container, validator registry, LLM caller, API client, history store, telemetry manager"
+  - "RAIL XML spec is dead weight; codebase has moved to Pydantic/JSON Schema but 815 lines of XML parsing remain"
+  - "Hub model spreads dependencies across N separate pip packages with independent version constraints"
+  - "4+ stack frames between user code and actual validation logic; hard to debug"
+  - "Branding confusion with security tools; this validates output format, not agent security"

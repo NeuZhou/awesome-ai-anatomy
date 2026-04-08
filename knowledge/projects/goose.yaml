@@ -1,0 +1,26 @@
+name: goose
+full_name: block/goose
+stars: 37343
+forks: 3589
+language: Rust + TypeScript + Python
+framework: Tokio + Axum + Electron
+loc: ~198000  # 124K Rust + 74K TypeScript
+license: Apache-2.0
+teardown_date: 2026-04-05
+teardown_path: goose/README.md
+patterns_found:
+  - middleware-chain  # 5-inspector tool inspection pipeline
+  - subagent-delegation  # subagent_handler
+anti_patterns_found:
+  - god-file  # goose core crate is 124K lines; Agent struct is 900+ lines
+key_innovations:
+  - "MCP as first-class extension protocol with 6 extension types (sse, stdio, builtin, platform, streamable_http, frontend, inline_python)"
+  - "5-inspector tool inspection pipeline: Security, Egress, Adversary (LLM-based), Permission, Repetition"
+  - "In-process MCP servers via tokio DuplexStream for zero-overhead builtin extensions"
+  - "Declarative provider pattern for OpenAI-compatible APIs"
+  - "Tool-pair summarization for context compaction"
+key_criticisms:
+  - "124K lines of Rust in a single core crate hurts compile times"
+  - "50+ provider files with 3000+ lines of format conversion code across wire formats"
+  - "Agent loop is a standard while loop; Rust doesn't add architectural insight beyond type safety"
+  - "High Rust barrier makes contributions difficult"

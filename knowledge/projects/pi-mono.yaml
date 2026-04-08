@@ -1,0 +1,26 @@
+name: pi-mono
+full_name: mariozechner/pi-mono
+stars: 32049
+forks: 3488
+language: TypeScript
+framework: Node.js (pure, no React/Electron) + Lit (web components)
+loc: ~147000  # 583 .ts files across 7 npm packages
+license: MIT
+teardown_date: 2026-04-05
+teardown_path: pi-mono/README.md
+patterns_found:
+  - middleware-chain  # 30+ event hooks in extension model
+anti_patterns_found:
+  - god-file  # AgentSession class is 1500+ lines with mixed concerns
+key_innovations:
+  - "Game-engine-inspired layered monorepo: pi-ai (renderer abstraction), pi-agent-core (game loop), pi-tui (scene graph), pi-coding-agent (content)"
+  - "Lazy provider loading via dynamic import + promise caching; zero cost until first use"
+  - "Stealth mode impersonating Claude Code tool names to use Anthropic rate limits"
+  - "Differential terminal rendering (only redraw changed lines/cells) borrowed from game rendering patterns"
+  - "Strict dependency graph: pi-tui has zero dependency on pi-ai"
+  - "JSONL tree session persistence with branching"
+key_criticisms:
+  - "Stealth mode impersonates another product to bypass provider restrictions; Anthropic could detect and block"
+  - "AgentSession class mixes model management, compaction, retry logic, bash execution, extension lifecycle, and session persistence"
+  - "69K-line coding-agent package contains mixed concerns despite clean inter-package boundaries"
+  - "One-person project competing against Anthropic's team; sustainability risk"

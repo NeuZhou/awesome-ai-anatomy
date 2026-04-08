@@ -1,0 +1,29 @@
+name: codex-cli
+full_name: openai/codex
+stars: 27000
+language: Rust
+framework: Tokio + Ratatui (TUI) + Clap (CLI) + Cargo + Bazel
+loc: ~549000  # 1389 .rs files, 88 workspace crates
+license: Apache-2.0
+teardown_date: 2026-04-06
+teardown_path: codex-cli/README.md
+patterns_found:
+  - middleware-chain  # hook system for lifecycle interception
+  - subagent-delegation  # multi-agent registry
+anti_patterns_found:
+  - god-file  # codex.rs is 7786 lines; app.rs in TUI is 10851+ lines; Session struct holds 40+ fields
+key_innovations:
+  - "Queue-pair architecture (Submission/Event) enabling CLI, desktop app, MCP server, and cloud worker from same core"
+  - "Guardian AI: secondary LLM reviews tool calls for auto-approval of low-risk actions"
+  - "Three-OS sandbox: Seatbelt (macOS), Landlock+bubblewrap+seccomp (Linux), Restricted Token+ACL (Windows, 8870 lines)"
+  - "Network proxy with MITM interception for safety (codex-exec-server)"
+  - "2-phase memory extraction pipeline"
+  - "88 workspace crates with strict architectural boundaries"
+key_criticisms:
+  - "codex-core is 176K lines in one crate; changing one line recompiles the entire crate"
+  - "Session struct holds 40+ fields and is passed as Arc<Session> everywhere; hard to test"
+  - "Windows sandbox is 8870 lines vs single API call on macOS; fragile and defaults to off"
+  - "88+ feature flags create combinatorial testing problems with non-obvious interactions"
+  - "Dual build system (Cargo + Bazel) adds contributor friction; MODULE.bazel.lock is 1.2MB"
+  - "Context compaction is simpler than Claude Code's 4-layer cascade; summarization loses more info than necessary"
+  - "112K lines for terminal UI is large (Helix editor is ~80K for a full terminal code editor)"
