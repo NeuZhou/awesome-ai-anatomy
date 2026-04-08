@@ -81,9 +81,9 @@ This is the part that interested me most. When the agent uses a skill and discov
 ```python
 # From skill_manager_tool.py
 def handle_patch(args):
-    """Targeted find-and-replace within SKILL.md or any supporting file"""
-    # Agent can modify any file in the skill directory
-    # Security scan runs AFTER modification
+ """Targeted find-and-replace within SKILL.md or any supporting file"""
+ # Agent can modify any file in the skill directory
+ # Security scan runs AFTER modification
 ```
 
 The `patch` action does targeted find-and-replace rather than full rewrites. This is smart — it means the agent can fix one section without regenerating the whole skill. And the post-edit security scan catches any injections the LLM might accidentally introduce.
@@ -98,10 +98,10 @@ The agent periodically nudges itself to persist knowledge. The `BuiltinMemoryPro
 ![From builtin_memory_provider.py](hermes-agent-3.png)
 
 def system_prompt_block(self) -> str:
-    """Uses the frozen snapshot captured at load time.
-    This ensures the system prompt stays stable throughout a session
-    (preserving the prompt cache), even though the live entries
-    may change via tool calls."""
+ """Uses the frozen snapshot captured at load time.
+ This ensures the system prompt stays stable throughout a session
+ (preserving the prompt cache), even though the live entries
+ may change via tool calls."""
 ```
 
 This avoids recompiling the system prompt every time the agent writes a memory entry. If your provider charges for prompt tokens and you have a 4K-word MEMORY.md, this saves real money over a long session.
@@ -119,15 +119,15 @@ Hermes's delegation system is more restrictive than DeerFlow's, and I think that
 ![From delegate_tool.py](hermes-agent-4.png)
 
 DELEGATE_BLOCKED_TOOLS = frozenset([
-    "delegate_task",   # no recursive delegation
-    "clarify",         # no user interaction
-    "memory",          # no writes to shared MEMORY.md
-    "send_message",    # no cross-platform side effects
-    "execute_code",    # children should reason step-by-step
+ "delegate_task", # no recursive delegation
+ "clarify", # no user interaction
+ "memory", # no writes to shared MEMORY.md
+ "send_message", # no cross-platform side effects
+ "execute_code", # children should reason step-by-step
 ])
 
 MAX_CONCURRENT_CHILDREN = 3
-MAX_DEPTH = 2  # parent (0) -> child (1) -> grandchild rejected
+MAX_DEPTH = 2 # parent (0) -> child (1) -> grandchild rejected
 ```
 
 Key design decisions:
@@ -158,9 +158,9 @@ I spent a while on the `ContextCompressor` because I've burned money on context 
 
 ```python
 SUMMARY_PREFIX = (
-    "[CONTEXT COMPACTION] Earlier turns in this conversation were compacted "
-    "to save context space. The summary below describes work that was "
-    "already completed..."
+ "[CONTEXT COMPACTION] Earlier turns in this conversation were compacted "
+ "to save context space. The summary below describes work that was "
+ "already completed..."
 )
 ```
 
@@ -176,11 +176,11 @@ Most agent frameworks treat each session as a clean slate with only MEMORY.md fo
 # From session_search_tool.py
 """
 Flow:
-  1. FTS5 search finds matching messages ranked by relevance
-  2. Groups by session, takes the top N unique sessions (default 3)
-  3. Loads each session's conversation, truncates to ~100k chars
-  4. Sends to Gemini Flash with a focused summarization prompt
-  5. Returns per-session summaries with metadata
+ 1. FTS5 search finds matching messages ranked by relevance
+ 2. Groups by session, takes the top N unique sessions (default 3)
+ 3. Loads each session's conversation, truncates to ~100k chars
+ 4. Sends to Gemini Flash with a focused summarization prompt
+ 5. Returns per-session summaries with metadata
 """
 ```
 
@@ -210,9 +210,9 @@ Daytona and Modal are the interesting ones — they offer **serverless persisten
 Hermes ships with a first-class OpenClaw migration tool:
 
 ```bash
-hermes claw migrate              # Interactive migration
-hermes claw migrate --dry-run    # Preview what would change
-hermes claw migrate --preset user-data  # Only data, no secrets
+hermes claw migrate # Interactive migration
+hermes claw migrate --dry-run # Preview what would change
+hermes claw migrate --preset user-data # Only data, no secrets
 ```
 
 It imports: SOUL.md, MEMORY.md, USER.md, skills, command allowlists, messaging configs, API keys, TTS assets, and workspace instructions.
@@ -227,8 +227,8 @@ The memory tool includes inline threat scanning — checking for prompt injectio
 
 ```python
 _MEMORY_THREAT_PATTERNS = [
-    # Patterns that detect injection attempts in memory entries
-    # Prevents adversarial content from persisting into system prompts
+ # Patterns that detect injection attempts in memory entries
+ # Prevents adversarial content from persisting into system prompts
 ]
 ```
 
