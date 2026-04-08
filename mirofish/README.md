@@ -33,68 +33,6 @@ What MiroFish does, in plain terms: you feed it a document (news article, policy
 
 ![Architecture](architecture.png)
 
-<details>
-<summary>Mermaid source (click to expand)</summary>
-
-```mermaid
-flowchart LR
-    subgraph Frontend["Frontend (Vue.js + Vite)"]
-        Step1[Step1: Graph Building]
-        Step2[Step2: Environment Config]
-        Step3[Step3: Simulation Run]
-        Step4[Step4: Report Generation]
-        Step5[Step5: Deep Interaction]
-    end
-
-    subgraph Backend["Backend (Flask)"]
-        GraphAPI["/api/graph"]
-        SimAPI["/api/simulation"]
-        ReportAPI["/api/report"]
-    end
-
-    subgraph Services["Core Services"]
-        OntGen["OntologyGenerator\nOntology Generation(LLM)"]
-        GraphBuilder["GraphBuilderService\nZep Graph Building"]
-        ProfileGen["OasisProfileGenerator\nAgent Profile Generation(LLM)"]
-        ConfigGen["SimulationConfigGenerator\nSimulation Config Generation(LLM)"]
-        SimRunner["SimulationRunner\nSimulation Run Manager"]
-        ReportAgent["ReportAgent\nReACT Report Generation(LLM)"]
-    end
-
-    subgraph External["External Dependencies"]
-        ZepCloud["Zep Cloud\nKnowledge Graph + Memory"]
-        OASIS["OASIS (camel-ai)\nSocial Media Simulation Engine"]
-        LLM["LLM API\n(OpenAI-compatible)"]
-    end
-
-    Frontend --> Backend
-    GraphAPI --> OntGen --> GraphBuilder
-    SimAPI --> ProfileGen --> ConfigGen --> SimRunner
-    ReportAPI --> ReportAgent
-    GraphBuilder --> ZepCloud
-    SimRunner --> OASIS
-    OntGen --> LLM
-    ProfileGen --> LLM
-    ConfigGen --> LLM
-    ReportAgent --> LLM
-    ReportAgent --> ZepCloud
-    OASIS --> LLM
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class Step1 primary
-    class SimRunner secondary
-    class ReportAgent secondary
-    class OASIS accent
-    class ZepCloud accent
-    class LLM warn
-```
-
-</details>
 
 MiroFish's architecture breaks into three layers: the outermost is a Vue.js step-by-step wizard UI bundled with Vite, the middle layer is a Flask API, and the bottom layer is a chain of LLM calls.
 
@@ -174,31 +112,6 @@ This "force multiple tool usage" strategy adds an extra layer of constraint beyo
 
 ### From Document to Agent: the Profile Generation Pipeline
 
-```mermaid
-sequenceDiagram
-    participant User as User
-    participant Onto as OntologyGenerator
-    participant Graph as GraphBuilder
-    participant Zep as Zep Cloud
-    participant Prof as ProfileGenerator
-    participant LLM as LLM API
-
-    User->>Onto: Upload document + simulation requirements
-    Onto->>LLM: Analyze text, generate 10 entity types
-    LLM-->>Onto: Entity types + relationship type definitions
-    Onto->>Graph: Pass text + ontology definitions
-    Graph->>Graph: Chunk text (500 chars/chunk)
-    Graph->>Zep: Batch send text chunks
-    Zep-->>Graph: Build knowledge graph (nodes + edges)
-    Graph->>Prof: Pass filtered entity list
-    loop Per entity (parallel, default 5 threads)
-        Prof->>Zep: Dual parallel retrieval (edges + nodes)
-        Zep-->>Prof: Facts + related entity summaries
-        Prof->>LLM: Entity info + retrieval context → generate persona
-        LLM-->>Prof: 2000-word detailed persona (bio + persona + MBTI + ...)
-    end
-    Prof-->>User: Agent Profile list (JSON/CSV)
-```
 
 A few design decisions in this pipeline worth discussing:
 
@@ -210,45 +123,6 @@ The generation process supports real-time file writes (save after each profile i
 
 ### Dual-Platform Parallel Simulation
 
-```mermaid
-flowchart LR
-    subgraph Config["Configuration Phase"]
-        SC[SimulationConfigGenerator]
-        TC[Time Config\nChinese Schedule Pattern]
-        EC[Event Config\nInitial Posts]
-        AC[Agent Config\nActivity/Stance/Influence]
-    end
-
-    subgraph Run["Execution Phase"]
-        direction TB
-        Twitter["Twitter Simulation Process\n(General LLM)"]
-        Reddit["Reddit Simulation Process\n(Accelerated LLM optional)"]
-        Monitor["Monitor Thread\nParse actions.jsonl"]
-    end
-
-    subgraph Post["Post-Processing"]
-        IPC["IPC Command Handler\nInterview/Close"]
-        Report["ReportAgent\nReACT Report Generation"]
-    end
-
-    SC --> TC & EC & AC
-    TC & EC & AC --> Twitter & Reddit
-    Twitter & Reddit --> Monitor
-    Monitor --> IPC
-    IPC --> Report
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class SC primary
-    class Twitter secondary
-    class Reddit secondary
-    class Report accent
-    class Monitor accent
-```
 
 How the simulation runs: the Flask backend spawns a subprocess running `run_parallel_simulation.py`, which uses `asyncio.gather` to launch Twitter and Reddit platform simulations in parallel. Each platform maintains its own SQLite database recording all agent actions.
 
