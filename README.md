@@ -149,6 +149,7 @@ New teardown every week. Cursor, Windsurf, and others are on the list.
 
 12 deep-dives published so far. The next batch is already in progress.
 
+- Substack: [AI Anatomy Newsletter](https://neuzhou.substack.com) — condensed teardowns in your inbox
 - Discord: [Join the community](https://discord.gg/kAQD7Cj8) — discuss architecture decisions
 
 ---
