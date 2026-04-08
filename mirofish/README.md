@@ -33,6 +33,17 @@ What MiroFish does, in plain terms: you feed it a document (news article, policy
 
 ![Architecture](architecture.png)
 
+<!-- Additional architecture diagrams -->
+
+![Diagram 1](mirofish-1.png)
+
+
+![Diagram 2](mirofish-2.png)
+
+
+![Diagram 3](mirofish-3.png)
+
+
 
 MiroFish's architecture breaks into three layers: the outermost is a Vue.js step-by-step wizard UI bundled with Vite, the middle layer is a Flask API, and the bottom layer is a chain of LLM calls.
 
