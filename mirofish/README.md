@@ -31,13 +31,10 @@ What MiroFish does, in plain terms: you feed it a document (news article, policy
 
 ## Architecture
 
+
+![Architecture](mirofish-1.png)
+
 ![Architecture](architecture.png)
-
-<!-- Additional architecture diagrams -->
-
-![Diagram 1](mirofish-1.png)
-
-
 ![Diagram 2](mirofish-2.png)
 
 
@@ -124,6 +121,9 @@ This "force multiple tool usage" strategy adds an extra layer of constraint beyo
 ### From Document to Agent: the Profile Generation Pipeline
 
 
+
+![From Document to Agent: the Profile Generation Pipeline](mirofish-2.png)
+
 A few design decisions in this pipeline worth discussing:
 
 The ontology stage hard-codes "exactly 10 entity types, last 2 must be Person and Organization as catch-alls." Looks rigid, but considering Zep's API caps custom types at 10, this is a pragmatic choice within API constraints.
@@ -134,6 +134,9 @@ The generation process supports real-time file writes (save after each profile i
 
 ### Dual-Platform Parallel Simulation
 
+
+
+![Dual-Platform Parallel Simulation](mirofish-3.png)
 
 How the simulation runs: the Flask backend spawns a subprocess running `run_parallel_simulation.py`, which uses `asyncio.gather` to launch Twitter and Reddit platform simulations in parallel. Each platform maintains its own SQLite database recording all agent actions.
 
