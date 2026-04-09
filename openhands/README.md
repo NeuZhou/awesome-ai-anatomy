@@ -35,10 +35,6 @@ OpenHands is a web-based AI agent platform for software development. It runs cod
 
 ![Architecture](architecture.png)
 
-![Condenser Pipeline](openhands-1.png)
-
-![Security Architecture](openhands-2.png)
-
 <details>
 <summary>Mermaid source (click to expand)</summary>
 
@@ -134,6 +130,8 @@ Three things set OpenHands apart from the 12 other projects we've analyzed: the 
 
 ### The Condenser System: 10 Ways to Forget
 
+![Condenser Pipeline](openhands-1.png)
+
 Most agents have one context management strategy (usually "summarize when full" or "truncate from the beginning"). OpenHands has **ten**, organized as a configurable pipeline:
 
 | Condenser | Lines | Strategy |
@@ -156,6 +154,8 @@ The `RollingCondenser` base class introduces a `should_condense` / `get_condensa
 The `AmortizedForgettingCondenser` (69 lines) is elegant: instead of hard-truncating, it assigns each event a survival probability that decays with age. Older events are probabilistically dropped. This means the agent gradually "forgets" old context rather than cliff-edging at a window boundary. Simple idea, surprisingly rare in production.
 
 ### Three-Layer Security
+
+![Security Architecture](openhands-2.png)
 
 ```
 SecurityAnalyzer (base)
