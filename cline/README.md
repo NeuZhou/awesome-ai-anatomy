@@ -14,6 +14,7 @@
 | Repository | https://github.com/cline/cline |
 | Latest Version | v3.77.0 |
 | Original Name | `claude-dev` (package.json still says it) |
+| Data as of | April 2026 |
 
 Cline is a VS Code extension that puts an AI coding agent in your sidebar. You describe a task, Cline writes code, runs commands, opens a browser, manages files, and asks for your approval at every step. It supports 40+ LLM providers (Anthropic, OpenAI, Google, AWS Bedrock, Ollama, and dozens more), has a plugin-like hooks system, spawns sub-agents, and manages context windows with automatic truncation. The npm package is still called `claude-dev` — a fossil from when this was a simple Claude wrapper that one developer published in mid-2024.
 
@@ -55,7 +56,7 @@ Cline is a VS Code extension that puts an AI coding agent in your sidebar. You d
 
 ---
 
-## Architecture Overview
+## Architecture
 
 
 ![Architecture Overview](cline-1.png)

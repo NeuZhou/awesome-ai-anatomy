@@ -14,6 +14,7 @@
 | License | AGPL-3.0 |
 | First Commit | 2025-11-26 (repo created) |
 | Latest Commit | 2026-04-02 |
+| Data as of | April 2026 |
 
 What MiroFish does, in plain terms: you feed it a document (news article, policy draft, novel chapter), it uses an LLM to extract people and organizations, generates a "social media persona" for each character, throws these LLM-driven agents into a simulated Twitter/Reddit environment to interact for N rounds, then compiles the interaction logs into a "future prediction report."
 

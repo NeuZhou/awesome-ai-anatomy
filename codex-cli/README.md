@@ -22,6 +22,7 @@
 | Build System | Cargo + Bazel (dual) |
 | License | Apache-2.0 |
 | Sandbox | Seatbelt (macOS), Landlock+bubblewrap+seccomp (Linux), Restricted Token + ACL (Windows) |
+| Data as of | April 2026 |
 
 ---
 

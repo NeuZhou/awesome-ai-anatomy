@@ -14,6 +14,7 @@
 | License | Apache-2.0 |
 | First Commit | 2023-01-29 |
 | Latest Release | v0.10.0 (2026-04-03) |
+| Data as of | April 2026 |
 
 Guardrails AI wraps LLM API calls and validates the output against a schema you define. You declare what you want (JSON structure, content constraints), attach validators, and Guardrails handles calling the LLM, checking the output, and optionally re-asking if validation fails. Think of it as a middleware layer between your code and the LLM that enforces output contracts.
 

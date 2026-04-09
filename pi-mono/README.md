@@ -14,6 +14,7 @@
 | License | MIT |
 | First Commit | 2025-08-09 |
 | Latest Release | v0.65.2 (npm) |
+| Data as of | April 2026 |
 
 Pi is a monorepo of seven npm packages that together form a full stack for building AI-powered coding agents. Run `npx @mariozechner/pi-coding-agent` and you get an interactive terminal agent that reads, edits, and writes code — like Claude Code, but open source, multi-provider, and with a TUI library you can actually reuse. The website is literally called `shittycodingagent.ai`.
 

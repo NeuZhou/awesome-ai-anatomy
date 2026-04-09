@@ -15,6 +15,7 @@
 | License | MIT |
 | First commit | May 2025 |
 | v2.0 | Feb 2026 (complete ground-up rewrite, shares zero code with v1) |
+| Data as of | April 2026 |
 
 DeerFlow is an orchestration layer that lets one LLM manage sub-agents, run sandboxed code, and persist memory across conversations. ByteDance calls it a "SuperAgent harness." It hit #1 on GitHub Trending when v2.0 launched.
 

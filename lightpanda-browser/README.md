@@ -14,6 +14,7 @@
 | License | AGPL-3.0 |
 | First Commit | 2023-02-07 |
 | Latest Release | 0.2.8 (2026-04-02) |
+| Data as of | April 2026 |
 
 Lightpanda is a headless browser designed for AI agents and web automation. You start it, it listens on a WebSocket port, and you talk to it using the Chrome DevTools Protocol (CDP). It runs your JavaScript through V8, parses HTML with html5ever (borrowed from Servo), and fetches pages with libcurl. No GUI. No rendering engine. No pixel pipeline. Just the parts of a browser that matter when you want to scrape, test, or let an AI agent interact with the web.
 

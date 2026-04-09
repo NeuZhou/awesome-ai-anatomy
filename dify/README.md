@@ -14,6 +14,7 @@
 | License | Modified Apache 2.0 (commercial use >1M users requires license) |
 | First Commit | April 2023 |
 | Latest Release | v1.13.3 (March 27, 2026) |
+| Data as of | April 2026 |
 
 Dify is a platform for building AI applications through a visual drag-and-drop interface. You open a browser, connect nodes together into workflows, hook up a knowledge base (RAG), pick a model provider, and hit publish. It ships as 7+ Docker containers and supports everything from simple chatbots to multi-step agent workflows with human-in-the-loop approval gates. Think "Zapier for LLM apps" but with its own RAG engine, code sandbox, and plugin marketplace built in.
 

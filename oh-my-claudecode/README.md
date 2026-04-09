@@ -15,6 +15,7 @@
 | License | MIT |
 | Creator | Yeachan Heo |
 | Install Method | Claude Code plugin OR npm package |
+| Data as of | April 2026 |
 
 oh-my-claudecode (OMC) isn't a standalone agent. It's a **plugin for Claude Code** that adds multi-agent orchestration on top. You install it inside Claude Code, and suddenly your single agent becomes a team of 19 specialized agents that coordinate through file-based messaging and tmux sessions.
 
@@ -141,8 +142,10 @@ What concerns me: this is a **plugin** that depends on Claude Code's internals. 
 
 ---
 
+## Verification Log
+
 <details>
-<summary>Verification Log</summary>
+<summary>Details</summary>
 
 | Claim | Method | Result |
 |-------|--------|--------|

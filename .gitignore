@@ -12,3 +12,6 @@ __pycache__/
 .drafts/
 # Architecture diagram HTML sources (used to generate PNGs)
 */architecture.html
+
+# Cline source (internal, not for public)
+_cline-src/

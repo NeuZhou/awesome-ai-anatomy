@@ -1,4 +1,4 @@
-# Block/Goose: The Rust Agent That Treats MCP as a First-Class Citizen
+# Goose: The Rust Agent That Treats MCP as a First-Class Citizen
 
 > Goose isn't really a "Rust agent." The agent loop is almost secondary — the real architecture is a distributed extension bus built on top of MCP, with the LLM acting as a scheduler. That distinction matters more than the language choice.
 
@@ -14,8 +14,9 @@
 | License | Apache-2.0 |
 | First Commit | 2024-08-23 |
 | Latest Release | v1.29.1 (2026-04-03) |
+| Data as of | April 2026 |
 
-Goose is an on-machine AI agent that runs shell commands, edits files, manages extensions, and orchestrates sub-agents. It talks to any LLM provider (30+ supported), uses MCP as its extension protocol, and ships as both a CLI (`goose`) and an Electron desktop app. It's built by Block Inc (the company behind Square and CashApp), and it directly competes with Claude Code, OpenClaw, and Cursor.
+Goose is an on-machine AI agent that runs shell commands, edits files, manages extensions, and orchestrates sub-agents. It talks to any LLM provider (30+ supported), uses MCP as its extension protocol, and ships as both a CLI (`goose`) and an Electron desktop app. Originally built by Block Inc (the company behind Square and CashApp), the project has since moved to the AAIF (AI Agent Infrastructure Foundation) organization on GitHub (`aaif-goose/goose`). It directly competes with Claude Code, OpenClaw, and Cursor.
 
 ---
 
@@ -268,7 +269,7 @@ The idea of background-summarizing old tool request/response pairs while the cur
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 37,343 stars | GitHub API (`/repos/block/goose`) | ✅ Verified |
+| 37,343 stars | GitHub API (`/repos/aaif-goose/goose`) | ✅ Verified |
 | 3,589 forks | GitHub API | ✅ Verified |
 | ~124K Rust LOC | `Get-ChildItem -Recurse -Include *.rs \| Get-Content \| Measure-Object -Line` on crates/ | ✅ Verified (124,627 lines) |
 | ~74K TypeScript LOC | Same method on ui/ directory (.ts, .tsx, .js, .jsx) | ✅ Verified (74,141 lines) |

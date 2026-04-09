@@ -16,11 +16,12 @@
 
 | Metric | Value |
 |--------|-------|
-| Stars | 109,546 (as of April 2026; originally analyzed from leaked source maps before public release) |
+| Stars | 109,558 (as of April 2026; originally analyzed from leaked source maps before public release) |
 | Language | TypeScript |
 | Lines of Code | ~510K (1,903 files) |
 | Framework | Bun, React/Ink, Zod v4 |
 | License | Proprietary (Anthropic) |
+| Data as of | April 2026 |
 
 ---
 
@@ -60,7 +61,7 @@
 
 ---
 
-## Architecture Overview
+## Architecture
 
 
 ![Architecture Overview](claude-code-1.png)

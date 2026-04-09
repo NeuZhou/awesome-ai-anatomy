@@ -16,7 +16,7 @@
 
 # Awesome AI Anatomy
 
-**12 AI agent projects dissected. Some had hidden pet systems. Some had zero security. All had God Objects.**
+**13 AI agent projects dissected. Some had hidden pet systems. Some had zero security. All had God Objects.**
 
 Claude Code ships 18 virtual pet species in production. Pi Mono can impersonate Claude Code to dodge rate limits. MiroFish's "collective intelligence" is just LLMs role-playing on a fake social network. These aren't hot takes — they're findings from reading every line of code.
 
@@ -79,7 +79,7 @@ Projects sorted by GitHub stars (descending).
 
 ## Cross-Project Comparison
 
-We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 11 projects:
+We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 13 projects:
 
 - Quick Reference (creator, stars, language, type, license)
 - Architecture patterns (agent loop, extensibility, deployment)
@@ -148,7 +148,7 @@ New teardown every week. Cursor, Windsurf, and others are on the list.
 
 **Watch** — Get notified for every new teardown, not just the ones that trend.
 
-12 deep-dives published so far. The next batch is already in progress.
+13 deep-dives published so far. The next batch is already in progress.
 
 - Substack: [AI Anatomy Newsletter](https://neuzhou.substack.com) — condensed teardowns in your inbox
 - Discord: [Join the community](https://discord.gg/kAQD7Cj8) — discuss architecture decisions
@@ -167,5 +167,5 @@ If you're a project maintainer and have concerns about any content, please [open
 ---
 
 <p align="center">
-  <i>12 projects dissected. Updated weekly.<br>If you build AI agents, you should know how the best ones actually work.</i>
+  <i>13 projects dissected. Updated weekly.<br>If you build AI agents, you should know how the best ones actually work.</i>
 </p>

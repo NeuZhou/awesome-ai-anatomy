@@ -15,6 +15,7 @@
 | License | MIT |
 | Creator | Nous Research (creators of Hermes LLM models) |
 | Tagline | "The agent that grows with you" |
+| Data as of | April 2026 |
 
 If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SOUL.md/MEMORY.md/AGENTS.md file structure, same skill system, same gateway architecture, even a `hermes claw migrate` command to import your OpenClaw config. Let's just say it out loud: **Hermes is OpenClaw rewritten in Python.** The file structure is the same, the concepts are the same, the terminology is the same. What's different is the stuff they added on top — and some of it is actually worth paying attention to.
 
@@ -246,7 +247,7 @@ No cost budgets, same as DeerFlow. For an agent that advertises Modal and Dayton
 
 ---
 
-## Hermes vs DeerFlow vs OpenClaw
+## Cross-Project Comparison
 
 | Feature | Hermes Agent | DeerFlow 2.0 | OpenClaw |
 |---------|-------------|-------------|----------|
@@ -264,7 +265,7 @@ No cost budgets, same as DeerFlow. For an agent that advertises Modal and Dayton
 
 ---
 
-## Stuff I'd Steal
+## Stuff Worth Stealing
 
 **Scan memory writes before persisting them.** This one's going into my own projects. Memory is a persistence vector for prompt injection and most frameworks don't even check.
 
@@ -316,3 +317,4 @@ No cost budgets, same as DeerFlow. For an agent that advertises Modal and Dayton
 ---
 
 *Part of [awesome-ai-anatomy](https://github.com/NeuZhou/awesome-ai-anatomy) — source-level teardowns of how production AI systems actually work.*
+ly work.*

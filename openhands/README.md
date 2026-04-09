@@ -1,4 +1,4 @@
-# All-Hands-AI/OpenHands: The 70K-Star Agent That's Rewriting Itself While You Watch
+# OpenHands/OpenHands: The 70K-Star Agent That's Rewriting Itself While You Watch
 
 > OpenHands is two codebases duct-taped together. The V0 "legacy" agent loop is 1,391 lines of event-driven Python with a 487-line stuck detector. The V1 replacement lives in a separate SDK repo that doesn't exist yet in this tree. Every core file has a deprecation banner dated April 1, 2026. That date has passed. The old code is still running.
 
@@ -15,8 +15,9 @@
 | First Commit | 2024-03-13 |
 | Originally | OpenDevin — renamed to OpenHands |
 | GitNexus Index | 21,157 nodes, 66,716 edges, 1,102 clusters, 300 execution flows |
+| Data as of | April 2026 |
 
-OpenHands is a web-based AI agent platform for software development. It runs code in Docker sandboxes, supports 6 different agent types, has 10 different memory condensation strategies, 3 security analyzers, integrations with 7 git platforms, and an enterprise layer with organization management. It was originally called OpenDevin (aiming to build an open-source Devin alternative) and rebranded to OpenHands.
+OpenHands is a web-based AI agent platform for software development. It runs code in Docker sandboxes, supports 6 different agent types, has 10 different memory condensation strategies, 3 security analyzers, integrations with 7 git platforms, and an enterprise layer with organization management. It was originally called OpenDevin (aiming to build an open-source Devin alternative), rebranded to OpenHands, and the GitHub organization moved from `All-Hands-AI` to `OpenHands` (`OpenHands/OpenHands`).
 
 ---
 
@@ -331,7 +332,7 @@ OpenHands doesn't do this yet, but should. The Docker sandbox helps, but extensi
 
 ---
 
-## Hooks and Hidden Details
+## Hooks & Easter Eggs
 
 **The Resolver is a standalone product.** `openhands/resolver/` (7,039 lines) is essentially an automated PR review and issue resolution system. It integrates with 7 git platforms, analyzes issues, generates fixes, and creates PRs. This could be extracted as its own project.
 
