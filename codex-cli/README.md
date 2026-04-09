@@ -282,7 +282,7 @@ The most complex sandbox because Windows lacks a unified sandboxing API:
 - **DPAPI** — Data Protection API for secret encryption
 - **Elevated helper** — A separate process runs with admin rights to set up sandbox infrastructure, communicates via named pipes (IPC)
 
-This is arguably the most sophisticated Windows sandboxing implementation in any open-source AI agent.
+This is the most detailed Windows sandboxing implementation in any open-source AI agent.
 
 #### Sandbox Manager
 

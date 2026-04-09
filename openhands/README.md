@@ -30,7 +30,7 @@ OpenHands is a web-based AI agent platform for software development. It runs cod
 | Security | A- | Three-layer security (GraySwan + Invariant + LLM) is the most structured approach in any open-source agent |
 | Memory/Context | A | 10 condenser strategies including structured summary and amortized forgetting — best in class |
 | Documentation | B- | Code comments are good; architectural docs assume you know the V0/V1 split |
-| **Overall** | **B+** | **The condenser system and security architecture are genuinely innovative; the V0/V1 migration debt is the elephant in the room** |
+| **Overall** | **B+** | **The condenser system and security architecture are unique in the open-source agent space; the V0/V1 migration debt is the elephant in the room** |
 
 ## Architecture
 
@@ -151,7 +151,7 @@ The `Pipeline` condenser is the key: it lets you compose strategies. You could r
 
 The `RollingCondenser` base class introduces a `should_condense` / `get_condensation` split. The condenser doesn't just return events — it can return a `Condensation` object, which is an action that gets added to the event stream. On the next agent step, the condenser uses that condensation event to produce a new `View`. This means condensation is itself an event in the history, creating an auditable trail of when and why context was compressed.
 
-The `AmortizedForgettingCondenser` (69 lines) is elegant: instead of hard-truncating, it assigns each event a survival probability that decays with age. Older events are probabilistically dropped. This means the agent gradually "forgets" old context rather than cliff-edging at a window boundary. Simple idea, surprisingly rare in production.
+The `AmortizedForgettingCondenser` (69 lines) is clever: instead of hard-truncating, it assigns each event a survival probability that decays with age. Older events are probabilistically dropped. This means the agent gradually "forgets" old context rather than cliff-edging at a window boundary. Simple idea, surprisingly rare in production.
 
 ### Three-Layer Security
 
@@ -184,7 +184,7 @@ No other open-source agent project we've analyzed has all three approaches. Goos
 
 When stuck is detected, the controller emits a `LoopDetectionObservation` and triggers `_handle_loop_recovery_action`, which attempts to break the loop by changing the agent's approach. There's also a separate 409-line test class (`TestAgentControllerLoopRecovery`) just for recovery logic.
 
-This is the most sophisticated stuck-detection system we've seen in any agent project. Most agents either don't detect loops at all (Cline, Dify) or have a simple "max retries" counter (Claude Code). OpenHands treats it as a first-class problem with its own analysis framework.
+This is the most thorough stuck-detection system in any open-source agent. Most agents either don't detect loops at all (Cline, Dify) or have a simple "max retries" counter (Claude Code). OpenHands treats it as a first-class problem with its own analysis framework.
 
 ---
 
@@ -271,9 +271,9 @@ This creates a real dilemma for contributors: do you fix bugs in V0 code that's 
 
 ## The Verdict
 
-OpenHands has the most sophisticated memory management system of any open-source agent. The 10-condenser pipeline with composable strategies, voluntary condensation requests, and auditable condensation events is the most interesting context management design in any open-source agent we've analyzed. If you're building an agent and need inspiration for context management, start here.
+OpenHands has the deepest memory management system in any open-source agent. The 10-condenser pipeline with composable strategies, voluntary condensation requests, and auditable condensation events is the most interesting context management design in any open-source agent we've analyzed. If you're building an agent and need inspiration for context management, start here.
 
-The security architecture is the most structured I've seen in any open-source agent: three complementary approaches (external ML, policy engine, self-evaluation) that can be used individually or together. Compare this to Claude Code's static allowlist or Cline's "do nothing and hope for the best."
+The security architecture is more structured than any other open-source agent we analyzed: three complementary approaches (external ML, policy engine, self-evaluation) that can be used individually or together. Compare this to Claude Code's static allowlist or Cline's "do nothing and hope for the best."
 
 The stuck detector is a standout feature that other projects should steal. A 487-line class dedicated to detecting and recovering from agent loops, with pattern analysis, configurable thresholds, and a separate test suite — this treats stuck detection as the engineering problem it actually is.
 

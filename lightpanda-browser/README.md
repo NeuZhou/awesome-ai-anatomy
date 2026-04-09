@@ -45,7 +45,7 @@ The pitch: 9x faster than Chrome, 16x less memory, instant startup. The reality:
 
 The architecture is a straightforward pipeline: network data comes in through libcurl, gets parsed by html5ever into a DOM tree managed entirely in Zig, V8 runs JavaScript against that DOM through a binding layer, and CDP exposes all of this to external tools like Playwright and Puppeteer.
 
-Each layer is remarkably thin. The entire CDP implementation — all 15 domains — is 7,123 lines. The network stack including HTTP/2, caching, robots.txt, and WebSocket handling is 3,418 lines. These are not wrapper layers; they contain real logic. The reason the line counts are so low is that Lightpanda just doesn't implement what it doesn't need. No CSS layout engine. No paint phase. No compositing layer. Every line has to justify itself against the question "does an AI agent need this?"
+Each layer is thin. The entire CDP implementation — all 15 domains — is 7,123 lines. The network stack including HTTP/2, caching, robots.txt, and WebSocket handling is 3,418 lines. These are not wrapper layers; they contain real logic. The reason the line counts are so low is that Lightpanda just doesn't implement what it doesn't need. No CSS layout engine. No paint phase. No compositing layer. Every line has to justify itself against the question "does an AI agent need this?"
 
 The heaviest file is `Page.zig` at 3,660 lines. It's the page lifecycle manager: navigation, script execution ordering, DOM events, frame management, and request coordination. It has the feel of a file that grew organically — it handles everything from `document.write` to intersection observers — but it hasn't reached the point of being unmanageable.
 
@@ -242,7 +242,7 @@ The Zig choice is interesting. It gives them comptime generics (enabling the zer
 
 The Web API coverage is the biggest gap. They have ~60 Web API files covering DOM manipulation, events, fetch, XHR, cookies, storage, and basic CSS. But the web has *hundreds* of APIs, and every real-world page uses some subset that's hard to predict. CORS isn't implemented (tracked in issue #2015). Service Workers aren't there. WebSocket support is partial. Each missing API is a potential crash or silent failure when Playwright scripts that work on Chrome are pointed at Lightpanda. The Playwright compatibility disclaimer in their README is honest about this — "a script that works with the current version may not function correctly with a future version."
 
-The MCP server mode is a forward-looking addition (1,733 lines). It lets AI agents talk to the browser directly using the Model Context Protocol, without going through CDP. For the AI agent use case that Lightpanda is targeting, this could matter more than CDP in the long term.
+The MCP server mode is a practical addition (1,733 lines). It lets AI agents talk to the browser directly using the Model Context Protocol, without going through CDP. For the AI agent use case that Lightpanda is targeting, this could matter more than CDP in the long term.
 
 Code quality is high. Tests are everywhere — the test directory has 334 HTML test files, the Zig source has inline tests in nearly every file, and they run Web Platform Tests against their implementation. The CDP tests in `Server.zig` test down to individual WebSocket frame parsing. This isn't a project that ships without testing.
 
