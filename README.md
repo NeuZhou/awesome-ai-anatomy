@@ -7,20 +7,27 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=social" alt="Stars">
-  <img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks">
+  <a href="https://github.com/NeuZhou/awesome-ai-anatomy/stargazers"><img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=social" alt="Stars"></a>
+  <a href="https://github.com/NeuZhou/awesome-ai-anatomy/network/members"><img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks"></a>
+  <a href="https://twitter.com/Neuzhou_"><img src="https://img.shields.io/twitter/follow/Neuzhou_?style=social" alt="Twitter"></a>
   <img src="https://img.shields.io/badge/teardowns-14-blue" alt="Teardowns">
   <img src="https://img.shields.io/badge/updated-weekly-brightgreen" alt="Updated Weekly">
+  <img src="https://img.shields.io/github/last-commit/NeuZhou/awesome-ai-anatomy?label=Last%20Updated" alt="Last Updated">
   <img src="https://img.shields.io/badge/license-MIT-orange" alt="License">
 </p>
 
+<h3 align="center">We read the source code. All of it. Here's what we found.</h3>
+
+> **Claude Code** hides 18 virtual pet species inside production code that runs on your machine.
+> **MemPalace** got 30K stars in 4 days — with 7,600 lines of Python.
+> **oh-my-codex** runs 30 AI agents in parallel using git worktrees for isolation.
+> None of this is in the docs. We found it by reading every file.
+
+<p align="center"><i>⭐ Star = subscribe to weekly teardowns. GitHub notifies you when we publish.</i></p>
+
 # Awesome AI Anatomy
 
-**14 AI agent projects dissected. Some had hidden pet systems. Some had zero security. All had God Objects.**
-
-Claude Code ships 18 virtual pet species in production. Pi Mono can mirror Claude Code's tool names for compatibility. MiroFish's "collective intelligence" is LLM agents interacting on a simulated social network. These aren't hot takes — they're findings from reading every line of code.
-
-Most "awesome" lists link to repos. We crack them open — architecture diagrams, design trade-offs, code smells, security gaps, and the engineering decisions nobody talks about in the docs.
+14 AI agent projects dissected — architecture diagrams, design patterns, and the engineering decisions nobody documents.
 
 ---
 
@@ -171,6 +178,27 @@ New teardown every week. Cursor, Windsurf, and others are on the list.
 - [Changelog](CHANGELOG.md) — track every update
 - Substack: [AI Anatomy Newsletter](https://neuzhou.substack.com) — condensed teardowns in your inbox
 - Discord: [Join the community](https://discord.gg/kAQD7Cj8) — discuss architecture decisions
+
+---
+
+## ⭐ Still reading? This list is worth a star.
+
+<p align="center">
+  <a href="https://github.com/NeuZhou/awesome-ai-anatomy">
+    <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=for-the-badge&logo=github&label=Star%20This%20Repo&color=yellow" alt="Star This Repo">
+  </a>
+</p>
+
+<p align="center">
+  <b>One star = weekly AI architecture teardowns delivered to your GitHub notifications.</b><br>
+  We publish new teardowns every week. Star to stay in the loop.
+</p>
+
+<p align="center">
+  <a href="https://star-history.com/#NeuZhou/awesome-ai-anatomy&Date">
+    <img src="https://api.star-history.com/svg?repos=NeuZhou/awesome-ai-anatomy&type=Date" width="600" alt="Star History Chart">
+  </a>
+</p>
 
 ---
 
