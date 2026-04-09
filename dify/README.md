@@ -203,7 +203,7 @@ The graph engine extraction into `graphon` is a good architectural move. It deco
 
 But the complexity cost is real. A minimal Dify deployment runs 7 containers. Add a vector database and you're at 8-9. Add the plugin daemon and sandbox, and you're running a small Kubernetes cluster. The `docker-compose.yaml` has 400+ environment variables, many with non-obvious interactions. The node factory alone has a type-specific initialization dictionary with 10+ entries, each wiring together different combinations of credentials providers, file managers, HTTP clients, and template renderers. For a project that sells itself on making AI "easy," the infrastructure requirements are anything but.
 
-The RAG pipeline is thorough but the 30+ vector DB support feels like checkbox-driven development. Each adapter needs its own CI, its own version pinning, and someone to fix it when the upstream API changes. Half of these are probably already bit-rotting. The Jieba keyword support for CJK is a thoughtful touch though — most Western-centric projects skip this entirely.
+The RAG pipeline is thorough but the 30+ vector DB support is broad. Each adapter needs its own maintenance. Prioritizing the top 10 most-used backends and marking the rest as community-maintained would focus the effort. The Jieba keyword support for CJK is a thoughtful touch though — most Western-centric projects skip this entirely.
 
 The plugin daemon architecture is pragmatic for multi-tenant safety but adds operational overhead that self-hosters feel. And the modified Apache 2.0 license (requiring a commercial license for >1M users) means this isn't truly "open" in the way MIT/Apache projects are — it's a hybrid between open-source and source-available.
 

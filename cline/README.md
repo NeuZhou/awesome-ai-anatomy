@@ -1,4 +1,4 @@
-# Cline: 60K Stars, a 3,756-Line God Object, and the VS Code Extension That Accidentally Became an Agent Framework
+# Cline: 60K Stars, a 3,756-Line Core Class, and the VS Code Extension That Became an Agent Framework
 
 > The most popular open-source coding agent is a VS Code sidebar panel. 560K lines of TypeScript, 40+ API providers, 28 tools, a hooks system, sub-agents, browser automation, MCP integration, and a "Focus Chain" task tracker — all stuffed into a single extension. I read every key file and found a codebase that grew organically from a weekend project into an enterprise platform, with the scars to prove it.
 
@@ -24,7 +24,7 @@ Cline is a VS Code extension that puts an AI coding agent in your sidebar. You d
 
 | Dimension | Grade | Notes |
 |-----------|-------|-------|
-| Architecture | C+ | 3,756-line God Object (`Task`), permission-by-polling, callback spaghetti between Task/Controller/ToolExecutor |
+| Architecture | C+ | 3,756-line core class (`Task`), permission-by-polling, tightly coupled Task/Controller/ToolExecutor |
 | Code Quality | B- | Competent TypeScript overall, but critical files have hundreds of lines of duplicated ask/say patterns and deeply nested control flow |
 | Security | B | Human-in-the-loop by default is solid, but "YOLO mode" is one toggle away from auto-approving everything including shell commands |
 | Extensibility | A- | 40+ provider adapters, MCP integration, hooks system, skills, and custom rules — the extension story is the best part |
@@ -73,7 +73,7 @@ The fundamental issue is that these layers are coupled through callback injectio
 
 ---
 
-## The God Object: Task (3,756 lines)
+## The Core Class: Task (3,756 lines)
 
 `src/core/task/index.ts` is the beating heart of Cline, and it's a textbook God Object. This single class handles:
 

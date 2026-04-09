@@ -1,4 +1,4 @@
-# Guardrails AI: A 1076-Line God Object Guarding Your LLM's Output — and the Reask Loop That Makes It Work
+# Guardrails AI: A 1076-Line Core Class Guarding Your LLM's Output — and the Reask Loop That Makes It Work
 
 > Guardrails AI is closer to a package manager with a validation engine bolted on than to a security tool — and that distinction matters more than the branding suggests.
 
