@@ -43,7 +43,7 @@ What MiroFish does, in plain terms: you feed it a document (news article, policy
 
 MiroFish's architecture breaks into three layers: the outermost is a Vue.js step-by-step wizard UI bundled with Vite, the middle layer is a Flask API, and the bottom layer is a chain of LLM calls.
 
-What surprised me is that the project's "core engine" doesn't live in MiroFish's own code. The actual agent social simulation is handled by OASIS (from the camel-ai team). MiroFish wraps an automation layer on top of OASIS — a "document-to-simulation" pipeline. There are at least 5 independent LLM call points in the pipeline: ontology generation, profile generation, simulation config generation, agent behavior decisions during simulation, and report generation. Each step is one or more LLM API requests. Running a full simulation won't be cheap.
+The project's "core engine" doesn't live in MiroFish's own code. The actual agent social simulation is handled by OASIS (from the camel-ai team). MiroFish wraps an automation layer on top of OASIS — a "document-to-simulation" pipeline. There are at least 5 independent LLM call points in the pipeline: ontology generation, profile generation, simulation config generation, agent behavior decisions during simulation, and report generation. Each step is one or more LLM API requests. Running a full simulation won't be cheap.
 
 The file structure is clean, though. `backend/app/services/` has one file per pipeline stage, `backend/scripts/` holds the OASIS simulation launch scripts. Frontend and backend are fully separated, communicating via REST API.
 

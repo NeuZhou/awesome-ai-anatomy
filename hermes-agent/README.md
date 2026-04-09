@@ -165,7 +165,7 @@ The structured summary template is the key improvement over naive compression. I
 
 ---
 
-## Session Search: This Is the Part That Actually Surprised Me
+## Session Search: FTS5 Over Event History
 
 Most agent frameworks treat each session as a clean slate with only MEMORY.md for continuity. I've been annoyed by this for months — the agent forgets what we talked about three days ago unless I manually wrote it down. Hermes stores all sessions in SQLite with FTS5 full-text search:
 

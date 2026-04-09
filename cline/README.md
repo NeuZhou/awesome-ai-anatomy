@@ -490,7 +490,7 @@ The npm package name is still `claude-dev`. The display name is `Cline`. The pub
 The idea of having model-specific prompt variants — not just different models, but different prompt structures for different model families — is worth adopting. The `devstral` variant has different rules than `next-gen` because those models respond to instructions differently. Most agents treat prompts as one-size-fits-all.
 
 ### 2. Loop Detection
-The `loop-detection.ts` module (70 lines) that detects when the model calls the same tool with identical arguments repeatedly is elegantly simple. Soft warning at 3 repetitions, hard escalation at 5. The `toolCallSignature` function strips metadata params and sorts keys for canonical comparison. Every agent should have this.
+The `loop-detection.ts` module (70 lines) that detects when the model calls the same tool with identical arguments repeatedly is dead simple. Soft warning at 3 repetitions, hard escalation at 5. The `toolCallSignature` function strips metadata params and sorts keys for canonical comparison. Every agent should have this.
 
 ### 3. File Read Deduplication Cache
 `TaskState.fileReadCache` tracks which files have been read and their modification times. If a file hasn't changed, the model gets a shortened version with a note like "file unchanged since last read." This prevents the common pattern where models re-read the same file 5 times in a task, wasting thousands of tokens each time.
@@ -504,7 +504,7 @@ The `TaskPresentationScheduler` coalesces rapid UI updates into batched flushes 
 
 Cline is what happens when a successful weekend project gets 60,000 stars and has to scale to enterprise demands. The extension started life as `claude-dev` — a thin wrapper that sent code to Claude and displayed the results. Today it's a 560K-line platform with 40+ provider adapters, a hooks system, sub-agents, browser automation, MCP integration, a task tracker, checkpoint management, and model-specific prompt variants.
 
-The feature set is genuinely impressive, and certain subsystems are well-designed. The prompt variant system shows sophisticated understanding of how different models respond to different instruction styles. The hooks architecture provides extension points that other agents lack entirely. The MCP integration is the most complete in any VS Code extension. The Focus Chain is a novel idea — giving the model a persistent checklist that users can edit — and it actually works.
+The feature set is impressive, and certain subsystems are well-designed. The prompt variant system shows sophisticated understanding of how different models respond to different instruction styles. The hooks architecture provides extension points that other agents lack entirely. The MCP integration is the most complete in any VS Code extension. The Focus Chain is a novel idea — giving the model a persistent checklist that users can edit — and it actually works.
 
 But the core is rotting under the weight of features. The 3,756-line `Task` class is the worst God Object in our survey — Claude Code's 1,729-line `query.ts` is bad enough, but at least it doesn't callback into itself through three layers of indirection. The `ToolExecutor` constructor with 30+ parameters including 15 callbacks is a maintenance burden that grows with every new feature. The polling-based approval flow with shared mutable state works but is architecturally primitive compared to event-driven alternatives. And the recursive agent loop means deep tool chains literally produce deep call stacks.
 

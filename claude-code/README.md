@@ -120,7 +120,7 @@ If I were leading the next architecture review, I'd split it into three modules:
 
 ![Core Innovation: Context Management - 4 Surgical Layers](claude-code-2.png)
 
-This is the most sophisticated part of the codebase. Most agents use a single "summarize and truncate" approach. Claude Code uses four mechanisms, applied in cascade:
+This is the most complex part of the codebase. Most agents use a single "summarize and truncate" approach. Claude Code uses four mechanisms, applied in cascade:
 
 
 **The design principle:** Lossless before lossy. Local before global.
@@ -346,7 +346,7 @@ Each tool is a plain object with schema, permissions, execution, UI rendering, a
 
 ## Key Takeaways
 
-1. **Context management is THE engineering challenge** - not prompts, not models. The 4-layer cascade is the most sophisticated production implementation I've seen.
+1. **Context management is THE engineering challenge** - not prompts, not models. The 4-layer cascade is the most layered production implementation we've analyzed.
 
 2. **Stream-then-execute beats wait-then-execute** - start tool execution during model generation. The UX improvement justifies the engineering complexity.
 

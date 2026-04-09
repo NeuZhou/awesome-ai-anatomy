@@ -41,7 +41,7 @@ Guardrails AI wraps LLM API calls and validates the output against a schema you 
 
 The whole thing flows through a single central class: `Guard`. It holds your validators, your output schema, your execution history, your API client, your telemetry config — everything. When you call it, it builds a `Runner`, which loops through LLM calls and validation steps until the output passes or the reask budget runs out.
 
-What surprised me: the validation service defaults to async execution. `validator_service/__init__.py` tries to grab an event loop and use `AsyncValidatorService` first, falling back to `SequentialValidatorService` only if that fails. Most users probably don't realize their validators are running in an async context by default.
+One detail worth noting: the validation service defaults to async execution. `validator_service/__init__.py` tries to grab an event loop and use `AsyncValidatorService` first, falling back to `SequentialValidatorService` only if that fails. Most users probably don't realize their validators are running in an async context by default.
 
 The architecture has a clear "onion" shape: Guard wraps Runner, Runner wraps ValidatorService, ValidatorService wraps individual Validators. Each layer adds its own error handling, telemetry, and state management. This means 4+ stack frames between your code and the actual validation logic — which shows up in stack traces when things go wrong.
 

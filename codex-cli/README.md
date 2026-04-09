@@ -34,7 +34,7 @@
 | Code Quality | A | 549K LOC Rust with 162 test files, dual Cargo+Bazel build, strict type boundaries |
 | Security | A | Three-platform sandbox (Seatbelt/Landlock+seccomp/Restricted Token), Guardian AI reviews tool calls |
 | Documentation | B+ | Crate-level docs exist but cross-crate architecture requires reading the code |
-| **Overall** | **A** | **Best-in-class sandbox design; Guardian auto-approval is a novel trust delegation pattern** |
+| **Overall** | **A** | **Strongest sandbox design in the group; Guardian auto-approval is a novel trust delegation pattern** |
 
 ---
 

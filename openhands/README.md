@@ -127,7 +127,6 @@ The most important thing to understand: **this codebase is mid-migration.** Ever
 
 ## Core Innovation
 
-Three things set OpenHands apart from the 12 other projects we've analyzed: the condenser system, the security architecture, and the stuck detector.
 
 ### The Condenser System: 10 Ways to Forget
 
@@ -272,7 +271,7 @@ This creates a real dilemma for contributors: do you fix bugs in V0 code that's 
 
 ## The Verdict
 
-OpenHands has the most sophisticated memory management system of any open-source agent. The 10-condenser pipeline with composable strategies, voluntary condensation requests, and auditable condensation events is the most interesting context management design I've found in any open-source agent. If you're building an agent and need inspiration for context management, start here.
+OpenHands has the most sophisticated memory management system of any open-source agent. The 10-condenser pipeline with composable strategies, voluntary condensation requests, and auditable condensation events is the most interesting context management design in any open-source agent we've analyzed. If you're building an agent and need inspiration for context management, start here.
 
 The security architecture is the most structured I've seen in any open-source agent: three complementary approaches (external ML, policy engine, self-evaluation) that can be used individually or together. Compare this to Claude Code's static allowlist or Cline's "do nothing and hope for the best."
 
@@ -280,7 +279,7 @@ The stuck detector is a standout feature that other projects should steal. A 487
 
 But the V0/V1 transition is a significant concern. 287K lines of Python with deprecation banners and a deferred migration creates ambiguity about which code to trust. The `AgentController` is a God Object (1,391 lines) that handles the agent loop, event dispatching, delegation, security checks, state management, and error recovery all in one class. The V1 architecture promises to fix this with the SDK split, but that promise is unfulfilled in this repo.
 
-The `critic` module is surprisingly thin — just 57 lines total. `AgentFinishedCritic` checks if the agent called `AgentFinishAction` and if the git patch is non-empty. For a project that emphasizes self-evaluation, the critic barely evaluates anything. This feels like a placeholder for a much more ambitious system that never materialized.
+The `critic` module is surprisingly thin — just 57 lines total. `AgentFinishedCritic` checks if the agent called `AgentFinishAction` and if the git patch is non-empty. For a project that emphasizes self-evaluation, the critic barely evaluates anything. It checks two booleans and calls it a day. Somebody had a grand vision for self-critique here, wrote the interface, and moved on.
 
 Would I use it? For automated issue resolution and PR workflows, yes — the resolver module (7,039 lines) with 7 git platform integrations is production-tested. For interactive coding, the CodeActAgent with Docker sandboxing is safer than most alternatives. But I'd watch the V0/V1 migration closely before building anything long-term on the internal APIs.
 
@@ -383,3 +382,5 @@ OpenHands doesn't do this yet, but should. The Docker sandbox helps, but extensi
 ---
 
 *Part of [awesome-ai-anatomy](https://github.com/NeuZhou/awesome-ai-anatomy) — source-level teardowns of how production AI systems actually work. This teardown was produced using GitNexus for structural analysis combined with manual source code review for architectural judgment.*
+t.*
+ment.*
