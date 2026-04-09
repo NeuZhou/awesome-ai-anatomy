@@ -57,6 +57,8 @@ The 5 findings people can't stop sharing:
 
 13 AI agent source code analyses — from orchestration frameworks to coding assistants.
 
+> 📱 On mobile? Scroll right to see all columns, or tap a project name to read the full teardown.
+
 | # | Project | Stars | Language | Lines | Key Findings | Status |
 |---|---------|-------|----------|-------|-------------|--------|
 | 001 | [**Dify**](dify/) | 136K | Python + TS | 1.24M | `graphon` engine, 7+ containers, 30+ vector DBs | Published |
@@ -115,9 +117,24 @@ We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal an
 
 ## Each Teardown Includes
 
-- `README.md` — Full source code analysis + architecture decisions
-- Problems found — Bugs, code smells, architectural risks
-- Comparisons — How it stacks up against alternatives
+- 📐 **Architecture diagrams** — d2-rendered PNG with component relationships
+- 🏆 **Overall rating** — A-F scale across security, architecture, code quality, and more
+- 🔬 **Core innovation analysis** — what the project does that nobody else does
+- 📍 **Code-level references** — file paths + line numbers for every claim
+- 📊 **Cross-project comparison table** — how it stacks up against alternatives
+- 💡 **"Stuff Worth Stealing"** — patterns other projects should adopt
+- ✅ **Verification log** — every factual claim fact-checked against source code
+- 🥚 **Easter eggs and hidden details** — the stuff you'd only find reading every file
+
+---
+
+## Knowledge Base
+
+Beyond individual teardowns, we maintain cross-cutting analysis:
+
+- **[COMPARISON.md](COMPARISON.md)** — Side-by-side comparison across all 13 projects
+- **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — Patterns, anti-patterns, and architectural trends
+- **[knowledge/](knowledge/)** — Structured knowledge base: design patterns, anti-patterns, and project metadata
 
 ---
 
@@ -150,6 +167,7 @@ New teardown every week. Cursor, Windsurf, and others are on the list.
 
 13 deep-dives published so far. The next batch is already in progress.
 
+- [Changelog](CHANGELOG.md) — track every update
 - Substack: [AI Anatomy Newsletter](https://neuzhou.substack.com) — condensed teardowns in your inbox
 - Discord: [Join the community](https://discord.gg/kAQD7Cj8) — discuss architecture decisions
 

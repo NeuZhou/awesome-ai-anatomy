@@ -25,7 +25,7 @@ Open an issue with the `project-suggestion` label:
 Want to do a full teardown? Amazing. Here's how:
 
 1. Fork the repo
-2. Create `project-name/README.md` using [TEMPLATE.md](TEMPLATE.md)
+2. Create `project-name/README.md` using [TEMPLATE.md](.github/TEMPLATE.md)
 3. Include:
    - At a Glance table with verified stats
    - Architecture overview with Mermaid diagram(s)
