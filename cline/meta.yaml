@@ -1,0 +1,37 @@
+name: Cline
+repo: cline/cline
+stars: 60000
+forks: 0
+language:
+  - TypeScript
+loc: 560000
+license: Apache-2.0
+created: "2024-06"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: C+
+  code_quality: B-
+  security: B
+  extensibility: A-
+  documentation: B+
+  overall: B-
+
+features:
+  sandbox: none
+  context_management: truncate
+  stuck_detection: true
+  multi_agent: true
+  mcp_support: true
+  security_layers: 1
+  provider_count: 43
+  plugin_system: true
+
+key_finding: "3,756-line God Object, 40+ providers, YOLO mode, hooks system"
+
+tags:
+  - coding-agent
+  - vscode-extension
+  - multi-provider
+  - mcp-support
+  - hooks-system

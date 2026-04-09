@@ -1,0 +1,37 @@
+name: Lightpanda
+repo: lightpanda-io/browser
+stars: 27287
+forks: 1120
+language:
+  - Zig
+  - Rust
+loc: 91000
+license: AGPL-3.0
+created: "2023-02-07"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: A
+  code_quality: A
+  security: B
+  documentation: B
+  overall: A-
+
+features:
+  sandbox: none
+  context_management: none
+  stuck_detection: false
+  multi_agent: false
+  mcp_support: true
+  security_layers: 0
+  provider_count: 0
+  plugin_system: false
+
+key_finding: "From-scratch browser for AI agents, 9x Chrome"
+
+tags:
+  - browser
+  - headless
+  - zig
+  - cdp
+  - performance

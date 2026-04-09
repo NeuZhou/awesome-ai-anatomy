@@ -1,0 +1,38 @@
+name: Goose
+repo: aaif-goose/goose
+stars: 37343
+forks: 3589
+language:
+  - Rust
+  - TypeScript
+loc: 198000
+license: Apache-2.0
+created: "2024-08-23"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: A-
+  code_quality: A
+  security: B+
+  documentation: B+
+  overall: A-
+
+features:
+  sandbox: process_isolation
+  context_management: summarize
+  stuck_detection: true
+  multi_agent: false
+  mcp_support: true
+  security_layers: 5
+  provider_count: 30
+  plugin_system: true
+
+key_finding: "MCP-first bus, 5-inspector pipeline, 30+ LLMs"
+
+tags:
+  - coding-agent
+  - cli
+  - mcp-first
+  - rust
+  - multi-provider
+  - extension-system

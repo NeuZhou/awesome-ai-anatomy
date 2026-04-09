@@ -1,0 +1,59 @@
+direction: down
+
+arch: "MemPalace Architecture" {
+
+  cli: "mempalace CLI\n(init / mine / search / status)" {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+  }
+  mcp: "MCP Server\n(19 tools, 812 lines)" {
+    style.fill: "#3b82f6"
+    style.font-color: "#fff"
+  }
+
+  miner: "miner.py (685 lines)\n3 modes: projects / convos / general" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+  }
+  convo: "convo_miner.py (404 lines)\nClaude / ChatGPT / Slack exports"
+  general: "general_extractor.py (521 lines)\ndecisions / milestones / problems"
+  entity: "entity_detector.py (853 lines)\npeople / projects / tools"
+
+  chromadb: "ChromaDB (local)\nmempalace_drawers\nverbatim text + metadata" {
+    style.fill: "#0891b2"
+    style.font-color: "#fff"
+  }
+  structure: "Wings (project/person)\n  Rooms (topic/aspect)\n    Drawers (memories)"
+
+  l0: "L0 Identity (~100 tok)" {style.fill: "#16a34a"; style.font-color: "#fff"}
+  l1: "L1 Essential (~500-800 tok)" {style.fill: "#22c55e"; style.font-color: "#fff"}
+  l2: "L2 On-Demand (~200-500)"
+  l3: "L3 Deep Search (unlimited)"
+
+  aaak: "AAAK dialect.py (1,075 lines)\nbiggest module, biggest controversy" {
+    style.fill: "#dc2626"
+    style.font-color: "#fff"
+  }
+  aaak_warn: "84.2% vs 96.6% raw\n12.4 point regression" {
+    style.fill: "#fca5a5"
+  }
+
+  searcher: "searcher.py (152 lines)\nChromaDB.query() + where filters" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+  }
+
+  cli -> miner
+  mcp -> searcher
+  mcp -> l0
+  miner -> convo
+  miner -> general
+  general -> entity
+  miner -> chromadb
+  searcher -> chromadb
+  chromadb -> structure
+  l0 -> l1
+  l2 -> l3
+  l3 -> searcher
+  aaak -> aaak_warn
+}

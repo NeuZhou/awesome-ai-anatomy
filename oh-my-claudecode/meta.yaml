@@ -1,0 +1,36 @@
+name: oh-my-claudecode
+repo: yeagerai/oh-my-claudecode
+stars: 24423
+forks: 2230
+language:
+  - TypeScript
+loc: 194000
+license: MIT
+created: "2025-06"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: B+
+  code_quality: B
+  security: B-
+  documentation: B
+  overall: B
+
+features:
+  sandbox: none
+  context_management: none
+  stuck_detection: false
+  multi_agent: true
+  mcp_support: false
+  security_layers: 0
+  provider_count: 3
+  plugin_system: false
+
+key_finding: "19-agent team via file IPC, Haiku→Opus routing"
+
+tags:
+  - multi-agent
+  - claude-code-plugin
+  - file-ipc
+  - model-routing
+  - team-orchestration

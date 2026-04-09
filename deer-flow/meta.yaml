@@ -1,0 +1,36 @@
+name: DeerFlow
+repo: bytedance/deer-flow
+stars: 58080
+forks: 7241
+language:
+  - Python
+  - TypeScript
+loc: 0
+license: MIT
+created: "2025-05"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: B
+  code_quality: B-
+  security: C+
+  documentation: B
+  overall: B-
+
+features:
+  sandbox: docker
+  context_management: summarize
+  stuck_detection: true
+  multi_agent: true
+  mcp_support: false
+  security_layers: 0
+  provider_count: 1
+  plugin_system: false
+
+key_finding: "14-layer middleware, hash loop kill@5, no RBAC"
+
+tags:
+  - agent-framework
+  - middleware-chain
+  - multi-agent
+  - langgraph

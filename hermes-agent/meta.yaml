@@ -1,0 +1,36 @@
+name: Hermes Agent
+repo: NousResearch/hermes-agent
+stars: 26130
+forks: 3416
+language:
+  - Python
+loc: 260000
+license: MIT
+created: "2025-01"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: B
+  code_quality: B-
+  security: C
+  documentation: B-
+  overall: B-
+
+features:
+  sandbox: docker
+  context_management: summarize
+  stuck_detection: false
+  multi_agent: true
+  mcp_support: false
+  security_layers: 0
+  provider_count: 1
+  plugin_system: true
+
+key_finding: "Self-improving skills, FTS5 search, frozen mem"
+
+tags:
+  - coding-agent
+  - cli
+  - self-improving
+  - session-search
+  - openclaw-clone

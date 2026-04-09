@@ -1,0 +1,45 @@
+# Meta.yaml Schema — awesome-ai-anatomy
+# Every teardown directory must have a meta.yaml following this schema.
+# These files power automated comparison table generation (future).
+
+# Example:
+name: OpenHands
+repo: OpenHands/OpenHands
+stars: 70860
+forks: 8886
+language:
+  - Python
+  - TypeScript
+loc: 400000
+license: MIT
+created: "2024-03-13"
+data_as_of: "2026-04"
+
+# Ratings (A/A-/B+/B/B-/C+/C/C-/D/F)
+ratings:
+  architecture: B+
+  code_quality: B
+  security: A-
+  documentation: B-
+  overall: B+
+
+# Architecture features (boolean or string)
+features:
+  sandbox: docker           # docker/kubernetes/seatbelt/landlock/none
+  context_management: condenser_pipeline  # condenser_pipeline/sliding_window/summarize/truncate/none
+  stuck_detection: true
+  multi_agent: true
+  mcp_support: true
+  security_layers: 3        # number of distinct security mechanisms
+  provider_count: 1         # number of LLM providers supported (1 = single, N = multi)
+  plugin_system: true
+
+# Key finding (one line, for comparison tables)
+key_finding: "10 condensers, 3-layer security, 487-line stuck detector, V0/V1 mid-migration"
+
+# Tags for filtering
+tags:
+  - coding-agent
+  - web-ui
+  - docker-sandbox
+  - multi-agent

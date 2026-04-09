@@ -1,0 +1,36 @@
+name: Pi Mono
+repo: badlogic/pi
+stars: 32049
+forks: 3488
+language:
+  - TypeScript
+loc: 147444
+license: MIT
+created: "2025-08-09"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: B+
+  code_quality: B
+  security: C
+  documentation: B-
+  overall: B
+
+features:
+  sandbox: none
+  context_management: summarize
+  stuck_detection: false
+  multi_agent: false
+  mcp_support: false
+  security_layers: 0
+  provider_count: 10
+  plugin_system: true
+
+key_finding: "Game-engine arch, stealth mode as Claude Code"
+
+tags:
+  - coding-agent
+  - cli
+  - game-engine-arch
+  - multi-provider
+  - monorepo

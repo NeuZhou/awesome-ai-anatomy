@@ -1,0 +1,36 @@
+name: Guardrails AI
+repo: guardrails-ai/guardrails
+stars: 6635
+forks: 561
+language:
+  - Python
+loc: 18079
+license: Apache-2.0
+created: "2023-01-29"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: B+
+  code_quality: B+
+  security: B
+  documentation: A-
+  overall: B+
+
+features:
+  sandbox: none
+  context_management: none
+  stuck_detection: false
+  multi_agent: false
+  mcp_support: false
+  security_layers: 0
+  provider_count: 1
+  plugin_system: true
+
+key_finding: "Validator Hub, reask self-correction loop"
+
+tags:
+  - security-tool
+  - validation
+  - llm-output-guard
+  - validator-hub
+  - reask-loop

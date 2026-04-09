@@ -1,0 +1,38 @@
+name: Dify
+repo: langgenius/dify
+stars: 136306
+forks: 21259
+language:
+  - Python
+  - TypeScript
+loc: 1283000
+license: "Modified Apache 2.0"
+created: "2023-04"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: B+
+  code_quality: B
+  security: B-
+  documentation: A
+  overall: B+
+
+features:
+  sandbox: docker
+  context_management: none
+  stuck_detection: false
+  multi_agent: true
+  mcp_support: false
+  security_layers: 2
+  provider_count: 30
+  plugin_system: true
+
+key_finding: "graphon engine, 7+ containers, 30+ vector DBs"
+
+tags:
+  - workflow-engine
+  - web-ui
+  - docker-sandbox
+  - rag-platform
+  - plugin-system
+  - low-code

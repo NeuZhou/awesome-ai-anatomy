@@ -1,0 +1,54 @@
+direction: down
+
+wake: "Wake-Up (600 tokens)" {
+  style.fill: "#f0fdf4"
+  style.stroke: "#16a34a"
+
+  l0: "Layer 0 Identity" {
+    style.fill: "#16a34a"
+    style.font-color: "#fff"
+    label: "Layer 0: Identity (100 tokens)\nPlain text: identity.txt\nWho am I, who do I work with"
+  }
+  l1: "Layer 1 Essential" {
+    style.fill: "#22c55e"
+    style.font-color: "#fff"
+    label: "Layer 1: Essential (500-800 tokens)\nTop moments from each wing\nDeduplicated, scored by distance"
+  }
+
+  l0 -> l1: "always loaded"
+}
+
+on_demand: "On-Demand" {
+  style.fill: "#fffbeb"
+  style.stroke: "#d97706"
+
+  l2: "Layer 2 Topic" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+    label: "Layer 2: Topic Memory (200-500 per topic)\nTriggered when a wing or room is mentioned\nFiltered by metadata"
+  }
+}
+
+deep: "Deep Search" {
+  style.fill: "#faf5ff"
+  style.stroke: "#7c3aed"
+
+  l3: "Layer 3 Full" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+    label: "Layer 3: Deep Search (unlimited)\nChromaDB semantic search\nReturns verbatim text, not summaries"
+  }
+}
+
+context: "LLM Context Window" {
+  style.fill: "#374151"
+  style.font-color: "#fff"
+  label: "LLM Context Window\nL0+L1 leave 95% of context free"
+}
+
+wake.l1 -> on_demand.l2: "topic mentioned"
+on_demand.l2 -> deep.l3: "explicit search needed"
+deep.l3 -> context: "results injected"
+wake.l0 -> context: "600 tokens total" {
+  style.stroke-dash: 3
+}

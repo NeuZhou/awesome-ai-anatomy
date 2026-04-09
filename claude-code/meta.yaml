@@ -1,0 +1,35 @@
+name: Claude Code
+repo: anthropics/claude-code
+stars: 109558
+forks: 0
+language:
+  - TypeScript
+loc: 510000
+license: Proprietary
+created: "2025-02"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: A
+  code_quality: A-
+  security: B+
+  documentation: A
+  overall: A-
+
+features:
+  sandbox: seatbelt
+  context_management: 4_layer_cascade
+  stuck_detection: false
+  multi_agent: true
+  mcp_support: true
+  security_layers: 1
+  provider_count: 1
+  plugin_system: false
+
+key_finding: "4-layer context, hidden pet system (18 species)"
+
+tags:
+  - coding-agent
+  - cli
+  - context-management
+  - streaming-tools

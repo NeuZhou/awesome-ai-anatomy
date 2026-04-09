@@ -9,14 +9,14 @@
 <p align="center">
   <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=social" alt="Stars">
   <img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks">
-  <img src="https://img.shields.io/badge/teardowns-13-blue" alt="Teardowns">
+  <img src="https://img.shields.io/badge/teardowns-14-blue" alt="Teardowns">
   <img src="https://img.shields.io/badge/updated-weekly-brightgreen" alt="Updated Weekly">
   <img src="https://img.shields.io/badge/license-MIT-orange" alt="License">
 </p>
 
 # Awesome AI Anatomy
 
-**13 AI agent projects dissected. Some had hidden pet systems. Some had zero security. All had God Objects.**
+**14 AI agent projects dissected. Some had hidden pet systems. Some had zero security. All had God Objects.**
 
 Claude Code ships 18 virtual pet species in production. Pi Mono can impersonate Claude Code to dodge rate limits. MiroFish's "collective intelligence" is just LLMs role-playing on a fake social network. These aren't hot takes — they're findings from reading every line of code.
 
@@ -55,7 +55,7 @@ The 5 findings people can't stop sharing:
 
 ## Project Index
 
-13 AI agent source code analyses — from orchestration frameworks to coding assistants.
+14 AI agent source code analyses — from orchestration frameworks to coding assistants.
 
 > 📱 On mobile? Scroll right to see all columns, or tap a project name to read the full teardown.
 
@@ -68,12 +68,13 @@ The 5 findings people can't stop sharing:
 | 005 | [**MiroFish**](mirofish/) | 50K | Python + Vue | 39K | LLM social sim as "collective intelligence" | Published |
 | 006 | [**Goose**](goose/) | 37K | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | Published |
 | 007 | [**Pi Mono**](pi-mono/) | 32K | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | Published |
-| 008 | [**Lightpanda**](lightpanda-browser/) | 27K | Zig + Rust | 91K | From-scratch browser for AI agents, 9x Chrome | Published |
-| 009 | [**Hermes Agent**](hermes-agent/) | 26K | Python | 260K | Self-improving skills, FTS5 search, frozen mem | Published |
-| 010 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | Published |
-| 011 | [**Guardrails AI**](guardrails-ai/) | 6.6K | Python | 18K | Validator Hub, reask self-correction loop | Published |
-| 012 | [**OpenAI Codex CLI**](codex-cli/) | 27K+ | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | Published |
-| 013 | [**Cline**](cline/) | 60K | TypeScript | 560K | 3,756-line God Object, 40+ providers, YOLO mode, hooks system | Published |
+| 008 | [**MemPalace**](mempalace/) | 30K | Python | 9K | Milla Jovovich's memory palace, 4-layer stack, AAAK dialect debunked, shell injection | **NEW** |
+| 009 | [**Lightpanda**](lightpanda-browser/) | 27K | Zig + Rust | 91K | From-scratch browser for AI agents, 9x Chrome | Published |
+| 010 | [**Hermes Agent**](hermes-agent/) | 26K | Python | 260K | Self-improving skills, FTS5 search, frozen mem | Published |
+| 011 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | Published |
+| 012 | [**Guardrails AI**](guardrails-ai/) | 6.6K | Python | 18K | Validator Hub, reask self-correction loop | Published |
+| 013 | [**OpenAI Codex CLI**](codex-cli/) | 27K+ | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | Published |
+| 014 | [**Cline**](cline/) | 60K | TypeScript | 560K | 3,756-line God Object, 40+ providers, YOLO mode, hooks system | Published |
 
 Projects sorted by GitHub stars (descending).
 
@@ -81,7 +82,7 @@ Projects sorted by GitHub stars (descending).
 
 ## Cross-Project Comparison
 
-We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 13 projects:
+We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 14 projects:
 
 - Quick Reference (creator, stars, language, type, license)
 - Architecture patterns (agent loop, extensibility, deployment)
@@ -132,7 +133,7 @@ We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal an
 
 Beyond individual teardowns, we maintain cross-cutting analysis:
 
-- **[COMPARISON.md](COMPARISON.md)** — Side-by-side comparison across all 13 projects
+- **[COMPARISON.md](COMPARISON.md)** — Side-by-side comparison across all 14 projects
 - **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — Patterns, anti-patterns, and architectural trends
 - **[knowledge/](knowledge/)** — Structured knowledge base: design patterns, anti-patterns, and project metadata
 
@@ -165,7 +166,7 @@ New teardown every week. Cursor, Windsurf, and others are on the list.
 
 **Watch** — Get notified for every new teardown, not just the ones that trend.
 
-13 deep-dives published so far. The next batch is already in progress.
+14 deep-dives published so far. The next batch is already in progress.
 
 - [Changelog](CHANGELOG.md) — track every update
 - Substack: [AI Anatomy Newsletter](https://neuzhou.substack.com) — condensed teardowns in your inbox
@@ -184,5 +185,5 @@ For takedown requests, please [open an issue](https://github.com/NeuZhou/awesome
 ---
 
 <p align="center">
-  <i>13 projects dissected. Updated weekly.<br>If you build AI agents, you should know how the best ones actually work.</i>
+  <i>14 projects dissected. Updated weekly.<br>If you build AI agents, you should know how the best ones actually work.</i>
 </p>

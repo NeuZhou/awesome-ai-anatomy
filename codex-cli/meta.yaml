@@ -1,0 +1,37 @@
+name: OpenAI Codex CLI
+repo: openai/codex
+stars: 27000
+forks: 0
+language:
+  - Rust
+loc: 549000
+license: Apache-2.0
+created: "2025-04"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: A
+  code_quality: A
+  security: A
+  documentation: B+
+  overall: A
+
+features:
+  sandbox: seatbelt_landlock_restricted_token
+  context_management: summarize
+  stuck_detection: false
+  multi_agent: true
+  mcp_support: true
+  security_layers: 3
+  provider_count: 1
+  plugin_system: true
+
+key_finding: "Queue-pair arch, Guardian AI approval, 3-OS sandbox"
+
+tags:
+  - coding-agent
+  - cli
+  - rust
+  - sandbox
+  - guardian-ai
+  - multi-platform
