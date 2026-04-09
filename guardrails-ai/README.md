@@ -35,7 +35,6 @@ Guardrails AI wraps LLM API calls and validates the output against a schema you 
 ![Architecture](guardrails-ai-1.png)
 
 ![Architecture](architecture.png)
-![Diagram 2](guardrails-ai-2.png)
 
 
 

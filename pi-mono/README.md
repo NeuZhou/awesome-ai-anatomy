@@ -35,10 +35,8 @@ Pi is a monorepo of seven npm packages that together form a full stack for build
 ![Architecture](pi-mono-1.png)
 
 ![Architecture](architecture.png)
-![Diagram 2](pi-mono-2.png)
 
 
-![Diagram 3](pi-mono-3.png)
 
 
 

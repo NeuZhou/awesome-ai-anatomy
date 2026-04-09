@@ -35,10 +35,8 @@ Goose is an on-machine AI agent that runs shell commands, edits files, manages e
 ![Architecture](goose-1.png)
 
 ![Architecture](architecture.png)
-![Diagram 2](goose-2.png)
 
 
-![Diagram 3](goose-3.png)
 
 
 

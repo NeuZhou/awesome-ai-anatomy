@@ -37,10 +37,8 @@ The pitch: 9x faster than Chrome, 16x less memory, instant startup. The reality:
 ![Architecture](lightpanda-browser-1.png)
 
 ![Architecture](architecture.png)
-![Diagram 2](lightpanda-browser-2.png)
 
 
-![Diagram 3](lightpanda-browser-3.png)
 
 
 

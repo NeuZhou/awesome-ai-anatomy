@@ -36,16 +36,12 @@ If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SO
 ![Architecture](hermes-agent-1.png)
 
 ![Architecture](architecture.png)
-![Diagram 2](hermes-agent-2.png)
 
 
-![Diagram 3](hermes-agent-3.png)
 
 
-![Diagram 4](hermes-agent-4.png)
 
 
-![Diagram 5](hermes-agent-5.png)
 
 
 

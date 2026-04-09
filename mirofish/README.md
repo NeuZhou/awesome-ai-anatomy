@@ -35,10 +35,8 @@ What MiroFish does, in plain terms: you feed it a document (news article, policy
 ![Architecture](mirofish-1.png)
 
 ![Architecture](architecture.png)
-![Diagram 2](mirofish-2.png)
 
 
-![Diagram 3](mirofish-3.png)
 
 
 

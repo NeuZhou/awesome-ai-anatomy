@@ -38,10 +38,8 @@ The weird part: it also spawns Codex and Gemini CLI workers alongside Claude. So
 ![Architecture](oh-my-claudecode-1.png)
 
 ![Architecture](architecture.png)
-![Diagram 2](oh-my-claudecode-2.png)
 
 
-![Diagram 3](oh-my-claudecode-3.png)
 
 
 

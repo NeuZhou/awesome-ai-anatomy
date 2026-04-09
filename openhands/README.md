@@ -34,9 +34,6 @@ OpenHands is a web-based AI agent platform for software development. It runs cod
 ## Architecture
 
 ![Architecture](architecture.png)
-![Condenser Pipeline](openhands-1.png)
-
-![Security Architecture](openhands-2.png)
 
 <details>
 <summary>Mermaid source (click to expand)</summary>
