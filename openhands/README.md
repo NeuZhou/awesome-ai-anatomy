@@ -1,6 +1,6 @@
 # OpenHands/OpenHands: The 70K-Star Agent That's Rewriting Itself While You Watch
 
-> OpenHands is two codebases duct-taped together. The V0 "legacy" agent loop is 1,391 lines of event-driven Python with a 487-line stuck detector. The V1 replacement lives in a separate SDK repo that doesn't exist yet in this tree. Every core file has a deprecation banner dated April 1, 2026. That date has passed. The old code is still running.
+> OpenHands is in the middle of an ambitious architecture migration. The V0 "legacy" agent loop is 1,391 lines of event-driven Python with a 487-line stuck detector. The V1 replacement lives in a separate SDK repo that doesn't exist yet in this tree. Every core file has a deprecation banner dated April 1, 2026. That date has passed. The old code is still running.
 
 ## At a Glance
 
@@ -30,7 +30,7 @@ OpenHands is a web-based AI agent platform for software development. It runs cod
 | Security | A- | Three-layer security (GraySwan + Invariant + LLM) is the most structured approach in any open-source agent |
 | Memory/Context | A | 10 condenser strategies including structured summary and amortized forgetting — best in class |
 | Documentation | B- | Code comments are good; architectural docs assume you know the V0/V1 split |
-| **Overall** | **B+** | **The condenser system and security architecture are unique in the open-source agent space; the V0/V1 migration debt is the elephant in the room** |
+| **Overall** | **B+** | **The condenser system and security architecture are unique in the open-source agent space; the V0/V1 migration debt is the defining architectural story right now** |
 
 ## Architecture
 
@@ -265,7 +265,7 @@ The V1 architecture is split between:
 
 The V1 app server already handles conversations, settings, auth, git integrations, and user management. But for the actual agent loop, it still delegates to the V0 `AgentController`. The migration is in-progress: the V0 code is heavily used, the V1 SDK isn't in this repo, and the deprecation date has passed.
 
-This creates a real dilemma for contributors: do you fix bugs in V0 code that's slated for removal, or do you wait for V1 which isn't fully available? The codebase comments explicitly say "please avoid extending this legacy file."
+This creates an interesting transition period for contributors: do you fix bugs in V0 code that's slated for removal, or do you wait for V1 which isn't fully available? The codebase comments explicitly say "please avoid extending this legacy file."
 
 ---
 

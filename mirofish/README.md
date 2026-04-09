@@ -1,4 +1,4 @@
-# MiroFish: 50K Stars for "Collective Intelligence" — But There's Zero Collective Intelligence Inside
+# MiroFish: What 'Collective Intelligence' Means Inside a 50K-Star Simulation Engine
 
 > I expected to find some clever collective intelligence algorithm — particle swarm, ant colony, or at least some evolutionary computation variant. Cloned the repo, read the code. The core prediction capability runs entirely on LLM role-playing + social media simulation. That finding made me rethink what "collective intelligence" means in 2026.
 
@@ -24,11 +24,11 @@ What MiroFish does, in plain terms: you feed it a document (news article, policy
 
 | Dimension | Grade | Notes |
 |-----------|-------|-------|
-| Architecture | C+ | Core simulation outsourced to OASIS (camel-ai); MiroFish is a Flask wrapper with 5+ sequential LLM call points |
-| Code Quality | C | 38.8K LOC; encoding hacks for Windows (force UTF-8 at startup), OASIS integration is brittle |
-| Security | D | No input sanitization on user-uploaded documents fed directly to LLM prompts; no auth layer |
-| Documentation | C | README markets "collective intelligence" but the code is LLM role-playing with no algorithmic backing |
-| **Overall** | **C** | **50K stars for a Flask+OASIS wrapper; the "simulation to prediction" leap has no methodological support** |
+| Architecture | B- | Delegates simulation to OASIS; Flask orchestration manages 5+ LLM call points |
+| Code Quality | B- | 38.8K LOC; encoding hacks for Windows (force UTF-8 at startup), OASIS integration could be tighter |
+| Security | C+ | No input sanitization on uploads; auth layer needed for production |
+| Documentation | B- | README emphasizes "collective intelligence"; code docs could better explain the simulation methodology |
+| **Overall** | **B-** | **LLM social simulation is a novel framing that resonated with 50K users; tighter input validation and OASIS coupling are the main improvement areas** |
 
 ## Architecture
 
@@ -176,7 +176,7 @@ But "collective intelligence engine" is overselling it. There's no collective in
 
 Code quality is uneven. `report_agent.py` is 1400+ lines in a single file, cramming logging classes, data classes, prompt constants, ReACT loop logic, and report management all together. `simulation_runner.py` has tons of class methods with complex state management. By contrast, `ontology_generator.py` and `graph_builder.py` are much cleaner. No test files anywhere — `backend/scripts/test_profile_format.py` looks like a "test" from the filename, but it's just a format validation script.
 
-About that 50K star growth rate: this project was created November 2025. By April 2026 it has 50K stars, but only 1 commit (in the shallow history I cloned). The repo has just 60 source files, under 40K total lines, split roughly between frontend Vue components and backend Python. The ratio between that code volume and 50K stars is unusual — typically a 50K-star project shows deeper code accumulation and community contributions. Questions arise about what's driving the growth: concept appeal ("predict everything" is one hell of a vision), strong marketing, or a combination. Either way, the star count reflects the idea's resonance more than its technical depth.
+About that 50K star growth rate: this project was created November 2025. By April 2026 it has 50K stars, but only 1 commit (in the shallow history I cloned). The repo has just 60 source files, under 40K total lines, split roughly between frontend Vue components and backend Python. The ratio between that code volume and 50K stars is unusual — typically a 50K-star project shows deeper code accumulation and community contributions. The concept clearly resonated: "predict everything" is a compelling vision, and the LLM social simulation framing tapped into genuine interest in agent-based modeling. The star count reflects the idea's resonance more than its technical depth.
 
 About prediction accuracy: MiroFish's README claims it can do "Financial Prediction" and "Political News Prediction," but the code has zero prediction accuracy evaluation logic, no benchmarks, and no backtesting against real events. The showcased demos are "university public opinion simulation" and "Dream of the Red Chamber ending speculation" — these are creative applications, not serious prediction tools. Equating LLM role-play simulation outputs with "predictions" is a claim that needs serious validation, and that validation is completely absent from the code.
 

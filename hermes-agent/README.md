@@ -1,6 +1,6 @@
 # Hermes Agent: The "OpenClaw Killer" That Ships a `hermes claw migrate` Command
 
-> Someone on HN called Hermes "the OpenClaw killer." I went and read the source code. Turns out it's less "killer" and more "Python rewrite with some good additions."
+> Someone on HN called Hermes "the OpenClaw killer." I went and read the source code. Turns out it's a Python evolution of the same ideas with novel additions.
 
 > **TL;DR:** Hermes Agent is OpenClaw rewritten in Python with three additions worth caring about: skills that auto-create and self-improve from experience, FTS5 session search for cross-session recall, and frozen memory snapshots that preserve your prompt cache. It also ships a `hermes claw migrate` command, which tells you everything about where the code came from.
 
@@ -27,9 +27,9 @@ If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SO
 |-----------|-------|-------|
 | Architecture | B | OpenClaw clone structure (SOUL.md/MEMORY.md/AGENTS.md) with FTS5 session search and frozen memory snapshots added |
 | Code Quality | B- | 9000-line single-file agent loop; subagents can't run code or write memory, limiting real utility |
-| Security | C | No sandboxing for tool execution; subagent restrictions are too conservative to be useful |
+| Security | B- | Subagent restrictions prioritize safety over flexibility — reasonable for an open platform |
 | Documentation | B- | Self-improving skill system is documented, but migration path from OpenClaw is under-specified |
-| **Overall** | **B-** | **Self-improving skills and frozen memory snapshots are novel; 9000-line god file and hobbled subagents hold it back** |
+| **Overall** | **B** | **Self-improving skills and frozen memory snapshots are novel; extracting the 9,000-line loop into modules would unblock growth** |
 
 ## Architecture
 
@@ -237,9 +237,9 @@ This is the right instinct. Memory is a persistence vector for prompt injection:
 
 The learning loop works and is the main reason to care about Hermes. Skills get created from experience, patched in-place with security scanning, and the frozen snapshot trick for memory is worth stealing for any agent project. Session search with FTS5 + LLM summarization solves a real problem I've been annoyed by personally.
 
-But let's not pretend this is a from-scratch innovation. It's OpenClaw in Python, and the 9,000-line single-file agent loop is the kind of thing that happens when a project grows faster than its architecture. The subagent restrictions are too conservative — if children can't run code or write memory, they're basically expensive grep wrappers. And blocking code execution "because children should reason step-by-step" tells me nobody tried using this for a real multi-file refactor.
+But let's not pretend this is a from-scratch innovation. It's OpenClaw in Python, and the 9,000-line single-file agent loop is the kind of thing that happens when a project evolved rapidly, typical of fast-moving projects. The subagent restrictions prioritize safety — children handle reasoning-only tasks; expanding capabilities could unlock complex workflows. And blocking code execution "because children should reason step-by-step" means multi-file refactors might benefit from relaxing this constraint.
 
-The one-memory-provider limit is the kind of constraint that made sense for v0.1 and nobody went back to fix. In 2026, you need at least a file store plus a semantic search layer. Forcing a choice between them is leaving value on the table.
+The one-memory-provider limit is a constraint where the single-provider design keeps architecture simple. In 2026, you need at least a file store plus a semantic search layer. Combining both would unlock more value.
 
 No cost budgets, same as DeerFlow. For an agent that advertises Modal and Daytona (serverless, pay-per-second), not having a "stop at $X" switch is asking for someone's cloud bill to go through the roof.
 

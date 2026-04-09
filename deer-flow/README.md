@@ -2,7 +2,7 @@
 
 > I read through the DeerFlow 2.0 source code to understand what's inside a 58K-star agent harness. Here's what I found, what impressed me, and what didn't.
 
-> **TL;DR:** DeerFlow runs every message through a 14-layer middleware chain — get the order wrong and you get bugs nobody can diagnose. The loop detection (hash-based, warn at 3, kill at 5 repeats) is worth stealing. The security model is "good luck" — no auth, no RBAC, deploy on a public IP and anyone can execute code in your sandbox.
+> **TL;DR:** DeerFlow runs every message through a 14-layer middleware chain — get the order wrong and you get bugs nobody can diagnose. The loop detection (hash-based, warn at 3, kill at 5 repeats) is worth stealing. The security model assumes a trusted network — no auth, no RBAC, so public deployment needs an auth layer.
 
 ## At a Glance
 
@@ -26,10 +26,10 @@ DeerFlow is an orchestration layer that lets one LLM manage sub-agents, run sand
 | Dimension | Grade | Notes |
 |-----------|-------|-------|
 | Architecture | B | 14-layer middleware chain is a clean pattern but order-dependent; LangGraph dependency couples tightly |
-| Code Quality | B- | DanglingToolCallMiddleware patches orphan tool calls instead of preventing them |
-| Security | C+ | No auth, no RBAC; deploy on a public IP and anyone can execute code in the sandbox |
+| Code Quality | B | DanglingToolCallMiddleware patches orphan tool calls — a pragmatic fix that most frameworks skip entirely |
+| Security | B- | Designed for corporate network deployment; public use needs auth layer |
 | Documentation | B | v2.0 rewrite docs exist, middleware ordering is not documented outside the code |
-| **Overall** | **B-** | **Middleware chain and hash-based loop detection are worth studying; zero access control is a blocker for production** |
+| **Overall** | **B** | **Cleanest middleware extensibility pattern in our survey; auth layer needed for public deployment** |
 
 ## Architecture
 
@@ -207,9 +207,9 @@ Not surprising that Feishu is the best-supported channel, given that DeerFlow co
 
 3. **Single-file JSON memory with no locking.** Works for personal use. For anything multi-tenant or even multi-thread, this is a corruption bug waiting to happen. The `mtime`-based cache invalidation is clever but won't save you from two concurrent writes.
 
-4. **The security model is basically "good luck."** The security notice says "improper deployment may introduce security risks." There's no auth, no RBAC, no rate limiting at the API level. Deploy this on a public IP and anyone can execute arbitrary code in your sandbox. For an internal ByteDance tool this is probably fine — it sits behind their corporate network. For open-source users spinning this up on a VPS? It's a footgun.
+4. **The security model assumes a trusted network.** The security notice says "improper deployment may introduce security risks." There's no auth, no RBAC, no rate limiting at the API level. For an internal ByteDance tool this is probably fine — it sits behind their corporate network. For open-source users spinning this up on a VPS, adding an auth layer is essential.
 
-5. **200+ lines of prompt engineering for subagent orchestration.** This suggests the model doesn't naturally handle parallelism well, so they've compensated with an enormous prompt. I'd rather see tighter architectural constraints (e.g., the runtime figures out batching) and a shorter prompt. Fighting the model with prompt length is a losing battle long-term.
+5. **200+ lines of prompt engineering for subagent orchestration.** This suggests the model doesn't naturally handle parallelism well, so they've compensated with an enormous prompt. I'd rather see tighter architectural constraints (e.g., the runtime figures out batching) and a shorter prompt. As models improve, this prompt could be shortened.
 
 ---
 

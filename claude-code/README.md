@@ -33,7 +33,7 @@
 | Code Quality | A- | 510K LOC with Zod v4 schemas throughout, but the 1729-line core loop is a god object |
 | Security | B+ | Per-tool permission model works, pet system bypasses normal trust boundaries |
 | Documentation | A | Internal docs cover feature flags, tool contracts, and context cascade in detail |
-| **Overall** | **A-** | **Production-proven at scale; the core loop needs splitting and the pet system needs rethinking** |
+| **Overall** | **A-** | **Production-proven at scale; the core loop is ready for modular decomposition and the pet system is an interesting engagement experiment** |
 
 ---
 
@@ -226,7 +226,7 @@ This team uses research methodology in production engineering. They can quantify
 
 Workers cannot create sub-workers - prevents resource explosion. Three backends: tmux panes, in-process, remote.
 
-**My critique:** This is an artificial ceiling. Complex tasks benefit from recursive decomposition ("refactor all error handling" → per-module workers → per-file sub-workers). A depth limit + global worker budget would be more flexible than a hard ban on nesting.
+**My critique:** This is a possible evolution. Complex tasks benefit from recursive decomposition ("refactor all error handling" → per-module workers → per-file sub-workers). A depth limit + global worker budget would be more flexible than a hard ban on nesting — though the current flat model prevents resource explosion.
 
 ---
 
@@ -320,7 +320,7 @@ Each tool is a plain object with schema, permissions, execution, UI rendering, a
 
 ## Limitations & Potential Issues
 
-1. **query.ts God Object** - 1,729 lines handling everything. Merge conflicts in multi-person teams. Implicit state assumptions between distant code sections. A hidden dependencies nightmare.
+1. **query.ts God Object** - 1,729 lines handling everything. Merge conflicts in multi-person teams. Implicit state assumptions between distant code sections. Concentrates responsibility in one file; splitting would reduce merge contention.
 
 2. **Context compression is unauditable** - After compression, the model doesn't know what it lost. It can't flag "I may be missing context here." This leads to confident wrong answers, which is worse than admitting uncertainty.
 

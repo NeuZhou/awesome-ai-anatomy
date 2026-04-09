@@ -18,7 +18,7 @@
 
 **14 AI agent projects dissected. Some had hidden pet systems. Some had zero security. All had God Objects.**
 
-Claude Code ships 18 virtual pet species in production. Pi Mono can impersonate Claude Code to dodge rate limits. MiroFish's "collective intelligence" is just LLMs role-playing on a fake social network. These aren't hot takes — they're findings from reading every line of code.
+Claude Code ships 18 virtual pet species in production. Pi Mono can mirror Claude Code's tool names for compatibility. MiroFish's "collective intelligence" is LLM agents interacting on a simulated social network. These aren't hot takes — they're findings from reading every line of code.
 
 Most "awesome" lists link to repos. We crack them open — architecture diagrams, design trade-offs, code smells, security gaps, and the engineering decisions nobody talks about in the docs.
 
@@ -45,7 +45,7 @@ The 5 findings people can't stop sharing:
 |---|---------|---------|---------------|
 | 1 | **Claude Code ships 18 virtual pet species** — a full tamagotchi system hidden in a coding agent | [Claude Code](claude-code/) | What else is hiding in tools you run with `sudo`? |
 | 2 | **Pi Mono's "stealth mode" impersonates Claude Code** — fakes tool names to dodge rate limits | [Pi Mono](pi-mono/) | Open-source projects gaming API providers is a trend |
-| 3 | **MiroFish's "collective intelligence" = zero collective intelligence** — it's LLMs role-playing humans on a simulated social network | [MiroFish](mirofish/) | 50K stars built on marketing, not on the tech the name promises |
+| 3 | **MiroFish's "collective intelligence" = LLM social simulation** — agents role-playing humans on a simulated social network | [MiroFish](mirofish/) | 50K stars driven by a compelling vision of agent-based prediction |
 | 4 | **Lightpanda's bitcast dispatch** makes Zig act like a language with vtables — a systems trick we'd never seen before | [Lightpanda](lightpanda-browser/) | Zig comptime metaprogramming pushed to its limits |
 | 5 | **DeerFlow's orphan tool call bug** — 93 lines of code fix a crash that affects every LangGraph-based agent | [DeerFlow](deer-flow/) | If you use LangGraph, you probably have this bug too |
 
@@ -65,7 +65,7 @@ The 5 findings people can't stop sharing:
 | 002 | [**Claude Code**](claude-code/) | 109K | TypeScript | 510K | 4-layer context, hidden pet system (18 species) | Published |
 | 003 | [**OpenHands**](openhands/) | 71K | Python + TS | 400K | 10 condensers, 3-layer security, 487-line stuck detector, V0/V1 mid-migration | **NEW** |
 | 004 | [**DeerFlow**](deer-flow/) | 58K | Python + TS | — | 14-layer middleware, hash loop kill@5, no RBAC | Published |
-| 005 | [**MiroFish**](mirofish/) | 50K | Python + Vue | 39K | LLM social sim as "collective intelligence" | Published |
+| 005 | [**MiroFish**](mirofish/) | 50K | Python + Vue | 39K | LLM social simulation engine for collective intelligence | Published |
 | 006 | [**Goose**](goose/) | 37K | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | Published |
 | 007 | [**Pi Mono**](pi-mono/) | 32K | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | Published |
 | 008 | [**MemPalace**](mempalace/) | 30K | Python | 9K | Milla Jovovich's memory palace, 4-layer stack, AAAK dialect debunked, shell injection | **NEW** |

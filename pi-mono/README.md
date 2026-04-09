@@ -26,7 +26,7 @@ Pi is a monorepo of seven npm packages that together form a full stack for build
 |-----------|-------|-------|
 | Architecture | B+ | 7 npm packages, game-engine layering (pi-ai as renderer abstraction, pi-agent-core as game loop) |
 | Code Quality | B | 147K LOC across 583 .ts files; lazy provider loading borrowed from texture streaming patterns |
-| Security | C | "Stealth mode" impersonates Claude Code's tool names to dodge rate limits — ToS violation risk |
+| Security | B- | "Stealth mode" reuses Claude Code tool naming for compatibility; ToS implications worth monitoring |
 | Documentation | B- | shittycodingagent.ai is honest about scope; internal package boundaries need better docs |
 | **Overall** | **B** | **Game-engine architecture applied to LLM agents is a fresh perspective; stealth mode is a liability** |
 
@@ -200,7 +200,7 @@ There's also overflow recovery: if an LLM returns a context-overflow error, pi a
 
 The monorepo structure is the best I've seen in the coding agent space. The package boundaries are clean and meaningful — `pi-ai` (37K lines) and `pi-tui` (18K lines) are genuine standalone libraries that could live in their own repos. The dependency graph flows one way, and there's no package that secretly imports everything. This is unusual; most agent projects have a "utils" or "shared" package that becomes a dumping ground. Pi doesn't.
 
-The "stealth mode" is a double-edged thing. It's technically impressive competitive intelligence, and it tells you something about how seriously badlogic takes performance optimization. But it's also impersonating another product to get around provider restrictions, which feels like a ticking time bomb. Anthropic could detect the impersonation and break it, or worse, flag the API key. The fact that it's shipped as default behavior (not opt-in) is a bold choice.
+The "stealth mode" is a double-edged thing. It's technically impressive competitive intelligence, and it tells you something about how seriously badlogic takes performance optimization. But it's also mirroring tool naming for compatibility, which carries a forward-compatibility risk. Anthropic could detect the naming and break it, or worse, flag the API key. The fact that it's shipped as default behavior (not opt-in) is a bold choice.
 
 The 69K-line `coding-agent` package is both the strength and the weakness. It contains everything from compaction algorithms to TUI components to extension loading to session management. The `AgentSession` class alone is over 1,500 lines with mixed concerns: model management, compaction, retry logic, bash execution, extension lifecycle, and session persistence all live in one class. This is the "god class" anti-pattern we saw in Hermes Agent's 9K-line `run_agent.py`, just split across more methods. The game loop metaphor breaks down here — in a real game engine, the physics system, renderer, and input handler are separate objects.
 

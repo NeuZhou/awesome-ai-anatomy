@@ -1,6 +1,6 @@
 # Goose: The Rust Agent That Treats MCP as a First-Class Citizen
 
-> Goose isn't really a "Rust agent." The agent loop is almost secondary — the real architecture is a distributed extension bus built on top of MCP, with the LLM acting as a scheduler. That distinction matters more than the language choice.
+> Goose is more than a "Rust agent." The agent loop is deliberately thin because the real insight is the MCP extension bus, with the LLM acting as a scheduler. That distinction matters more than the language choice.
 
 ## At a Glance
 

@@ -1,6 +1,6 @@
 # Dify: 1.2 Million Lines of "Make AI Easy" and the Complexity It Creates
 
-> I went through Dify's source code expecting a low-code wrapper around OpenAI. What I found was a full-blown platform operating system — with its own graph engine, a plugin daemon that runs as a separate process, and support for 30+ vector databases. It's the most overengineered open-source AI project on GitHub — and I mean that as both a compliment and a warning, and that ambition is both its strength and its weight.
+> I went through Dify's source code expecting a low-code wrapper around OpenAI. What I found was a full-blown platform operating system — with its own graph engine, a plugin daemon that runs as a separate process, and support for 30+ vector databases. It's the most ambitious open-source AI project on GitHub — and I mean that as both a compliment and a warning, and that ambition is both its strength and its weight.
 
 ## At a Glance
 
@@ -201,7 +201,7 @@ You already know the feature list — it's long. The question is whether the bre
 
 The graph engine extraction into `graphon` is a good architectural move. It decouples the execution core from Dify's application layer, making the engine testable and potentially reusable. The layer-based middleware system (execution limits, quota tracking, observability) is well-designed and easy to extend.
 
-But the complexity cost is real. A minimal Dify deployment runs 7 containers. Add a vector database and you're at 8-9. Add the plugin daemon and sandbox, and you're running a small Kubernetes cluster. The `docker-compose.yaml` has 400+ environment variables, many with non-obvious interactions. The node factory alone has a type-specific initialization dictionary with 10+ entries, each wiring together different combinations of credentials providers, file managers, HTTP clients, and template renderers. For a project that sells itself on making AI "easy," the infrastructure requirements are anything but.
+But the complexity cost is real. A minimal Dify deployment runs 7 containers. Add a vector database and you're at 8-9. Add the plugin daemon and sandbox, and you're running a small Kubernetes cluster. The `docker-compose.yaml` has 400+ environment variables, many with non-obvious interactions. The node factory alone has a type-specific initialization dictionary with 10+ entries, each wiring together different combinations of credentials providers, file managers, HTTP clients, and template renderers. For a project that sells itself on making AI "easy," self-hosters inherit the infrastructure complexity — the conscious tradeoff of a platform approach.
 
 The RAG pipeline is thorough but the 30+ vector DB support is broad. Each adapter needs its own maintenance. Prioritizing the top 10 most-used backends and marking the rest as community-maintained would focus the effort. The Jieba keyword support for CJK is a thoughtful touch though — most Western-centric projects skip this entirely.
 

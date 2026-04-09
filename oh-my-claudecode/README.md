@@ -111,7 +111,7 @@ The phase controller infers the current phase from task status distribution — 
 
 OMC is the most ambitious of the four projects I've torn down so far, and also the most sprawling. 194K lines of TypeScript for a Claude Code plugin is a lot. The 19-agent definitions are mostly thin wrappers around different system prompts — the real engineering is in the team coordination layer.
 
-The file-based IPC is the right call for cross-process coordination, and the mkdir-based locking is solid. The codebase has that "grew faster than its architecture" feel — 125 TypeScript files in the `team/` directory — but that's typical of fast-moving projects at this scale.
+The file-based IPC is the right call for cross-process coordination, and the mkdir-based locking is solid. The codebase reflects the breadth of coordination problems being solved — 125 TypeScript files in the `team/` directory — but that's typical of fast-moving projects at this scale.
 
 The multi-model angle (Claude + Codex + Gemini) is the real differentiator. None of the other frameworks I've looked at coordinate across model providers.
 

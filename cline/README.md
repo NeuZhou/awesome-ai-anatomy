@@ -1,6 +1,6 @@
 # Cline: 60K Stars, a 3,756-Line Core Class, and the VS Code Extension That Became an Agent Framework
 
-> The most popular open-source coding agent is a VS Code sidebar panel. 560K lines of TypeScript, 40+ API providers, 28 tools, a hooks system, sub-agents, browser automation, MCP integration, and a "Focus Chain" task tracker — all stuffed into a single extension. I read every key file and found a codebase that grew organically from a weekend project into an enterprise platform, with the scars to prove it.
+> The most popular open-source coding agent is a VS Code sidebar panel. 560K lines of TypeScript, 40+ API providers, 28 tools, a hooks system, sub-agents, browser automation, MCP integration, and a "Focus Chain" task tracker — all stuffed into a single extension. I read every key file and found a codebase that grew organically from a weekend project into an enterprise platform, every layer reflecting a phase of that journey.
 
 ## At a Glance
 
@@ -24,12 +24,12 @@ Cline is a VS Code extension that puts an AI coding agent in your sidebar. You d
 
 | Dimension | Grade | Notes |
 |-----------|-------|-------|
-| Architecture | C+ | 3,756-line core class (`Task`), permission-by-polling, tightly coupled Task/Controller/ToolExecutor |
+| Architecture | B- | 3,756-line core class (`Task`), permission-by-polling, ambitious 4-layer hierarchy (Extension → Controller → Task → ToolExecutor) |
 | Code Quality | B- | Competent TypeScript overall, but critical files have hundreds of lines of duplicated ask/say patterns and deeply nested control flow |
 | Security | B | Human-in-the-loop by default is solid, but "YOLO mode" is one toggle away from auto-approving everything including shell commands |
 | Extensibility | A- | 40+ provider adapters, MCP integration, hooks system, skills, and custom rules — the extension story is the best part |
 | Documentation | B+ | `.clinerules/cline-overview.md` is an excellent internal architecture doc; the hooks and prompt variant systems are well-documented |
-| **Overall** | **B-** | **Massive feature set with genuine innovation in provider support and extensibility, but the core agent loop is an unmaintainable monolith that needs a fundamental refactor** |
+| **Overall** | **B+** | **Feature-rich coding agent with the broadest provider support; extracting the Task class into focused modules would unlock contributor velocity** |
 
 ---
 
@@ -48,7 +48,7 @@ Cline is a VS Code extension that puts an AI coding agent in your sidebar. You d
 - [Browser Automation: Puppeteer, Not Playwright](#browser-automation-puppeteer-not-playwright)
 - [MCP Integration](#mcp-integration)
 - [Focus Chain: A Built-In Task Tracker](#focus-chain-a-built-in-task-tracker)
-- [Code Smells and Real Problems](#code-smells-and-real-problems)
+- [Architecture Observations](#code-smells-and-real-problems)
 - [Cross-Project Comparison](#cross-project-comparison)
 - [Stuff Worth Stealing](#stuff-worth-stealing)
 - [The Verdict](#the-verdict)
@@ -228,7 +228,7 @@ This is architecturally simpler than event-driven approval (no callback chains, 
 - **State is shared mutable** — `askResponse`, `askResponseText`, `askResponseImages`, `askResponseFiles` are set by the webview handler and read by the polling loop. The `stateMutex` protects some operations but not this read path.
 - **Race condition defense** — `lastMessageTs` is tracked to detect when a new ask supersedes the current one ("Current ask promise was ignored" error)
 
-**YOLO Mode** is the scariest setting in Cline. One toggle (`yoloModeToggled`) makes `shouldAutoApproveTool` return `[true, true]` for every tool including `execute_command`. This means the agent can run arbitrary shell commands without human approval. The auto-approve logic in `autoApprove.ts` checks YOLO mode first, before any other permission logic.
+**YOLO Mode** is the boldest trust-the-user setting in Cline. One toggle (`yoloModeToggled`) makes `shouldAutoApproveTool` return `[true, true]` for every tool including `execute_command`. This means the agent can run arbitrary shell commands without human approval. The auto-approve logic in `autoApprove.ts` checks YOLO mode first, before any other permission logic.
 
 **Command Permission Controller** (`CommandPermissionController.ts`) adds a secondary defense layer for command execution. It reads `CLINE_COMMAND_PERMISSIONS` from environment variables and validates commands against allow/deny glob patterns. It parses commands into segments, detects shell operators, recursively validates subshells, and blocks dangerous characters (backticks outside single quotes, newlines outside quotes). This is the most security-conscious code in the entire codebase — and it's gated behind an environment variable that almost nobody will set.
 
@@ -254,7 +254,7 @@ Sent to API: [msg6, msg7, msg8, msg9]
 
 **File read optimization:** Before triggering truncation, the `ContextManager.attemptFileReadOptimization` method tries to reduce context usage by rewriting file-read tool results — replacing full file contents with abbreviated versions when the file hasn't changed. This is a pragmatic optimization that avoids the overhead of full compaction.
 
-**Compared to Claude Code:** Claude Code has 4 layers (HISTORY_SNIP → Microcompact → CONTEXT_COLLAPSE → Autocompact), each progressively more aggressive but starting from lossless operations. Cline jumps straight to deletion. There's no cache-level editing, no structured summaries for intermediate history. This means Cline loses context more aggressively and less gracefully than Claude Code.
+**Compared to Claude Code:** Claude Code has 4 layers (HISTORY_SNIP → Microcompact → CONTEXT_COLLAPSE → Autocompact), each progressively more aggressive but starting from lossless operations. Cline jumps straight to deletion. There's no cache-level editing, no structured summaries for intermediate history. This means Cline opts for simplicity over Claude Code's multi-layer approach.
 
 ---
 
@@ -405,7 +405,7 @@ This is essentially a "todo list" that the AI maintains as it works. It gives us
 
 ---
 
-## Code Smells and Real Problems
+## Architecture Observations
 
 ### 1. The 30-Parameter Constructor
 The `ToolExecutor` constructor takes 30+ parameters, 15 of which are callback functions:
@@ -510,7 +510,7 @@ But the core is straining under the weight of features. The 3,756-line `Task` cl
 
 Would I use Cline? Yes — the VS Code integration and provider diversity are unmatched. Would I contribute to it? Absolutely, especially if the team invests in the architectural refactor that's clearly on the roadmap. The pieces are all there.
 
-**Grade: B-** — A feature-complete product with genuine innovation in extensibility, ready for an architectural leap that would make it the definitive coding agent.
+**Grade: B+** — A feature-complete product with genuine innovation in extensibility, ready for an architectural leap that would make it the definitive coding agent.
 
 ---
 

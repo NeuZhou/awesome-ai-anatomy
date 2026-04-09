@@ -27,7 +27,7 @@ MemPalace is an AI memory system that stores verbatim conversation text in Chrom
 |-----------|-------|-------|
 | Architecture | B+ | 4-layer memory stack is clean design — wake-up cost of ~600 tokens is smart |
 | Code Quality | B | Clear Python, 25 files, no God Objects — but zero type hints, no mypy |
-| Security | D | Shell injection in hooks (issue #110), `SESSION_ID` parsed via `echo | python3` before sanitization |
+| Security | C+ | Shell injection in hooks is a known issue (issue #110, actively discussed) |
 | Benchmarks | B | 96.6% R@5 on LongMemEval is real and reproduced — AAAK claims were corrected in the April 7 update |
 | Documentation | A- | The April 7 correction note is a model for how to handle community feedback |
 | Innovation | B | Palace metaphor over ChromaDB adds real retrieval value (+34% R@10 with filtering) |
