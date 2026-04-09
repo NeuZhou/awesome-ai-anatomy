@@ -9,7 +9,7 @@ entry: "Entry Points" {
     style.font-color: "#fff"
     label: "Web UI\n(React + Vite)"
   }
-  cli: "CLI" {
+  cli: CLI {
     style.fill: "#3b82f6"
     style.font-color: "#fff"
     label: "CLI\n(headless mode)"
@@ -17,38 +17,50 @@ entry: "Entry Points" {
   resolver: "Issue Resolver" {
     style.fill: "#60a5fa"
     style.font-color: "#fff"
-    label: "Issue Resolver\n(7,039 lines)"
+    label: "Issue Resolver\n(7,039 lines · 7 git platforms)"
   }
 }
 
-app_server: "V1 App Server (FastAPI)" {
+app_server: "V1 App Server (FastAPI) — 15,218 lines" {
   style.fill: "#faf5ff"
   style.stroke: "#7c3aed"
 
   conv_mgr: "Conversation Manager" {
     style.fill: "#7c3aed"
     style.font-color: "#fff"
-    label: "Conversation Manager\n(886 lines)"
+    label: "StandaloneConversationManager\n(886 lines)"
   }
-  routes: "Routes\n(82 clusters)"
+  routes: "Routes (82 clusters)"
   auth: "Auth Layer"
+  integrations: "Git Integrations" {
+    label: "GitHub · GitLab · Bitbucket\nAzure DevOps · Forgejo"
+  }
+
+  routes -> conv_mgr
+  conv_mgr -> auth
+  conv_mgr -> integrations
 }
 
 v0_core: "V0 Legacy Core ⚠️ DEPRECATED" {
   style.fill: "#fef2f2"
   style.stroke: "#dc2626"
+  style.font-color: "#dc2626"
+  style.bold: true
 
-  agent_ctrl: "AgentController" {
+  agent_ctrl: AgentController {
     style.fill: "#dc2626"
     style.font-color: "#fff"
+    style.bold: true
     label: "AgentController\n(1,391 lines — God Object)"
   }
-  stuck: "StuckDetector" {
+  stuck: StuckDetector {
     style.fill: "#ef4444"
     style.font-color: "#fff"
-    label: "StuckDetector\n(487 lines)"
+    label: "StuckDetector\n(487 lines · pattern analysis\nloop type / repeat count / recovery)"
   }
-  event_stream: "EventStream\n(pub/sub bus)"
+  event_stream: "EventStream" {
+    label: "EventStream\n(pub/sub · 20+ event types)"
+  }
   state: "State Tracker"
   replay: "Replay Manager"
 
@@ -62,44 +74,53 @@ agents: "Agent Hub (6 agents)" {
   style.fill: "#fffbeb"
   style.stroke: "#d97706"
 
-  codeact: "CodeActAgent" {
+  codeact: CodeActAgent {
     style.fill: "#d97706"
     style.font-color: "#fff"
-    label: "CodeActAgent ★\n(primary, 316 lines)"
+    label: "CodeActAgent ★\n(primary · 316 lines\nbash/browser/edit/ipython\nthink/finish/condense/track)"
   }
-  browsing: "BrowsingAgent"
-  visual: "VisualBrowsingAgent"
-  loc: "LOCAgent"
-  readonly: "ReadOnlyAgent"
-  dummy: "DummyAgent\n(testing)"
+  browsing: BrowsingAgent
+  visual: VisualBrowsingAgent
+  loc: LOCAgent
+  readonly: ReadOnlyAgent
+  dummy: "DummyAgent (testing)"
 }
 
 memory: "Memory System" {
   style.fill: "#f0fdf4"
   style.stroke: "#16a34a"
 
-  conv_memory: "ConversationMemory"
+  conv_memory: ConversationMemory
   condenser: "Condenser Pipeline" {
     style.fill: "#16a34a"
     style.font-color: "#fff"
-    label: "Condenser Pipeline\n(10 strategies)"
+    label: "Condenser Pipeline (10 strategies)\nNoOp · RecentEvents · ObsMasking\nBrowserOutput · AmortizedForgetting\nConvWindow · LLMAttention\nLLMSummarizing · StructuredSummary\n+ Pipeline combinator"
   }
+  condensation: "Condensation Event" {
+    label: "Condensation → event stream\n(auditable context compression)"
+    style.fill: "#bbf7d0"
+  }
+
+  conv_memory -> condenser
+  condenser -> condensation
 }
 
 security: "Security Layer (3 analyzers)" {
   style.fill: "#fdf4ff"
   style.stroke: "#a855f7"
 
-  grayswan: "GraySwan" {
+  grayswan: GraySwan {
     style.fill: "#a855f7"
     style.font-color: "#fff"
-    label: "GraySwan Analyzer\n(external ML API)"
+    label: "GraySwanAnalyzer (208 lines)\nExternal ML via Cygnal API\nRisk thresholds: LOW/MED/HIGH"
   }
-  invariant: "Invariant" {
-    label: "Invariant Analyzer\n(policy engine)"
+  invariant: Invariant {
+    style.fill: "#8b5cf6"
+    style.font-color: "#fff"
+    label: "InvariantAnalyzer (133 lines)\nPolicy engine · user-defined rules\nViolation → ask confirmation"
   }
   llm_risk: "LLM Risk" {
-    label: "LLM Risk Analyzer\n(self-evaluation)"
+    label: "LLMRiskAnalyzer (48 lines)\nSelf-evaluation · zero deps"
   }
 }
 
@@ -107,43 +128,47 @@ runtime: "Runtime Layer" {
   style.fill: "#ecfeff"
   style.stroke: "#0891b2"
 
-  docker: "Docker" {
+  docker: Docker {
     style.fill: "#0891b2"
     style.font-color: "#fff"
-    label: "Docker Runtime ★"
+    label: "Docker Runtime ★\n(container sandboxing)"
   }
-  k8s: "Kubernetes"
-  local: "Local"
-  remote: "Remote"
-  action_exec: "Action Execution Server\n(in-sandbox)"
+  k8s: Kubernetes
+  local: Local
+  remote: Remote
+  action_exec: "Action Execution Server" {
+    label: "ActionExecutionServer\n(in-sandbox · file/shell/jupyter/browser)"
+  }
 
   docker -> action_exec
   k8s -> action_exec
-  local -> action_exec
-  remote -> action_exec
 }
 
-integrations: "Git Integrations" {
-  style.fill: "#f0f9ff"
-  style.stroke: "#0369a1"
+critic: "Critic ⚠️ Minimal" {
+  style.fill: "#fef2f2"
+  style.stroke: "#dc2626"
 
-  github: "GitHub"
-  gitlab: "GitLab"
-  bitbucket: "Bitbucket"
-  azure: "Azure DevOps"
-  forgejo: "Forgejo"
+  finish_critic: "AgentFinishedCritic" {
+    label: "AgentFinishedCritic\n(57 lines total — just checks\nif agent called finish)"
+    style.fill: "#fecaca"
+  }
 }
 
+# Connections between layers
 entry.webui -> app_server.routes
 entry.cli -> v0_core.agent_ctrl
 entry.resolver -> v0_core.agent_ctrl
-app_server.routes -> app_server.conv_mgr
-app_server.conv_mgr -> v0_core.agent_ctrl
+app_server.conv_mgr -> v0_core.agent_ctrl: "V1 routes to V0 brain" {
+  style.stroke: "#dc2626"
+  style.stroke-dash: 3
+}
 v0_core.agent_ctrl -> agents.codeact
-agents.codeact -> memory.conv_memory
-memory.conv_memory -> memory.condenser
 v0_core.agent_ctrl -> security.grayswan
 v0_core.agent_ctrl -> security.invariant
 v0_core.agent_ctrl -> security.llm_risk
 v0_core.agent_ctrl -> runtime.docker
-app_server.conv_mgr -> integrations.github
+v0_core.agent_ctrl -> critic.finish_critic
+agents.codeact -> memory.conv_memory
+memory.condensation -> v0_core.event_stream: "fed back into history" {
+  style.stroke-dash: 3
+}

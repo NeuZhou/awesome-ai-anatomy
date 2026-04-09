@@ -1,80 +1,88 @@
 direction: down
 
-title: "Memory Condenser Pipeline" {
-  style.fill: "#f0fdf4"
-  style.stroke: "#16a34a"
-  style.font-size: 24
-}
-
-input: "Event History\n(Actions + Observations)" {
+input: "Event History" {
   style.fill: "#374151"
   style.font-color: "#fff"
+  label: "Event History\n(Actions + Observations)"
 }
 
-pipeline: "Condenser Pipeline (composable)" {
-  style.fill: "#f0fdf4"
-  style.stroke: "#16a34a"
+rule_based: "Rule-Based Condensers (fast, no LLM)" {
+  style.fill: "#f0f4ff"
+  style.stroke: "#2563eb"
 
-  noop: "NoOpCondenser\n(pass-through)" {
-    style.fill: "#e5e7eb"
+  noop: "NoOpCondenser (22 lines)" {
+    label: "NoOpCondenser\nPass-through"
   }
-  recent: "RecentEventsCondenser\n(keep last N)" {
-    style.fill: "#dbeafe"
+  recent: "RecentEventsCondenser (31 lines)" {
+    label: "RecentEventsCondenser\nKeep last N events"
   }
-  obs_mask: "ObservationMaskingCondenser\n(replace content with placeholders)" {
-    style.fill: "#dbeafe"
+  obs_mask: "ObservationMaskingCondenser (39 lines)" {
+    label: "ObservationMaskingCondenser\nReplace content → placeholders"
   }
-  browser: "BrowserOutputCondenser\n(clean verbose browser output)" {
-    style.fill: "#dbeafe"
-  }
-  amortized: "AmortizedForgettingCondenser" {
-    style.fill: "#fde68a"
-    label: "AmortizedForgettingCondenser\n(probabilistic decay — older = more likely to drop)"
-  }
-  conv_window: "ConversationWindowCondenser" {
-    style.fill: "#fde68a"
-    label: "ConversationWindowCondenser\n(sliding window, keep-first/keep-last)"
-  }
-  llm_attention: "LLMAttentionCondenser" {
-    style.fill: "#fca5a5"
-    label: "LLMAttentionCondenser\n(LLM scores importance, keeps high-scoring)"
-  }
-  llm_summarize: "LLMSummarizingCondenser" {
-    style.fill: "#fca5a5"
-    label: "LLMSummarizingCondenser\n(LLM generates summary replacement)"
-  }
-  structured: "StructuredSummaryCondenser" {
-    style.fill: "#c084fc"
-    style.font-color: "#fff"
-    label: "StructuredSummaryCondenser ★\n(329 lines — task progress tracking)"
-  }
-  chain: "Pipeline Combinator" {
-    style.fill: "#16a34a"
-    style.font-color: "#fff"
-    label: "Pipeline Combinator\n(chain any N condensers)"
+  browser: "BrowserOutputCondenser (49 lines)" {
+    label: "BrowserOutputCondenser\nClean verbose browser output"
   }
 }
 
-output_view: "View\n(condensed events → LLM)" {
+statistical: "Statistical Condensers (probabilistic)" {
+  style.fill: "#fffbeb"
+  style.stroke: "#d97706"
+
+  amortized: "AmortizedForgettingCondenser (69 lines)" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+    label: "AmortizedForgettingCondenser ★\nExponential decay probability\nOlder events more likely to drop"
+  }
+  conv_window: "ConversationWindowCondenser (188 lines)" {
+    label: "ConversationWindowCondenser\nSliding window\nConfigurable keep-first/keep-last"
+  }
+}
+
+llm_powered: "LLM-Powered Condensers (expensive, smart)" {
+  style.fill: "#fdf4ff"
+  style.stroke: "#a855f7"
+
+  attention: "LLMAttentionCondenser (140 lines)" {
+    label: "LLMAttentionCondenser\nLLM scores importance\nKeeps high-scoring events"
+  }
+  summarize: "LLMSummarizingCondenser (182 lines)" {
+    label: "LLMSummarizingCondenser\nLLM generates summary\nReplaces entire history"
+  }
+  structured: "StructuredSummaryCondenser (329 lines)" {
+    style.fill: "#a855f7"
+    style.font-color: "#fff"
+    label: "StructuredSummaryCondenser ★\nTask progress tracking\nMost sophisticated strategy"
+  }
+}
+
+pipeline: "Pipeline Combinator (50 lines)" {
+  style.fill: "#16a34a"
+  style.font-color: "#fff"
+  label: "Pipeline Combinator\nChain any N condensers in sequence"
+}
+
+output: "View → LLM" {
   style.fill: "#059669"
   style.font-color: "#fff"
+  label: "View (condensed events)\n→ LLM context window"
 }
 
-output_action: "Condensation\n(event in history — auditable)" {
-  style.fill: "#d97706"
-  style.font-color: "#fff"
+condensation: "Condensation Event" {
+  style.fill: "#bbf7d0"
+  label: "Condensation Event\n→ appended to EventStream\n(auditable trail of compression)"
 }
 
-input -> pipeline.chain
-pipeline.chain -> output_view: "within budget"
-pipeline.chain -> output_action: "needs condensation"
-output_action -> input: "next step re-processes"
-
-pipeline.noop -> pipeline.recent: "Rule-based\n(fast, no LLM cost)" {style.stroke-dash: 3}
-pipeline.recent -> pipeline.obs_mask {style.stroke-dash: 3}
-pipeline.obs_mask -> pipeline.browser {style.stroke-dash: 3}
-pipeline.browser -> pipeline.amortized: "Statistical\n(probabilistic)" {style.stroke-dash: 3}
-pipeline.amortized -> pipeline.conv_window {style.stroke-dash: 3}
-pipeline.conv_window -> pipeline.llm_attention: "LLM-powered\n(expensive, smart)" {style.stroke-dash: 3}
-pipeline.llm_attention -> pipeline.llm_summarize {style.stroke-dash: 3}
-pipeline.llm_summarize -> pipeline.structured {style.stroke-dash: 3}
+input -> rule_based
+input -> statistical
+input -> llm_powered
+rule_based -> pipeline
+statistical -> pipeline
+llm_powered -> pipeline
+pipeline -> output: "within budget"
+pipeline -> condensation: "needs compression" {
+  style.stroke-dash: 3
+}
+condensation -> input: "next step re-processes" {
+  style.stroke: "#dc2626"
+  style.stroke-dash: 3
+}

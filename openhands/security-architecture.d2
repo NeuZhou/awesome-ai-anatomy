@@ -1,65 +1,93 @@
-direction: right
+direction: down
 
-title: "Security Analyzer Architecture" {
-  style.fill: "#fdf4ff"
-  style.stroke: "#a855f7"
-  style.font-size: 24
-}
-
-action: "Agent Action\n(e.g., CmdRunAction)" {
+action: "Agent Action" {
   style.fill: "#374151"
   style.font-color: "#fff"
+  label: "Agent Action\n(CmdRun / FileEdit / Browse / ...)"
 }
 
-base: "SecurityAnalyzer (base class)" {
-  style.fill: "#f5f3ff"
+analyzer: "SecurityAnalyzer (base class)" {
+  style.fill: "#faf5ff"
   style.stroke: "#7c3aed"
 
-  method: "security_risk(action) → ActionSecurityRisk"
-  stream: "set_event_stream(events)"
+  method: "security_risk(action)" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+    label: "security_risk(action)\n→ ActionSecurityRisk"
+  }
 }
 
 grayswan: "GraySwan Analyzer (208 lines)" {
-  style.fill: "#a855f7"
-  style.font-color: "#fff"
+  style.fill: "#fdf4ff"
+  style.stroke: "#a855f7"
 
-  api: "Cygnal API\n(external ML service)"
+  api: "Cygnal API" {
+    style.fill: "#a855f7"
+    style.font-color: "#fff"
+    label: "Cygnal API\n(external ML service)"
+  }
   convert: "Convert events → OpenAI format"
-  threshold: "Risk thresholds:\nLOW < 0.3\nMEDIUM < 0.7\nHIGH < 1.0"
-  env: "Requires: GRAYSWAN_API_KEY"
+  threshold: "Configurable thresholds" {
+    label: "LOW < 0.3 · MEDIUM < 0.7 · HIGH < 1.0"
+  }
+  env: "Requires: GRAYSWAN_API_KEY" {
+    style.fill: "#fecaca"
+  }
+
+  convert -> api -> threshold
 }
 
 invariant: "Invariant Analyzer (133 lines)" {
-  style.fill: "#6366f1"
-  style.font-color: "#fff"
+  style.fill: "#f0f4ff"
+  style.stroke: "#2563eb"
 
-  client: "InvariantClient\n(policy engine)"
-  policy: "User-defined policies\n(what agent can/cannot do)"
-  trace: "Maintains event trace"
-  confirm: "Policy violation →\nask user for confirmation"
+  client: "InvariantClient" {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+    label: "InvariantClient\n(policy engine)"
+  }
+  policy: "User-defined policies" {
+    label: "User-defined policies\n(what agent can/cannot do)"
+  }
+  trace: "Event trace history"
+  confirm: "Ask user confirmation" {
+    label: "Policy violation →\nask user for confirmation"
+    style.fill: "#fde68a"
+  }
+
+  client -> policy
+  client -> trace
+  policy -> confirm: "violation detected" {style.stroke-dash: 3}
 }
 
 llm_risk: "LLM Risk Analyzer (48 lines)" {
-  style.fill: "#8b5cf6"
-  style.font-color: "#fff"
+  style.fill: "#ecfdf5"
+  style.stroke: "#059669"
 
-  self_eval: "Same LLM evaluates\nits own action risk"
-  note: "Lightest approach\n(zero external deps)"
+  self_eval: "Self-evaluation" {
+    style.fill: "#059669"
+    style.font-color: "#fff"
+    label: "Same LLM evaluates\nits own action risk"
+  }
+  note: "Lightest approach" {
+    label: "Zero external dependencies\nWeakest guarantee"
+    style.fill: "#fecaca"
+  }
 }
 
-risk_levels: "ActionSecurityRisk" {
+risk: "ActionSecurityRisk" {
   style.fill: "#fef2f2"
   style.stroke: "#dc2626"
 
   low: "LOW → proceed" {style.fill: "#bbf7d0"}
   medium: "MEDIUM → log warning" {style.fill: "#fde68a"}
-  high: "HIGH → block or confirm" {style.fill: "#fca5a5"}
+  high: "HIGH → block or ask" {style.fill: "#fca5a5"}
 }
 
-action -> base
-base -> grayswan: "Option 1: External ML"
-base -> invariant: "Option 2: Policy rules"
-base -> llm_risk: "Option 3: Self-eval"
-grayswan -> risk_levels
-invariant -> risk_levels
-llm_risk -> risk_levels
+action -> analyzer.method
+analyzer.method -> grayswan: "Option 1: External ML"
+analyzer.method -> invariant: "Option 2: Policy rules"
+analyzer.method -> llm_risk: "Option 3: Self-eval"
+grayswan.threshold -> risk
+invariant.client -> risk
+llm_risk.self_eval -> risk
