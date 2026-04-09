@@ -51,7 +51,7 @@ The 5 findings people can't stop sharing:
 | # | Finding | Project | Why It Matters |
 |---|---------|---------|---------------|
 | 1 | **Claude Code ships 18 virtual pet species** — a full tamagotchi system hidden in a coding agent | [Claude Code](claude-code/) | What else is hiding in tools you run with `sudo`? |
-| 2 | **Pi Mono's "stealth mode" impersonates Claude Code** — fakes tool names to dodge rate limits | [Pi Mono](pi-mono/) | Open-source projects gaming API providers is a trend |
+| 2 | **Pi Mono's "stealth mode" mirrors Claude Code tool names** for provider compatibility | [Pi Mono](pi-mono/) | Open-source projects gaming API providers is a trend |
 | 3 | **MiroFish's "collective intelligence" = LLM social simulation** — agents role-playing humans on a simulated social network | [MiroFish](mirofish/) | 50K stars driven by a compelling vision of agent-based prediction |
 | 4 | **Lightpanda's bitcast dispatch** makes Zig act like a language with vtables — a systems trick we'd never seen before | [Lightpanda](lightpanda-browser/) | Zig comptime metaprogramming pushed to its limits |
 | 5 | **DeerFlow's orphan tool call bug** — 93 lines of code fix a crash that affects every LangGraph-based agent | [DeerFlow](deer-flow/) | If you use LangGraph, you probably have this bug too |
@@ -75,7 +75,7 @@ The 5 findings people can't stop sharing:
 | 005 | [**MiroFish**](mirofish/) | 50K | Python + Vue | 39K | LLM social simulation engine for collective intelligence | Published |
 | 006 | [**Goose**](goose/) | 37K | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | Published |
 | 007 | [**Pi Mono**](pi-mono/) | 32K | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | Published |
-| 008 | [**MemPalace**](mempalace/) | 30K | Python | 9K | Milla Jovovich's memory palace, 4-layer stack, AAAK dialect debunked, shell injection | **NEW** |
+| 008 | [**MemPalace**](mempalace/) | 30K | Python | 9K | Milla Jovovich's memory palace, 4-layer stack, 4-layer memory stack, AAAK dialect under iteration, shell injection fix pending | **NEW** |
 | 009 | [**Lightpanda**](lightpanda-browser/) | 27K | Zig + Rust | 91K | From-scratch browser for AI agents, 9x Chrome | Published |
 | 010 | [**Hermes Agent**](hermes-agent/) | 26K | Python | 260K | Self-improving skills, FTS5 search, frozen mem | Published |
 | 011 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | Published |
@@ -119,7 +119,7 @@ We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal an
 | "What they use" | **Why they chose it** |
 | Stars and badges | **Architecture diagrams + trade-off analysis** |
 | Surface-level | **Staff-engineer-level depth** |
-| Praise everything | **Find real problems** |
+| Praise everything | **Reveal engineering decisions and trade-offs** |
 
 ---
 
@@ -185,7 +185,7 @@ New teardown every week. Cursor, Windsurf, and others are on the list.
 
 <p align="center">
  <a href="https://github.com/NeuZhou/awesome-ai-anatomy">
-  <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=for-the-badge&logo=github&label=Star%20This%20Repo&color=yellow" alt="Star This Repo">
+ <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=for-the-badge&logo=github&label=Star%20This%20Repo&color=yellow" alt="Star This Repo">
  </a>
 </p>
 
@@ -196,7 +196,7 @@ New teardown every week. Cursor, Windsurf, and others are on the list.
 
 <p align="center">
  <a href="https://star-history.com/#NeuZhou/awesome-ai-anatomy&Date">
-  <img src="https://api.star-history.com/svg?repos=NeuZhou/awesome-ai-anatomy&type=Date" width="600" alt="Star History Chart">
+ <img src="https://api.star-history.com/svg?repos=NeuZhou/awesome-ai-anatomy&type=Date" width="600" alt="Star History Chart">
  </a>
 </p>
 
