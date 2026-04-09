@@ -9,7 +9,7 @@
 <p align="center">
   <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=social" alt="Stars">
   <img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks">
-  <img src="https://img.shields.io/badge/teardowns-12-blue" alt="Teardowns">
+  <img src="https://img.shields.io/badge/teardowns-13-blue" alt="Teardowns">
   <img src="https://img.shields.io/badge/updated-weekly-brightgreen" alt="Updated Weekly">
   <img src="https://img.shields.io/badge/license-MIT-orange" alt="License">
 </p>
@@ -55,22 +55,23 @@ The 5 findings people can't stop sharing:
 
 ## Project Index
 
-12 AI agent source code analyses — from orchestration frameworks to coding assistants.
+13 AI agent source code analyses — from orchestration frameworks to coding assistants.
 
 | # | Project | Stars | Language | Lines | Key Findings | Status |
 |---|---------|-------|----------|-------|-------------|--------|
 | 001 | [**Dify**](dify/) | 136K | Python + TS | 1.24M | `graphon` engine, 7+ containers, 30+ vector DBs | Published |
 | 002 | [**Claude Code**](claude-code/) | 109K | TypeScript | 510K | 4-layer context, hidden pet system (18 species) | Published |
-| 003 | [**DeerFlow**](deer-flow/) | 58K | Python + TS | — | 14-layer middleware, hash loop kill@5, no RBAC | Published |
-| 004 | [**MiroFish**](mirofish/) | 50K | Python + Vue | 39K | LLM social sim as "collective intelligence" | Published |
-| 005 | [**Goose**](goose/) | 37K | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | Published |
-| 006 | [**Pi Mono**](pi-mono/) | 32K | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | Published |
-| 007 | [**Lightpanda**](lightpanda-browser/) | 27K | Zig + Rust | 91K | From-scratch browser for AI agents, 9x Chrome | Published |
-| 008 | [**Hermes Agent**](hermes-agent/) | 26K | Python | 260K | Self-improving skills, FTS5 search, frozen mem | Published |
-| 009 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | Published |
-| 010 | [**Guardrails AI**](guardrails-ai/) | 6.6K | Python | 18K | Validator Hub, reask self-correction loop | Published |
-| 011 | [**OpenAI Codex CLI**](codex-cli/) | 27K+ | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | Published |
-| 012 | [**Cline**](cline/) | 60K | TypeScript | 560K | 3,756-line God Object, 40+ providers, YOLO mode, hooks system | **NEW** |
+| 003 | [**OpenHands**](openhands/) | 71K | Python + TS | 400K | 10 condensers, 3-layer security, 487-line stuck detector, V0/V1 mid-migration | **NEW** |
+| 004 | [**DeerFlow**](deer-flow/) | 58K | Python + TS | — | 14-layer middleware, hash loop kill@5, no RBAC | Published |
+| 005 | [**MiroFish**](mirofish/) | 50K | Python + Vue | 39K | LLM social sim as "collective intelligence" | Published |
+| 006 | [**Goose**](goose/) | 37K | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | Published |
+| 007 | [**Pi Mono**](pi-mono/) | 32K | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | Published |
+| 008 | [**Lightpanda**](lightpanda-browser/) | 27K | Zig + Rust | 91K | From-scratch browser for AI agents, 9x Chrome | Published |
+| 009 | [**Hermes Agent**](hermes-agent/) | 26K | Python | 260K | Self-improving skills, FTS5 search, frozen mem | Published |
+| 010 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | Published |
+| 011 | [**Guardrails AI**](guardrails-ai/) | 6.6K | Python | 18K | Validator Hub, reask self-correction loop | Published |
+| 012 | [**OpenAI Codex CLI**](codex-cli/) | 27K+ | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | Published |
+| 013 | [**Cline**](cline/) | 60K | TypeScript | 560K | 3,756-line God Object, 40+ providers, YOLO mode, hooks system | Published |
 
 Projects sorted by GitHub stars (descending).
 
