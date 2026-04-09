@@ -277,9 +277,9 @@ The security architecture is more structured than any other open-source agent we
 
 The stuck detector is a standout feature that other projects should steal. A 487-line class dedicated to detecting and recovering from agent loops, with pattern analysis, configurable thresholds, and a separate test suite — this treats stuck detection as the engineering problem it actually is.
 
-But the V0/V1 transition is a significant concern. 287K lines of Python with deprecation banners and a deferred migration creates ambiguity about which code to trust. The `AgentController` is a God Object (1,391 lines) that handles the agent loop, event dispatching, delegation, security checks, state management, and error recovery all in one class. The V1 architecture promises to fix this with the SDK split, but that promise is unfulfilled in this repo.
+But the V0/V1 transition is worth watching — 287K lines of Python with deprecation banners and a deferred migration means contributors should check which code path is canonical. The `AgentController` (1,391 lines) would benefit from splitting into focused modules, and the V1 SDK architecture promises exactly that.
 
-The `critic` module is surprisingly thin — just 57 lines total. `AgentFinishedCritic` checks if the agent called `AgentFinishAction` and if the git patch is non-empty. For a project that emphasizes self-evaluation, the critic barely evaluates anything. It checks two booleans and calls it a day. Somebody had a grand vision for self-critique here, wrote the interface, and moved on.
+The `critic` module is surprisingly thin — just 57 lines total. `AgentFinishedCritic` checks if the agent called `AgentFinishAction` and if the git patch is non-empty. The base class is clean — adding richer evaluators would be a high-impact contribution.
 
 Would I use it? For automated issue resolution and PR workflows, yes — the resolver module (7,039 lines) with 7 git platform integrations is production-tested. For interactive coding, the CodeActAgent with Docker sandboxing is safer than most alternatives. But I'd watch the V0/V1 migration closely before building anything long-term on the internal APIs.
 
@@ -292,7 +292,7 @@ Would I use it? For automated issue resolution and PR workflows, yes — the res
 | Language | Python + TS | TypeScript | Rust | TypeScript |
 | Sandboxing | Docker containers | OS seatbelt/landlock | MCP process isolation | None |
 | Context Mgmt | 10 condenser strategies | 4-layer compaction | Auto-compact + pair summarization | Sliding window |
-| Security | GraySwan + Invariant + LLM | Permission allowlist | 5-inspector pipeline | Trust everything |
+| Security | GraySwan + Invariant + LLM | Permission allowlist | 5-inspector pipeline | User-managed |
 | Stuck Detection | Dedicated 487-line detector | Basic retry | RepetitionInspector | None |
 | Agent Types | 6 (specialized) | 1 (general) | 1 (general) | 1 (general) |
 | Self-Criticism | AgentFinishedCritic (minimal) | None | None | None |

@@ -109,13 +109,13 @@ The phase controller infers the current phase from task status distribution — 
 
 ## The Verdict
 
-OMC is the most ambitious of the four projects I've torn down so far, and also the messiest. 194K lines of TypeScript for a Claude Code plugin is a lot. The 19-agent definitions are mostly thin wrappers around different system prompts — the real engineering is in the team coordination layer.
+OMC is the most ambitious of the four projects I've torn down so far, and also the most sprawling. 194K lines of TypeScript for a Claude Code plugin is a lot. The 19-agent definitions are mostly thin wrappers around different system prompts — the real engineering is in the team coordination layer.
 
-The file-based IPC is the right call for cross-process coordination, and the mkdir-based locking is solid. But the codebase has that "grew faster than its architecture" feel — 125 TypeScript files just in the `team/` directory, with names like `skininthegamebros-guidance.ts` that suggest rapid iteration without cleanup.
+The file-based IPC is the right call for cross-process coordination, and the mkdir-based locking is solid. The codebase has that "grew faster than its architecture" feel — 125 TypeScript files in the `team/` directory — but that's typical of fast-moving projects at this scale.
 
-The multi-model angle (Claude + Codex + Gemini) is the real differentiator. None of the other frameworks I've looked at coordinate across model providers. Whether you actually need three different LLMs for a task is debatable, but having the option is interesting.
+The multi-model angle (Claude + Codex + Gemini) is the real differentiator. None of the other frameworks I've looked at coordinate across model providers.
 
-What concerns me: this is a **plugin** that depends on Claude Code's internals. If Anthropic changes the plugin API or the Claude Code architecture, OMC breaks. There's no abstraction layer insulating OMC from upstream changes. At 24K stars this is a real risk — a lot of users depending on a project that could be rendered non-functional by a single Anthropic release.
+One thing to keep in mind: as a **plugin** that depends on Claude Code's internals, an abstraction layer insulating OMC from upstream API changes would reduce breakage risk for its 24K-star user base.
 
 ---
 

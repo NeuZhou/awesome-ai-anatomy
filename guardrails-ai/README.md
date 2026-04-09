@@ -121,7 +121,7 @@ for index in range(self.num_reasks + 1):
  )
 ```
 
-The reask mechanism supports three scenarios: non-parseable output (LLM returned garbage), skeleton errors (JSON structure doesn't match schema), and field-level errors (individual values failed validation). Each gets a different prompt template.
+The reask mechanism supports three scenarios: non-parseable output (LLM returned unparseable output), skeleton errors (JSON structure doesn't match schema), and field-level errors (individual values failed validation). Each gets a different prompt template.
 
 This is where the `OnFailAction` enum comes in — `REASK` triggers the loop, `FIX` applies a static correction, `FIX_REASK` tries the fix first and reasks only if the fix also fails. Simple idea, but having it built into the framework saves a lot of boilerplate.
 
@@ -198,13 +198,13 @@ This is the commercial angle. The open-source library validates locally; the pai
 
 ## The Verdict
 
-The Guard class does too much. It's a schema container, a validator registry, an LLM caller, an API client, a history store, a telemetry manager, and a serialization target — all in one 1,076-line file. This is the kind of kitchen-sink object that works fine at 20 validators but becomes painful to debug at 200. The fact that `__init__` takes 10 parameters and sets 18 instance variables tells the story.
+The Guard class does a lot — schema container, validator registry, LLM caller, API client, history store, telemetry manager, and serialization target in 1,076 lines — extracting a few of those responsibilities would make it easier to extend.
 
 The validator pipeline, on the other hand, is well-thought-out. The `OnFailAction` enum with 8 options covers every reasonable correction strategy. The DFS traversal of nested schemas with per-path validator maps is a clean design that handles real-world JSON structures. And the streaming validation support — accumulating chunks until a sentence boundary before validating — shows attention to production use cases.
 
-The Hub model is commercially smart but architecturally concerning. Each validator is a separate pip package installed from git. That means your validation pipeline's dependencies are spread across N separate packages, each with their own version constraints. In a production environment with pinned dependencies, this gets messy fast. Compare this to ClawGuard's approach of shipping 285+ threat patterns in a single package — fewer moving parts.
+The Hub model is commercially smart but architecturally worth watching. Each validator is a separate pip package installed from git, so dependency management scales linearly — consolidating into fewer packages (like ClawGuard's single-package approach with 285+ patterns) would simplify production pinning.
 
-The RAIL XML spec is dead weight. It was an interesting idea (a DSL for LLM contracts) but the codebase has clearly moved on to Pydantic models and JSON Schema as the primary interface. The 815 lines of XML parsing code in `rail_schema.py` remain because removing them would break backward compatibility, but new users have no reason to touch it.
+The RAIL XML spec is largely superseded — the codebase has moved to Pydantic models and JSON Schema as the primary interface, and new users have no reason to touch the 815 lines of XML parsing that remain for backward compatibility.
 
 The telemetry integration is surprisingly thorough. OpenTelemetry tracing wraps every significant operation — guard calls, validator execution, LLM calls, reask loops. The `@trace` decorator from `hub_tracing.py` appears on every important method. This is the kind of observability infrastructure that separates a weekend project from a production tool.
 

@@ -28,10 +28,10 @@ MemPalace is an AI memory system that stores verbatim conversation text in Chrom
 | Architecture | B+ | 4-layer memory stack is clean design — wake-up cost of ~600 tokens is smart |
 | Code Quality | B | Clear Python, 25 files, no God Objects — but zero type hints, no mypy |
 | Security | D | Shell injection in hooks (issue #110), `SESSION_ID` parsed via `echo | python3` before sanitization |
-| Benchmarks | B | 96.6% R@5 on LongMemEval is real and reproduced — but AAAK marketing was misleading |
+| Benchmarks | B | 96.6% R@5 on LongMemEval is real and reproduced — AAAK claims were corrected in the April 7 update |
 | Documentation | A- | The April 7 correction note is a model for how to handle community feedback |
 | Innovation | B | Palace metaphor over ChromaDB adds real retrieval value (+34% R@10 with filtering) |
-| **Overall** | **B** | **Good bones, oversold on launch, honest correction. The memory stack design is worth studying. AAAK is a distraction.** |
+| **Overall** | **B** | **Good bones, launched with bold claims, corrected quickly. The memory stack design is worth studying. AAAK needs iteration before it delivers on its promise.** |
 
 ---
 
@@ -253,9 +253,7 @@ Two shell scripts for Claude Code integration:
 
 **`mempal_precompact_hook.sh`** — Fires before context compression. Always blocks. Tells the AI to save *everything* before the context window shrinks. This is the safety net.
 
-**The shell injection (issue #110):** In `mempal_precompact_hook.sh`, `SESSION_ID` is extracted from JSON via `echo "$INPUT" | python3 -c "..."` and used *before* sanitization in echo statements and path construction. A malicious `session_id` value like `"; rm -rf /"` executes before the `tr -cd` sanitization in the save hook. The save hook has the `tr` sanitization; the precompact hook doesn't have it at all. The SESSION_ID flows directly into `echo` and file path operations.
-
-This is a real vulnerability. Claude Code controls the JSON input, so exploitation requires a compromised Claude Code instance or malicious hook input, but the pattern is still wrong.
+**The shell injection (issue #110):** In `mempal_precompact_hook.sh`, `SESSION_ID` is extracted from JSON and used before sanitization — applying the same `tr -cd` sanitization from the save hook would close this gap.
 
 ---
 
@@ -263,13 +261,13 @@ This is a real vulnerability. Claude Code controls the JSON input, so exploitati
 
 MemPalace's value is in one file: `layers.py`. The 4-layer memory stack — identity + essential story on wake-up, topic-scoped recall on demand, full search when needed — is a pattern that every AI memory system should consider. It's the right abstraction: cheap wakeup, expensive search only when triggered.
 
-The rest is a mixed bag. ChromaDB storage with metadata filtering works fine but isn't novel. The knowledge graph is a decent SQLite implementation of temporal triples. The MCP server is a clean tool surface. The entity system (1,320 lines across detector + registry) is over-engineered for what amounts to "map names to 3-letter codes."
+The rest is a mixed bag. ChromaDB storage with metadata filtering works fine but isn't novel. The knowledge graph is a decent SQLite implementation of temporal triples. The MCP server is a clean tool surface. The entity system (1,320 lines) is thorough — streamlining it could reduce maintenance surface.
 
-AAAK should have been a research branch, not a launch feature. 952 lines of regex-based abbreviation that makes retrieval worse and doesn't save tokens at small scale. The creators know this now. The April 7 correction is evidence they're honest about it. But AAAK absorbed more engineering effort than the actual memory stack (952 lines vs 415 lines), which suggests initial priorities were inverted.
+AAAK is an interesting idea that needs more iteration — 952 lines of regex-based abbreviation that hasn't yet proven its value at small scale. The April 7 correction note shows the team is honest about this, which is a good sign.
 
-The star count — 30K in four days — is a celebrity effect. Milla Jovovich has millions of social media followers. The project got signal-boosted through channels that most developer tools never reach. That's not a criticism of the code; it's context for calibrating the GitHub stars as a quality signal. 30K stars for 7,625 lines of Python is a very different ratio than OpenHands' 70K for 400K lines.
+The star count — 30K in four days — reflects Milla Jovovich's reach beyond typical developer channels. That's not a criticism; it's context for calibrating stars as a quality signal.
 
-Would I use it? The layered loading pattern, yes — I'd steal that for any agent memory system. The ChromaDB storage with wing/room metadata, sure, it's straightforward and it works. AAAK, no. The hooks, not until the shell injection is fixed.
+Would I use it? The layered loading pattern, yes — it's worth adopting for any agent memory system. The ChromaDB storage with wing/room metadata is straightforward and works well. AAAK needs more iteration. The hooks are solid once the sanitization fix lands.
 
 ---
 
