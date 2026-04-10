@@ -1,7 +1,7 @@
 name: Claude Code
 repo: anthropics/claude-code
 stars: 109558
-forks: 0
+forks: 18175
 language:
   - TypeScript
 loc: 510000
@@ -9,24 +9,45 @@ license: Proprietary
 created: "2025-02"
 data_as_of: "2026-04"
 
+category: coding-agent
+maturity: production
+deployment: npm
+
 ratings:
   architecture: A
   code_quality: A-
   security: B+
+  context_management: A
   documentation: A
   overall: A-
 
 features:
   sandbox: seatbelt
+  agent_loop: custom
   context_management: 4_layer_cascade
   stuck_detection: false
   multi_agent: true
   mcp_support: true
-  security_layers: 1
-  provider_count: 1
   plugin_system: false
+  security:
+    layers: 1
+    types: [per-tool-permission, sandbox-exec]
+  providers:
+    count: 1
+    names: [anthropic]
 
-key_finding: "4-layer context, hidden pet system (18 species)"
+key_finding: "4-layer context cascade, hidden pet system (18 species), 1729-line god object"
+
+worth_stealing:
+  - "4-layer context cascade: lossless before lossy, local before global — progressive degradation preserves maximum information"
+  - "Streaming tool execution with RWLock: start executing read-only tools while the model is still generating"
+  - "buildTool() factory over inheritance: each tool is a plain object with schema, permissions, execution, UI rendering co-located"
+
+easter_eggs:
+  - "18 virtual pet species with hex-encoded names (duck through chonk), RPG stats, 5 rarity tiers, 1% shiny variants"
+  - "KAIROS autonomous mode — Greek for 'the right moment', enables fully autonomous operation"
+  - "Anti-distillation fake tools that poison training data if competitors try to distill behavior"
+  - "tengu_ prefix on all runtime feature gates — Japanese for heavenly dog, the project codename"
 
 tags:
   - coding-agent

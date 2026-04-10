@@ -9,27 +9,48 @@ license: Apache-2.0
 created: "2023-01-29"
 data_as_of: "2026-04"
 
+category: security-framework
+maturity: production
+deployment: pip
+
 ratings:
   architecture: B+
   code_quality: B+
   security: B
+  context_management: C
   documentation: A-
   overall: B+
 
 features:
   sandbox: none
+  agent_loop: custom
   context_management: none
   stuck_detection: false
   multi_agent: false
   mcp_support: false
-  security_layers: 0
-  provider_count: 1
   plugin_system: true
+  security:
+    layers: 0
+    types: []
+  providers:
+    count: 1
+    names: [litellm]
 
-key_finding: "Validator Hub, reask self-correction loop"
+key_finding: "Validator Hub (npm-for-LLM-constraints), reask self-correction loop with 8 OnFailAction variants"
+
+worth_stealing:
+  - "OnFailAction pattern: 8 variants (reask/fix/filter/refrain/noop/exception/fix_reask/custom) cover the entire error-handling decision tree"
+  - "Streaming chunk accumulation: accumulates LLM chunks until sentence boundary before validating"
+  - "Reask loop with budget ceiling: targeted feedback with exact failing field, capped at configurable num_reasks"
+
+easter_eggs:
+  - "jsonformer escape hatch: hidden @experimental decorator for constrained JSON generation, bypassing normal pipeline"
+  - "text2sql application: entire text-to-SQL pipeline living inside the library source code"
+  - "Typo '_configure_hub_telemtry' (missing 'e') has shipped since early versions"
+  - "Remote inference: validators can call JWT-authenticated Hub endpoints — validation involves network calls to Guardrails servers"
 
 tags:
-  - security-tool
+  - security-framework
   - validation
   - llm-output-guard
   - validator-hub

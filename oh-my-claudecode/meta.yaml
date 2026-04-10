@@ -9,24 +9,43 @@ license: MIT
 created: "2025-06"
 data_as_of: "2026-04"
 
+category: dev-tool
+maturity: beta
+deployment: npm
+
 ratings:
   architecture: B+
   code_quality: B
   security: B-
+  context_management: C
   documentation: B
   overall: B
 
 features:
   sandbox: none
+  agent_loop: plan-execute
   context_management: none
   stuck_detection: false
   multi_agent: true
   mcp_support: false
-  security_layers: 0
-  provider_count: 3
   plugin_system: false
+  security:
+    layers: 0
+    types: []
+  providers:
+    count: 3
+    names: [anthropic, openai, google]
 
-key_finding: "19-agent team via file IPC, Haiku→Opus routing"
+key_finding: "19-agent team via file IPC, mkdir-based locking, Haiku→Opus model tier routing, tri-model coordination"
+
+worth_stealing:
+  - "mkdir-based cross-process locking: atomic on all filesystems, with stale lock detection and exponential backoff"
+  - "Model tier routing with prompt-as-Markdown: Haiku for critic (cheap), Opus for code-reviewer (deep reasoning), saves 30-50% on tokens"
+
+easter_eggs:
+  - "File-based IPC with inbox/outbox JSONL — lowest-common-denominator that works across Claude, Codex, and Gemini CLI processes"
+  - "Phase controller infers current phase from task status distribution — no explicit state machine transitions"
+  - "As a plugin depending on Claude Code internals, one Anthropic release could break everything"
 
 tags:
   - multi-agent

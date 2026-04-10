@@ -9,24 +9,44 @@ license: MIT
 created: "2025-01"
 data_as_of: "2026-04"
 
+category: coding-agent
+maturity: beta
+deployment: pip
+
 ratings:
   architecture: B
   code_quality: B-
-  security: C
+  security: B-
+  context_management: B+
   documentation: B-
   overall: B-
 
 features:
   sandbox: docker
+  agent_loop: custom
   context_management: summarize
   stuck_detection: false
   multi_agent: true
   mcp_support: false
-  security_layers: 0
-  provider_count: 1
   plugin_system: true
+  security:
+    layers: 1
+    types: [memory-threat-detection]
+  providers:
+    count: 1
+    names: [gemini-flash]
 
-key_finding: "Self-improving skills, FTS5 search, frozen mem"
+key_finding: "Self-improving skills (auto-create + self-patch), FTS5 session search, frozen memory snapshots"
+
+worth_stealing:
+  - "Scan memory writes before persisting: memory is a persistence vector for prompt injection, most frameworks don't check"
+  - "Store full session transcripts alongside curated memory: FTS5 search over raw logs fills gaps MEMORY.md misses"
+
+easter_eggs:
+  - "'hermes claw migrate' command — named after the project they're migrating from, the most honest 'we forked the concept' signal"
+  - "9,000-line single-file agent loop (run_agent.py) — nobody at 26K stars has refactored it"
+  - "Frozen snapshot trick: BuiltinMemoryProvider snapshots MEMORY.md at session start, never updates during session (prompt-cache optimization)"
+  - "DELEGATE_BLOCKED_TOOLS as philosophy: no recursion, no user interaction, no shared state, 'children should reason step-by-step'"
 
 tags:
   - coding-agent

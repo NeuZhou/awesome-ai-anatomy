@@ -1,45 +1,66 @@
-# Meta.yaml Schema — awesome-ai-anatomy
+# Meta.yaml V2 Schema — awesome-ai-anatomy
 # Every teardown directory must have a meta.yaml following this schema.
 # These files power automated comparison table generation (future).
 
-# Example:
-name: OpenHands
-repo: OpenHands/OpenHands
-stars: 70860
-forks: 8886
-language:
-  - Python
-  - TypeScript
-loc: 400000
-license: MIT
-created: "2024-03-13"
-data_as_of: "2026-04"
+# ─── Basic Info ───────────────────────────────────────────────
+name: ProjectName               # Display name
+repo: org/repo                  # GitHub org/repo
+stars: 12345                    # GitHub star count
+forks: 123                     # GitHub fork count
+language: [Python, TypeScript]  # Primary languages
+loc: 400000                    # Lines of code (approximate)
+license: MIT                   # SPDX license identifier
+created: "2024-03-13"         # First commit / creation date
+data_as_of: "2026-04"         # When this data was collected
 
-# Ratings (A/A-/B+/B/B-/C+/C/C-/D/F)
+# ─── Classification ──────────────────────────────────────────
+# category: what the project IS
+#   coding-agent | workflow-engine | browser | security-framework |
+#   memory-system | social-simulation | dev-tool
+category: coding-agent
+
+# maturity: project lifecycle stage
+#   production | beta | experimental
+maturity: production
+
+# deployment: primary installation method
+#   binary | npm | pip | docker | docker-compose
+deployment: npm
+
+# ─── Ratings (A/A-/B+/B/B-/C+/C/C-/D/F) ────────────────────
 ratings:
   architecture: B+
   code_quality: B
   security: A-
+  context_management: A         # Unified name (replaces old memory_context)
   documentation: B-
   overall: B+
 
-# Architecture features (boolean or string)
+# ─── Architecture Features ───────────────────────────────────
 features:
-  sandbox: docker           # docker/kubernetes/seatbelt/landlock/none
-  context_management: condenser_pipeline  # condenser_pipeline/sliding_window/summarize/truncate/none
-  stuck_detection: true
-  multi_agent: true
-  mcp_support: true
-  security_layers: 3        # number of distinct security mechanisms
-  provider_count: 1         # number of LLM providers supported (1 = single, N = multi)
-  plugin_system: true
+  sandbox: docker               # docker | kubernetes | seatbelt | landlock | wasm | process_isolation | none
+  agent_loop: event-driven      # react | plan-execute | event-driven | workflow-dag | custom
+  context_management: condenser_pipeline  # condenser_pipeline | sliding_window | summarize | 4_layer_cascade | truncate | none
+  stuck_detection: true         # Does the project detect stuck/looping agents?
+  multi_agent: true             # Does the project support multiple agents?
+  mcp_support: false            # Model Context Protocol support?
+  plugin_system: false          # Extensible via plugins/extensions?
+  security:
+    layers: 3                   # Number of distinct security mechanisms
+    types: [grayswan, invariant, llm-analyzer]  # Specific mechanism names
+  providers:
+    count: 1                    # Number of LLM providers supported
+    names: [litellm]            # Specific provider names
 
-# Key finding (one line, for comparison tables)
-key_finding: "10 condensers, 3-layer security, 487-line stuck detector, V0/V1 mid-migration"
+# ─── Key Insights ─────────────────────────────────────────────
+key_finding: "one-line summary of the most important discovery"
 
-# Tags for filtering
-tags:
-  - coding-agent
-  - web-ui
-  - docker-sandbox
-  - multi-agent
+worth_stealing:
+  - "Pattern 1 other projects should adopt"
+  - "Pattern 2"
+
+easter_eggs:
+  - "Hidden discovery"          # or null if none
+
+# ─── Tags (for filtering) ────────────────────────────────────
+tags: [coding-agent, docker-sandbox, multi-agent]

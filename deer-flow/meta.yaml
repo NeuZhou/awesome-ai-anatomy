@@ -10,27 +10,47 @@ license: MIT
 created: "2025-05"
 data_as_of: "2026-04"
 
+category: workflow-engine
+maturity: beta
+deployment: docker
+
 ratings:
   architecture: B
   code_quality: B-
-  security: C+
+  security: B-
+  context_management: B
   documentation: B
   overall: B-
 
 features:
   sandbox: docker
+  agent_loop: workflow-dag
   context_management: summarize
   stuck_detection: true
   multi_agent: true
   mcp_support: false
-  security_layers: 0
-  provider_count: 1
   plugin_system: false
+  security:
+    layers: 0
+    types: []
+  providers:
+    count: 1
+    names: [langgraph]
 
-key_finding: "14-layer middleware, hash loop kill@5, no RBAC"
+key_finding: "14-layer middleware chain, hash-based loop detection (warn@3, kill@5), no auth/RBAC"
+
+worth_stealing:
+  - "Middleware-first architecture: 14+ composable, testable middlewares for cross-cutting concerns"
+  - "Hash-based loop detection: order-independent tool call hashing with escalating intervention at 3/5 repeats"
+  - "DanglingToolCallMiddleware: patches orphan tool calls from interrupted sessions — most frameworks don't handle this"
+
+easter_eggs:
+  - "ClarificationMiddleware MUST be last — all-caps comment suggests someone learned this from a production incident"
+  - "'SuperAgent harness' branding reveals ByteDance's positioning: DeerFlow is the harness, not the agent"
+  - "200-line parallelism prompt: belt-and-suspenders from every time a model launched 8 parallel tasks and crashed"
 
 tags:
-  - agent-framework
+  - workflow-engine
   - middleware-chain
   - multi-agent
   - langgraph

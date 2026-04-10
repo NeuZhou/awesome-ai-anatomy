@@ -10,24 +10,45 @@ license: Apache-2.0
 created: "2024-08-23"
 data_as_of: "2026-04"
 
+category: coding-agent
+maturity: production
+deployment: binary
+
 ratings:
   architecture: A-
   code_quality: A
   security: B+
+  context_management: B+
   documentation: B+
   overall: A-
 
 features:
   sandbox: process_isolation
+  agent_loop: custom
   context_management: summarize
   stuck_detection: true
   multi_agent: false
   mcp_support: true
-  security_layers: 5
-  provider_count: 30
   plugin_system: true
+  security:
+    layers: 5
+    types: [security-inspector, egress-inspector, adversary-inspector, permission-inspector, repetition-inspector]
+  providers:
+    count: 30
+    names: [anthropic, openai, google, ollama, bedrock, azure, deepseek, groq, mistral, fireworks]
 
-key_finding: "MCP-first bus, 5-inspector pipeline, 30+ LLMs"
+key_finding: "MCP-first extension bus (6 extension types), 5-inspector tool pipeline, 30+ LLM providers"
+
+worth_stealing:
+  - "Declarative provider pattern: add OpenAI-compatible providers via 10-line JSON file, zero Rust code"
+  - "Environment variable blocklist: 31 known-dangerous keys blocked for extensions (LD_PRELOAD, DYLD_INSERT_LIBRARIES, etc.)"
+  - "Tool-pair summarization: background-summarizes old tool request/response pairs while current turn executes"
+
+easter_eggs:
+  - "'Top of Mind' extension (tom): injects arbitrary text into every turn via environment variables"
+  - "Code Mode extension: agent writes Python code that calls extensions instead of making tool calls directly"
+  - "31-entry env var blocklist with detailed explanations — basically a crash course in privilege escalation"
+  - "README includes the joke 'Why did the developer choose goose? Because it always helps them migrate their code to production!'"
 
 tags:
   - coding-agent

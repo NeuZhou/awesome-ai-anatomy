@@ -10,24 +10,43 @@ license: "Modified Apache 2.0"
 created: "2023-04"
 data_as_of: "2026-04"
 
+category: workflow-engine
+maturity: production
+deployment: docker-compose
+
 ratings:
   architecture: B+
   code_quality: B
   security: B-
+  context_management: C
   documentation: A
   overall: B+
 
 features:
   sandbox: docker
+  agent_loop: workflow-dag
   context_management: none
   stuck_detection: false
   multi_agent: true
   mcp_support: false
-  security_layers: 2
-  provider_count: 30
   plugin_system: true
+  security:
+    layers: 2
+    types: [ssrf-proxy, code-sandbox]
+  providers:
+    count: 30
+    names: [openai, anthropic, gemini, ollama, bedrock, azure, mistral, deepseek]
 
-key_finding: "graphon engine, 7+ containers, 30+ vector DBs"
+key_finding: "graphon engine, 7+ Docker containers, 30+ vector DBs, 1600-line docker-compose, plugin daemon"
+
+worth_stealing:
+  - "Layer-based graph engine middleware (graphon): extend workflow execution without modifying the engine"
+  - "LLM-powered metadata filtering: prompts LLM with dataset schema to generate filter conditions automatically"
+  - "Child engine spawning for iteration: each loop iteration gets fresh VariablePool and runtime state"
+
+easter_eggs:
+  - "docker-compose.yaml has 400+ environment variables — stopped counting"
+  - "Modified Apache 2.0 license: commercial use >1M users requires a separate license"
 
 tags:
   - workflow-engine

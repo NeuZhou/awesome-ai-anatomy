@@ -10,24 +10,44 @@ license: AGPL-3.0
 created: "2025-11-26"
 data_as_of: "2026-04"
 
+category: social-simulation
+maturity: beta
+deployment: pip
+
 ratings:
-  architecture: C+
-  code_quality: C
-  security: D
-  documentation: C
-  overall: C
+  architecture: B-
+  code_quality: B-
+  security: C+
+  context_management: C
+  documentation: B-
+  overall: B-
 
 features:
   sandbox: none
+  agent_loop: react
   context_management: none
   stuck_detection: false
   multi_agent: true
   mcp_support: false
-  security_layers: 0
-  provider_count: 1
   plugin_system: false
+  security:
+    layers: 0
+    types: []
+  providers:
+    count: 1
+    names: [oasis-camel-ai]
 
-key_finding: "LLM social sim as 'collective intelligence'"
+key_finding: "LLM social simulation as 'collective intelligence' — 50K stars, but core engine is OASIS (camel-ai)"
+
+worth_stealing:
+  - "Dual-platform parallel simulation with independent action logs and incremental file-position reads"
+  - "Forced multi-tool ReACT strategy: minimum 3 tool calls per section with unused tool reminders"
+
+easter_eggs:
+  - "builtins.open monkey-patch forces UTF-8 on Windows — crude but effective encoding fix for OASIS"
+  - "Chinese timezone activity patterns hard-coded (activity 0.05 midnight-5am, 1.5 at 7-10pm) despite 'universal' branding"
+  - "Shanda Group strategic support acknowledged — commercial public opinion simulation angle"
+  - "v50K stars on ~40K LOC with 60 source files — star count reflects the idea's resonance more than technical depth"
 
 tags:
   - social-simulation

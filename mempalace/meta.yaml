@@ -9,24 +9,47 @@ license: MIT
 created: "2026-04-05"
 data_as_of: "2026-04"
 
+category: memory-system
+maturity: experimental
+deployment: pip
+
 ratings:
   architecture: B+
   code_quality: B
   security: C+
+  context_management: A-
   documentation: A-
   overall: B
 
 features:
   sandbox: none
-  context_management: 4_layer_stack
+  agent_loop: custom
+  context_management: 4_layer_cascade
   stuck_detection: false
   multi_agent: false
   mcp_support: true
-  security_layers: 0
-  provider_count: 0
   plugin_system: false
+  security:
+    layers: 0
+    types: []
+  providers:
+    count: 0
+    names: []
 
-key_finding: "4-layer memory stack, ChromaDB palace metaphor, +34% retrieval"
+key_finding: "4-layer memory stack (wake-up ~600 tokens), ChromaDB palace metaphor, +34% retrieval with room filtering"
+
+worth_stealing:
+  - "Layered loading pattern: identity + essential facts on wake-up (~600 tokens), topic-scoped recall on demand, full search only when needed"
+  - "Auto-teach via status tool: MCP tool response includes AAAK spec and memory protocol — AI learns by calling a tool, not reading docs"
+  - "PreCompact hook strategy: block context compaction to force save-everything pass before context shrinks"
+  - "Temporal knowledge graph in SQLite: time-bounded triples with invalidation, free and local alternative to Zep/Graphiti"
+
+easter_eggs:
+  - "Milla Jovovich (Resident Evil star) is listed as primary author — star velocity is partly celebrity amplification"
+  - "April 7 correction note: creators admitted AAAK token counting was wrong and benchmarks were misleading, within 2 days of launch"
+  - "AAAK dialect has 20 emotion markers (vul=vulnerability, joy, fear, raw=raw_honesty) — designed for personal/emotional memory"
+  - "v3.0.14 on a 4-day-old project — either private history or started at v3.0.0"
+  - "Shell injection in hooks (issue #110) — SESSION_ID used before sanitization"
 
 tags:
   - memory-system

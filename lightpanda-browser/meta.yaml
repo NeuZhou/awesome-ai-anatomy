@@ -10,24 +10,44 @@ license: AGPL-3.0
 created: "2023-02-07"
 data_as_of: "2026-04"
 
+category: browser
+maturity: beta
+deployment: binary
+
 ratings:
   architecture: A
   code_quality: A
   security: B
+  context_management: C
   documentation: B
   overall: A-
 
 features:
   sandbox: none
+  agent_loop: custom
   context_management: none
   stuck_detection: false
   multi_agent: false
   mcp_support: true
-  security_layers: 0
-  provider_count: 0
   plugin_system: false
+  security:
+    layers: 0
+    types: []
+  providers:
+    count: 0
+    names: []
 
-key_finding: "From-scratch browser for AI agents, 9x Chrome"
+key_finding: "From-scratch browser for AI agents in Zig, 9x faster than Chrome, 16x less memory, bitcast CDP dispatch"
+
+worth_stealing:
+  - "Comptime V8 bridge: Zig type declarations become V8 function templates at compile time with zero runtime dispatch overhead"
+  - "Arena-based memory management: page-scoped arenas freed in one operation on navigation, explaining the 16x memory reduction"
+  - "Integer bitcast CDP dispatch: domain names cast to fixed-width integers for switch-based routing, no hashing needed"
+
+easter_eggs:
+  - "html5ever FFI uses 14 callback function pointers per parse call — Zig calls Rust calls back Zig"
+  - "Single-connection-per-server limitation: CDP server accepts connections one at a time"
+  - "LP domain in CDP: a proprietary Lightpanda-specific CDP domain alongside the standard 15 Chrome domains"
 
 tags:
   - browser

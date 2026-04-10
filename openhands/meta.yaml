@@ -10,25 +10,42 @@ license: MIT
 created: "2024-03-13"
 data_as_of: "2026-04"
 
+category: coding-agent
+maturity: production
+deployment: docker
+
 ratings:
   architecture: B+
   code_quality: B
   security: A-
-  memory_context: A
+  context_management: A
   documentation: B-
   overall: B+
 
 features:
   sandbox: docker
+  agent_loop: event-driven
   context_management: condenser_pipeline
   stuck_detection: true
   multi_agent: true
   mcp_support: false
-  security_layers: 3
-  provider_count: 1
   plugin_system: false
+  security:
+    layers: 3
+    types: [grayswan, invariant, llm-analyzer]
+  providers:
+    count: 1
+    names: [litellm]
 
 key_finding: "10 condensers, 3-layer security, 487-line stuck detector, V0/V1 mid-migration"
+
+worth_stealing:
+  - "10-condenser pipeline: most sophisticated context management in the group, progressive compression from observation to full summarization"
+  - "3-layer security: GraySwan, Invariant, LLM-analyzer provide defense-in-depth for agent actions"
+  - "487-line stuck detector: pattern-matching on repeated tool calls to break infinite loops"
+
+easter_eggs:
+  - "V0/V1 mid-migration: codebase has two parallel architectures coexisting"
 
 tags:
   - coding-agent

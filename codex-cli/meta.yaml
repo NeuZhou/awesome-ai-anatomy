@@ -9,24 +9,45 @@ license: Apache-2.0
 created: "2025-04"
 data_as_of: "2026-04"
 
+category: coding-agent
+maturity: production
+deployment: binary
+
 ratings:
   architecture: A
   code_quality: A
   security: A
+  context_management: B
   documentation: B+
   overall: A
 
 features:
-  sandbox: seatbelt_landlock_restricted_token
+  sandbox: landlock
+  agent_loop: custom
   context_management: summarize
   stuck_detection: false
   multi_agent: true
   mcp_support: true
-  security_layers: 3
-  provider_count: 1
   plugin_system: true
+  security:
+    layers: 4
+    types: [seatbelt, landlock-seccomp, restricted-token, guardian-ai, network-proxy]
+  providers:
+    count: 1
+    names: [openai]
 
-key_finding: "Queue-pair arch, Guardian AI approval, 3-OS sandbox"
+key_finding: "Queue-pair architecture, Guardian AI auto-approval, 3-OS sandbox (17K LoC), MITM network proxy"
+
+worth_stealing:
+  - "Guardian pattern: separate AI model risk-scores actions in real-time, auto-approves if risk_score < 80"
+  - "Queue-pair architecture: Sender<Submission>/Receiver<Event> decouples core from frontends (CLI, desktop, MCP)"
+  - "Progressive sandbox escalation: try tightest sandbox first, retry with looser constraints on failure"
+  - "Two-phase memory extraction: per-rollout raw extraction then cross-rollout consolidation"
+
+easter_eggs:
+  - "arg0-based multi-binary dispatch: same binary behaves differently based on executable name"
+  - "Feature flag lifecycle stages: UnderDevelopment → Experimental → Stable → Deprecated → Removed"
+  - "88 workspace crates — extreme modularity with MODULE.bazel.lock of 1.2MB"
 
 tags:
   - coding-agent

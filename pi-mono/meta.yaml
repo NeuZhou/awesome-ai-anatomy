@@ -9,24 +9,47 @@ license: MIT
 created: "2025-08-09"
 data_as_of: "2026-04"
 
+category: coding-agent
+maturity: beta
+deployment: npm
+
 ratings:
   architecture: B+
   code_quality: B
-  security: C
+  security: B-
+  context_management: B
   documentation: B-
   overall: B
 
 features:
   sandbox: none
+  agent_loop: custom
   context_management: summarize
   stuck_detection: false
   multi_agent: false
   mcp_support: false
-  security_layers: 0
-  provider_count: 10
   plugin_system: true
+  security:
+    layers: 0
+    types: []
+  providers:
+    count: 10
+    names: [anthropic, openai, google, bedrock, azure, ollama, mistral, deepseek, groq, vertex]
 
-key_finding: "Game-engine arch, stealth mode as Claude Code"
+key_finding: "Game-engine architecture applied to LLM agents, stealth mode impersonating Claude Code's tool names"
+
+worth_stealing:
+  - "Lazy provider loading: dynamic import + promise caching, zero cost until first use — straight from game texture streaming"
+  - "Steering/follow-up queue system: two-lane input during agent execution for interruptions vs post-completion messages"
+  - "Tool definition with integrated TUI rendering: renderCall/renderResult co-located with execution in single definition"
+
+easter_eggs:
+  - "shittycodingagent.ai — the actual registered domain and official site"
+  - "Stealth mode: renames tools to match Claude Code's exact casing to piggyback on Anthropic's preferential treatment"
+  - "Claude Code History Tracker (cchistory.mariozechner.at) — competitive intelligence side project by the same author"
+  - "'mom' package name: Slack bot that delegates to the coding agent, unexplained naming"
+  - "armin.ts and daxnuts.ts: hidden TUI components as Easter eggs for Discord community"
+  - "OSS Weekend Mode: script auto-closes all issues/PRs from non-maintainers for configurable date range"
 
 tags:
   - coding-agent

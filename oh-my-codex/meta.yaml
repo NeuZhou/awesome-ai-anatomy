@@ -9,24 +9,46 @@ license: None
 created: "2025-06"
 data_as_of: "2026-04"
 
+category: dev-tool
+maturity: beta
+deployment: npm
+
 ratings:
   architecture: A-
   code_quality: A-
   security: B
+  context_management: C
   documentation: B+
   overall: A-
 
 features:
-  sandbox: git_worktree
+  sandbox: none
+  agent_loop: plan-execute
   context_management: none
   stuck_detection: true
   multi_agent: true
   mcp_support: true
-  security_layers: 1
-  provider_count: 1
   plugin_system: true
+  security:
+    layers: 1
+    types: [plugin-process-isolation]
+  providers:
+    count: 1
+    names: [openai]
 
-key_finding: "30 agents, git worktree isolation, autoresearch loop"
+key_finding: "30 agents, git worktree isolation, hook plugin SDK, autoresearch loop with keep/discard decisions"
+
+worth_stealing:
+  - "Plugin hook SDK with process isolation: spawn plugins as child processes, 1.5s timeout with SIGTERM→SIGKILL escalation"
+  - "Heuristic task-to-worker allocation: emergent locality via file-path overlap scoring, zero LLM calls"
+  - "Autonomous research loops (autoresearch): git worktree per experiment, evaluator contract, score-based keep/discard"
+  - "Phase-gated pipeline with bounded fix loops: plan→prd→exec→verify→fix with max 3 retry attempts"
+
+easter_eggs:
+  - "Same developer's second take: comparing OMC→OMX reveals which designs survived (file IPC, mkdir locking) and which got replaced (shared FS → worktrees)"
+  - "Korean keywords in role-router: 테스트, 커버리지, 디자인 — thoughtful internationalization"
+  - "Monotonic worker index: worker-3 stays worker-3 even after worker-2 is removed, preventing naming collisions"
+  - "No license file despite 19K stars"
 
 tags:
   - multi-agent
