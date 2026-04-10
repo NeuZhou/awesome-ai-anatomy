@@ -1,0 +1,66 @@
+name: "🔬 Teardown Request"
+description: "Nominate an open-source AI project for a deep teardown. We'll read the code so you don't have to."
+title: "Teardown Request: [Project Name]"
+labels: ["teardown-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a project! Community nominations help us pick the most interesting codebases to tear apart.
+
+  - type: input
+    id: project-name
+    attributes:
+      label: Project Name
+      description: "The name of the project you'd like us to tear down."
+      placeholder: "e.g., LangGraph"
+    validations:
+      required: true
+
+  - type: input
+    id: github-url
+    attributes:
+      label: GitHub URL
+      description: "Link to the project's repository."
+      placeholder: "https://github.com/org/repo"
+    validations:
+      required: true
+
+  - type: input
+    id: stars
+    attributes:
+      label: Stars (approximate)
+      description: "Rough star count — helps us gauge community interest."
+      placeholder: "e.g., 12k"
+    validations:
+      required: false
+
+  - type: input
+    id: language
+    attributes:
+      label: Primary Language
+      description: "Main programming language of the project."
+      placeholder: "e.g., Python, TypeScript, Rust"
+    validations:
+      required: false
+
+  - type: textarea
+    id: why-interesting
+    attributes:
+      label: Why is this project interesting?
+      description: "What caught your eye? A clever architecture, novel approach, or something you want to understand better?"
+      placeholder: "I'm curious how they handle..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: specific-areas
+    attributes:
+      label: Anything specific you want analyzed?
+      description: "Optional — tell us what you'd most like to see in the teardown."
+      placeholder: |
+        - How does the agent loop work?
+        - What's their memory strategy?
+        - How do they handle tool calling?
+    validations:
+      required: false
