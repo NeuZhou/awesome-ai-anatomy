@@ -531,6 +531,6 @@ footer a:hover { color: var(--accent); }
   color: #58a6ff;
 }
 .ms-option.selected::before {
-  content: "< ";
+  content: "\2713 ";
   color: #58a6ff;
 }
