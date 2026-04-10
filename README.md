@@ -16,7 +16,7 @@
  <img src="https://img.shields.io/badge/license-MIT-orange" alt="License">
 </p>
 
-<h3 align="center">We read the source code. All of it. Here's what we found.</h3>
+<h3 align="center">Source code teardowns of AI coding agents. Architecture diagrams, design patterns, and the stuff nobody documents.</h3>
 
 > **Claude Code** hides 18 virtual pet species inside production code that runs on your machine.
 > **MemPalace** got 30K stars in 4 days — with 7,600 lines of Python.
@@ -57,6 +57,8 @@ The 5 findings people can't stop sharing:
 | 5 | **DeerFlow's orphan tool call bug** — 93 lines of code fix a crash that affects every LangGraph-based agent | [DeerFlow](deer-flow/) | If you use LangGraph, you probably have this bug too |
 
 > These are real findings from reading source code, not vibes from README files.
+
+Ever wondered how Claude Code manages its context window? Or why Codex CLI chose Rust and built a 17K-line sandbox? These teardowns answer questions like that by reading the actual source code.
 
 ---
 
@@ -118,10 +120,10 @@ We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** -- a deep horizontal ana
 
 | Other "awesome" lists | This repo |
 |----------------------|-----------|
-| Link to repos | **Dissect** repos |
+| Curate links and descriptions | **Dissect** repos |
 | "What they use" | **Why they chose it** |
-| Stars and badges | **Architecture diagrams + trade-off analysis** |
-| Surface-level | **Staff-engineer-level depth** |
+| Overview metrics | **Architecture diagrams + trade-off analysis** |
+| High-level overviews | **Detailed engineering analysis with code references** |
 | Praise everything | **Reveal engineering decisions and trade-offs** |
 
 ---
@@ -184,18 +186,9 @@ New teardown every week. Cursor, Windsurf, and others are on the list.
 
 ---
 
-## ⭐ Still reading? This list is worth a star.
+## ⭐ Stay in the Loop
 
-<p align="center">
- <a href="https://github.com/NeuZhou/awesome-ai-anatomy">
- <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=for-the-badge&logo=github&label=Star%20This%20Repo&color=yellow" alt="Star This Repo">
- </a>
-</p>
-
-<p align="center">
- <b>One star = weekly AI architecture teardowns delivered to your GitHub notifications.</b><br>
- We publish new teardowns every week. Star to stay in the loop.
-</p>
+Star this repo to get notified when new teardowns drop.
 
 <p align="center">
  <a href="https://star-history.com/#NeuZhou/awesome-ai-anatomy&Date">
@@ -216,5 +209,5 @@ For takedown requests, please [open an issue](https://github.com/NeuZhou/awesome
 ---
 
 <p align="center">
- <i>15 projects dissected. Updated weekly.<br>If you build AI agents, you should know how the best ones actually work.</i>
+ <i>15 projects dissected. Updated weekly.</i>
 </p>
