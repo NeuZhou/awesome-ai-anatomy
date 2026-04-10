@@ -23,9 +23,17 @@
 
     <div class="filter-bar">
       <span class="filter-label">Select projects to compare:</span>
-      <button id="select-all" class="filter-btn active">All</button>
-      <button id="select-none" class="filter-btn">Clear</button>
-      <div class="project-checkboxes" id="project-checkboxes"></div>
+      <div class="multi-select" id="multi-select">
+        <div class="multi-select-input" id="ms-input">
+          <div class="selected-tags" id="selected-tags"></div>
+          <input type="text" id="ms-search" placeholder="Search projects..." autocomplete="off">
+        </div>
+        <div class="multi-select-dropdown" id="ms-dropdown"></div>
+      </div>
+      <div class="filter-actions">
+        <button id="select-all" class="filter-btn">Select All</button>
+        <button id="select-none" class="filter-btn">Clear All</button>
+      </div>
     </div>
 
     <div class="table-wrapper">
@@ -364,43 +372,117 @@
     const table = document.querySelector('.comparison-table');
     const tbody = table.querySelector('tbody');
     const rows = Array.from(tbody.querySelectorAll('tr'));
-    const container = document.getElementById('project-checkboxes');
+    const dropdown = document.getElementById('ms-dropdown');
+    const searchInput = document.getElementById('ms-search');
+    const tagsContainer = document.getElementById('selected-tags');
+    const msInput = document.getElementById('ms-input');
     const selectAll = document.getElementById('select-all');
     const selectNone = document.getElementById('select-none');
 
-    // Build checkboxes from table rows
-    rows.forEach((row, i) => {
-      const name = row.querySelector('td a')?.textContent || row.querySelector('td')?.textContent || '';
-      const label = document.createElement('label');
-      label.className = 'project-chip';
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.checked = true;
-      cb.dataset.index = i;
-      cb.addEventListener('change', filterRows);
-      label.appendChild(cb);
-      label.appendChild(document.createTextNode(' ' + name.trim()));
-      container.appendChild(label);
-    });
+    // Build project list from table
+    const projects = rows.map((row, i) => ({
+      name: (row.querySelector('td a')?.textContent || row.querySelector('td')?.textContent || '').trim(),
+      index: i,
+      selected: true
+    }));
 
-    function filterRows() {
-      const checks = container.querySelectorAll('input[type="checkbox"]');
-      const anyUnchecked = Array.from(checks).some(c => !c.checked);
-      selectAll.classList.toggle('active', !anyUnchecked);
-      checks.forEach(cb => {
-        rows[cb.dataset.index].style.display = cb.checked ? '' : 'none';
+    function renderDropdown(filter) {
+      const q = (filter || '').toLowerCase();
+      dropdown.innerHTML = '';
+      projects.forEach(p => {
+        if (q && !p.name.toLowerCase().includes(q)) return;
+        const item = document.createElement('div');
+        item.className = 'ms-option' + (p.selected ? ' selected' : '');
+        item.textContent = p.name;
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          p.selected = !p.selected;
+          render();
+        });
+        dropdown.appendChild(item);
       });
     }
 
-    selectAll.addEventListener('click', () => {
-      container.querySelectorAll('input').forEach(c => c.checked = true);
+    function renderTags() {
+      tagsContainer.innerHTML = '';
+      const sel = projects.filter(p => p.selected);
+      if (sel.length === projects.length) {
+        const tag = document.createElement('span');
+        tag.className = 'ms-tag all';
+        tag.textContent = 'All projects';
+        tagsContainer.appendChild(tag);
+      } else if (sel.length === 0) {
+        const tag = document.createElement('span');
+        tag.className = 'ms-tag none';
+        tag.textContent = 'None selected';
+        tagsContainer.appendChild(tag);
+      } else {
+        sel.forEach(p => {
+          const tag = document.createElement('span');
+          tag.className = 'ms-tag';
+          tag.innerHTML = p.name + '<span class="ms-tag-x" data-idx="' + p.index + '">&times;</span>';
+          tagsContainer.appendChild(tag);
+        });
+      }
+      // Tag remove buttons
+      tagsContainer.querySelectorAll('.ms-tag-x').forEach(x => {
+        x.addEventListener('click', (e) => {
+          e.stopPropagation();
+          projects[parseInt(x.dataset.idx)].selected = false;
+          render();
+        });
+      });
+    }
+
+    function filterRows() {
+      projects.forEach(p => {
+        rows[p.index].style.display = p.selected ? '' : 'none';
+      });
+    }
+
+    function render() {
+      renderTags();
+      renderDropdown(searchInput.value);
       filterRows();
+    }
+
+    // Dropdown toggle
+    msInput.addEventListener('click', () => {
+      dropdown.classList.toggle('open');
+      if (dropdown.classList.contains('open')) {
+        searchInput.focus();
+        renderDropdown(searchInput.value);
+      }
+    });
+
+    searchInput.addEventListener('input', () => {
+      dropdown.classList.add('open');
+      renderDropdown(searchInput.value);
+    });
+
+    searchInput.addEventListener('click', (e) => e.stopPropagation());
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (!document.getElementById('multi-select').contains(e.target)) {
+        dropdown.classList.remove('open');
+      }
+    });
+
+    selectAll.addEventListener('click', () => {
+      projects.forEach(p => p.selected = true);
+      searchInput.value = '';
+      render();
     });
 
     selectNone.addEventListener('click', () => {
-      container.querySelectorAll('input').forEach(c => c.checked = false);
-      filterRows();
+      projects.forEach(p => p.selected = false);
+      searchInput.value = '';
+      render();
     });
+
+    // Init
+    render();
   })();
   </script>
 </body>
