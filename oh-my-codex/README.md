@@ -252,6 +252,8 @@ This is the most novel module in OMX and has no equivalent in OMC. AutoResearch 
 
 The decision logic in `decideAutoresearchOutcome` handles 7 outcome states (keep, discard, noop, abort, interrupted, ambiguous, error) with explicit reasoning attached to each. A trailing-noop counter lets supervisors detect when the agent is stuck. Every iteration is recorded in both a TSV results file and a JSON ledger — full experiment reproducibility.
 
+![AutoResearch Loop](oh-my-codex-1.png)
+
 ## Source Reading Path
 
 ### Quick Path (15 min)
@@ -274,6 +276,16 @@ The decision logic in `decideAutoresearchOutcome` handles 7 outcome states (keep
 | 4 | `src/hooks/extensibility/dispatcher.ts` | Plugin process isolation, timeout escalation, result parsing | 10 min |
 | 5 | `src/autoresearch/runtime.ts` | Full experiment loop: prepare → iterate → evaluate → decide → record | 15 min |
 | 6 | `src/team/role-router.ts` | Keyword-based role routing with Korean language support | 5 min |
+
+## Trade-offs Worth Knowing
+
+Every design choice has a cost. Three worth flagging:
+
+- **Git worktree disk overhead.** Each worker gets a full worktree copy. On large monorepos (multi-GB), `git worktree add` takes time and disk space scales linearly with worker count. For typical project sizes this is fine; for very large repos, shallow worktrees or sparse checkouts would help.
+
+- **Debugging 30 agents across 5 phases.** When something fails in a pipeline this deep, tracing the root cause requires reading tmux pane logs, mailbox files, and the dispatch queue state. The delivery log and phase controller state help, but centralized error aggregation would make this easier.
+
+- **File-based IPC latency.** The inbox/outbox JSONL mechanism works well for the send-and-check cadence of coding tasks, but would not be suitable for sub-second communication. For OMX's use case this is the right trade-off; for real-time coordination, an in-memory message bus would be needed.
 
 ## Cross-Project Comparison
 
