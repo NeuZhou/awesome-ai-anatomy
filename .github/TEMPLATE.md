@@ -122,9 +122,9 @@
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| {star count} | GitHub API | ✅ Verified |
-| {LOC count} | cloc output | ✅ Verified |
-| {file path reference} | file exists check | ✅ Verified |
+| {star count} | GitHub API |  Verified |
+| {LOC count} | cloc output |  Verified |
+| {file path reference} | file exists check |  Verified |
 | ... | ... | ... |
 
 </details>

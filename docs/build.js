@@ -154,7 +154,7 @@ function generateProjectCard(p) {
           <span class="rating" style="background:${ratingColor(overall)}">${overall}</span>
         </div>
         <div class="card-meta">
-          <span class="stars">⭐ ${formatStars(p.stars || 0)}</span>
+          <span class="stars"> ${formatStars(p.stars || 0)}</span>
           <span class="lang">${langs.map(l => `<span class="lang-badge">${escapeHtml(l)}</span>`).join(' ')}</span>
         </div>
         <p class="key-finding">${escapeHtml(p.key_finding || '')}</p>
@@ -180,18 +180,18 @@ const indexHtml = `<!DOCTYPE html>
   <meta name="twitter:title" content="Awesome AI Anatomy">
   <meta name="twitter:description" content="Source-level teardowns of how production AI systems actually work.">
   <meta name="twitter:image" content="${REPO_URL}/raw/main/assets/social-preview.png">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'>🔬</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'></text></svg>">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="hero">
     <div class="hero-content">
-      <h1>🔬 Awesome AI Anatomy</h1>
+      <h1> Awesome AI Anatomy</h1>
       <p class="hero-subtitle">We read the source code. All of it. Here's what we found.</p>
       <p class="hero-desc">${projects.length} AI agent projects dissected — architecture diagrams, design patterns, and the engineering decisions nobody documents.</p>
       <div class="hero-links">
-        <a href="${REPO_URL}" class="btn btn-primary" target="_blank">⭐ Star on GitHub</a>
-        <a href="comparison.html" class="btn btn-secondary">📊 Compare All</a>
+        <a href="${REPO_URL}" class="btn btn-primary" target="_blank"> Star on GitHub</a>
+        <a href="comparison.html" class="btn btn-secondary"> Compare All</a>
       </div>
     </div>
   </header>
@@ -243,7 +243,7 @@ const indexHtml = `<!DOCTYPE html>
   </main>
 
   <footer>
-    <p>Built with ❤️ by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> · 
+    <p>Built with  by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> · 
     <a href="${REPO_URL}" target="_blank">GitHub</a> · 
     <a href="${REPO_URL}/blob/main/CONTRIBUTING.md" target="_blank">Contribute</a></p>
   </footer>
@@ -273,9 +273,9 @@ function generateComparisonTable() {
       <td><span class="rating-cell" style="color:${ratingColor(code)}">${code}</span></td>
       <td><span class="rating-cell" style="color:${ratingColor(sec)}">${sec}</span></td>
       <td>${escapeHtml(String(f.sandbox || 'none'))}</td>
-      <td>${f.multi_agent ? '✅' : '❌'}</td>
-      <td>${f.mcp_support ? '✅' : '❌'}</td>
-      <td>${f.plugin_system ? '✅' : '❌'}</td>
+      <td>${f.multi_agent ? '' : ''}</td>
+      <td>${f.mcp_support ? '' : ''}</td>
+      <td>${f.plugin_system ? '' : ''}</td>
       <td>${escapeHtml(String(f.security_layers || 0))}</td>
       <td class="key-finding-cell">${escapeHtml(p.key_finding || '')}</td>
     </tr>`;
@@ -294,7 +294,7 @@ const comparisonHtml = `<!DOCTYPE html>
   <meta property="og:title" content="AI Agent Comparison — Awesome AI Anatomy">
   <meta property="og:description" content="Side-by-side comparison of 15 AI agent projects.">
   <meta property="og:image" content="${REPO_URL}/raw/main/assets/social-preview.png">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'>🔬</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'></text></svg>">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -304,7 +304,7 @@ const comparisonHtml = `<!DOCTYPE html>
   </nav>
 
   <main class="comparison-page">
-    <h1>📊 Project Comparison</h1>
+    <h1> Project Comparison</h1>
     <p class="comparison-desc">${projects.length} projects compared across ratings, features, and architecture decisions.</p>
 
     <div class="table-wrapper">
@@ -369,7 +369,7 @@ const comparisonHtml = `<!DOCTYPE html>
               return `<tr>
                 <td>${escapeHtml(p.name)}</td>
                 <td>${escapeHtml(String(f.context_management || 'none'))}</td>
-                <td>${f.stuck_detection ? '✅' : '❌'}</td>
+                <td>${f.stuck_detection ? '' : ''}</td>
                 <td>${f.provider_count || 0}</td>
                 <td>${escapeHtml(p.license || 'N/A')}</td>
                 <td>${(p.loc || 0).toLocaleString()}</td>
@@ -382,7 +382,7 @@ const comparisonHtml = `<!DOCTYPE html>
   </main>
 
   <footer>
-    <p>Built with ❤️ by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> · 
+    <p>Built with  by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> · 
     <a href="${REPO_URL}" target="_blank">GitHub</a></p>
   </footer>
 </body>

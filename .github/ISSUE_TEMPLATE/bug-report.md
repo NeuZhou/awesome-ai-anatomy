@@ -1,5 +1,5 @@
 ---
-name: "🐛 Bug Report"
+name: " Bug Report"
 about: "Found an error in a teardown? Let us know"
 labels: bug
 ---

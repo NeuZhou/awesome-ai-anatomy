@@ -102,7 +102,7 @@
         const badge = document.createElement('span');
         badge.className = 'staff-pick-badge';
         badge.title = 'Staff Pick — Outstanding teardown';
-        badge.textContent = '⭐ Staff Pick';
+        badge.textContent = ' Staff Pick';
         // Insert before the rating badge
         const ratingEl = header.querySelector('.rating');
         header.insertBefore(badge, ratingEl);
@@ -118,21 +118,21 @@
       filter: () => true
     },
     coding: {
-      label: '💻 Coding Agents',
+      label: ' Coding Agents',
       filter: (card) => {
         const tags = card.dataset.tags || '';
         return tags.includes('coding-agent');
       }
     },
     'top-rated': {
-      label: '🏆 Top Rated',
+      label: ' Top Rated',
       filter: (card) => {
         const r = ratingToNum(card.dataset.rating);
         return r >= 3.7; // A or A-
       }
     },
     'hidden-gems': {
-      label: '💎 Hidden Gems',
+      label: ' Hidden Gems',
       filter: (card) => {
         const r = ratingToNum(card.dataset.rating);
         const stars = parseInt(card.dataset.stars) || 0;

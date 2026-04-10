@@ -1,4 +1,4 @@
-name: "🔬 Teardown Request"
+name: " Teardown Request"
 description: "Nominate an open-source AI project for a deep teardown. We'll read the code so you don't have to."
 title: "Teardown Request: [Project Name]"
 labels: ["teardown-request"]
