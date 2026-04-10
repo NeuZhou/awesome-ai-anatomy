@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://neuzhou.github.io/awesome-ai-anatomy/sitemap.xml
