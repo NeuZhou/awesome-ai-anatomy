@@ -1,0 +1,54 @@
+direction: down
+
+research: "AutoResearch Loop" {
+
+  prepare: "Prepare\nCreate git worktree sandbox\nParse mission + evaluator command" {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+  }
+
+  iterate: "Iterate\nAgent works on code changes\nCommits candidate artifact" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+  }
+
+  evaluate: "Evaluate\nRun evaluator command\nOutput: pass/fail + score" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+  }
+
+  decide: "Decide" {
+    style.fill: "#0891b2"
+    style.font-color: "#fff"
+  }
+
+  keep: "Keep\nUpdate last_kept_commit\nLog to ledger TSV" {
+    style.fill: "#16a34a"
+    style.font-color: "#fff"
+  }
+
+  discard: "Discard\ngit reset --hard last_kept_commit\nLog to ledger TSV" {
+    style.fill: "#dc2626"
+    style.font-color: "#fff"
+  }
+
+  stuck: "Stuck Detection\nTrailing no-op counter\nForce stop if agent loops" {
+    style.fill: "#fca5a5"
+  }
+
+  complete: "Complete\nMerge kept changes back\nClean up worktree" {
+    style.fill: "#16a34a"
+    style.font-color: "#fff"
+  }
+
+  prepare -> iterate: "start"
+  iterate -> evaluate: "commit + artifact"
+  evaluate -> decide: "result"
+  decide -> keep: "score improved"
+  decide -> discard: "score dropped"
+  keep -> iterate: "next iteration"
+  discard -> iterate: "retry"
+  iterate -> stuck: "no progress"
+  stuck -> complete: "force stop"
+  keep -> complete: "max iterations reached"
+}

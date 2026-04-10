@@ -1,0 +1,73 @@
+direction: down
+
+arch: "oh-my-codex Architecture" {
+
+  cli: "omx CLI\n(cli/omx.ts)" {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+  }
+
+  pipeline: "Pipeline Orchestrator\nralplan > team-exec > ralph-verify" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+  }
+
+  orchestrator: "Phase Controller\nplan > prd > exec > verify > fix" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+  }
+
+  dispatch: "Dispatch Queue\nmkdir lock + exponential backoff" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+  }
+
+  alloc: "Allocation Policy\nrole match (+18) + path overlap (*4)\nload penalty (-4)" {
+    style.fill: "#22c55e"
+    style.font-color: "#fff"
+  }
+
+  router: "Role Router\nkeyword heuristics (multilingual)" {
+    style.fill: "#22c55e"
+    style.font-color: "#fff"
+  }
+
+  scaling: "Dynamic Scaling\nmonotonic index + full rollback"
+
+  workers: "Tmux Workers\n(git worktree per worker)" {
+    style.fill: "#0891b2"
+    style.font-color: "#fff"
+  }
+
+  mailbox: "File-Based IPC\ninbox/outbox JSONL"
+
+  hooks: "Hook System\nPlugin SDK (process-isolated .mjs)" {
+    style.fill: "#16a34a"
+    style.font-color: "#fff"
+  }
+
+  autoresearch: "AutoResearch\ncandidate > evaluate > keep/discard" {
+    style.fill: "#a855f7"
+    style.font-color: "#fff"
+  }
+
+  notifications: "Notifications\nDiscord + Telegram + Slack + Webhook"
+
+  mcp: "4 MCP Servers\ncode-intel + memory + state + trace"
+
+  hud: "HUD Dashboard"
+
+  cli -> pipeline
+  cli -> hooks
+  pipeline -> orchestrator
+  orchestrator -> dispatch
+  dispatch -> workers
+  alloc -> dispatch
+  router -> alloc
+  workers -> mailbox
+  scaling -> workers
+  autoresearch -> workers
+  cli -> notifications
+  cli -> hud
+  cli -> mcp
+}
