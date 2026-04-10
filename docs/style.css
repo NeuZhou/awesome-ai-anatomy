@@ -347,6 +347,53 @@ main { max-width: 1280px; margin: 0 auto; padding: 1.5rem; }
 }
 .bar-value { font-size: 0.85rem; font-weight: 700; }
 
+/* Staff Pick Badge */
+.staff-pick-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.5rem;
+  background: linear-gradient(135deg, rgba(210, 153, 34, 0.2), rgba(210, 153, 34, 0.1));
+  border: 1px solid var(--accent-yellow);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-yellow);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+/* Filter Presets */
+.filter-presets {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+.preset-btn {
+  padding: 0.35rem 0.85rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  outline: none;
+}
+.preset-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(88, 166, 255, 0.08);
+}
+.preset-btn.active {
+  background: rgba(88, 166, 255, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* Footer */
 footer {
   text-align: center;
