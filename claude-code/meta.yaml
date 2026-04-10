@@ -13,13 +13,12 @@ category: coding-agent
 maturity: production
 deployment: npm
 
-ratings:
-  architecture: A
-  code_quality: A-
-  security: B+
-  context_management: A
-  documentation: A
-  overall: A-
+characteristics:
+  architecture: "single-file agentic loop (query.ts, 1729 lines), 40+ tools as pure functions via buildTool() factory, streaming tool execution with RWLock"
+  code_organization: "510K LOC TypeScript, 1903 files, Bun runtime with compile-time feature flag macros, Zod v4 schemas throughout"
+  security_approach: "per-tool permission model with trust level scoping, seatbelt sandbox for process execution"
+  context_strategy: "4-layer cascade: compact conversations losslessly, summarize tool outputs, truncate old turns, drop least-relevant context"
+  documentation: "internal docs cover feature flags, tool contracts, context cascade; inline Zod schemas serve as living API docs"
 
 features:
   sandbox: seatbelt

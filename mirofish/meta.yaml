@@ -14,13 +14,12 @@ category: social-simulation
 maturity: beta
 deployment: pip
 
-ratings:
-  architecture: B-
-  code_quality: B-
-  security: C+
-  context_management: C
-  documentation: B-
-  overall: B-
+characteristics:
+  architecture: "Vue.js wizard UI → Flask API → 5+ LLM call chain (ontology→profiles→sim config→agent behavior→report), core simulation delegated to OASIS (camel-ai)"
+  code_organization: "38.8K LOC (20K Python + 18.8K Vue/JS), 60 source files, backend/app/services/ one file per pipeline stage"
+  security_approach: "no input sanitization on uploads, no auth layer, builtins.open monkey-patch forces UTF-8 on Windows"
+  context_strategy: "no context management — stateless simulation pipeline, each run is independent"
+  documentation: "README emphasizes 'collective intelligence' framing, simulation methodology under-documented"
 
 features:
   sandbox: none

@@ -27,14 +27,13 @@ maturity: production
 #   binary | npm | pip | docker | docker-compose
 deployment: npm
 
-# ─── Ratings (A/A-/B+/B/B-/C+/C/C-/D/F) ────────────────────
-ratings:
-  architecture: B+
-  code_quality: B
-  security: A-
-  context_management: A         # Unified name (replaces old memory_context)
-  documentation: B-
-  overall: B+
+# ─── Characteristics (factual descriptions, no grades) ───────
+characteristics:
+  architecture: "describe the architectural pattern concretely"          # e.g. "queue-pair async event system"
+  code_organization: "describe structure with concrete details"          # e.g. "88 Rust workspace crates, clean module boundaries"
+  security_approach: "describe actual security mechanisms"               # e.g. "3-layer: seatbelt sandbox + Guardian AI approval + restricted token"
+  context_strategy: "describe the context/memory mechanism"              # e.g. "4-layer cascade: compact, summarize, truncate, drop"
+  documentation: "describe what documentation exists"                    # e.g. "inline code comments, architecture decision records"
 
 # ─── Architecture Features ───────────────────────────────────
 features:

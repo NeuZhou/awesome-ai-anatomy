@@ -13,13 +13,12 @@ category: dev-tool
 maturity: beta
 deployment: npm
 
-ratings:
-  architecture: A-
-  code_quality: A-
-  security: B
-  context_management: C
-  documentation: B+
-  overall: A-
+characteristics:
+  architecture: "30-agent team with 5-phase pipeline (plan→prd→exec→verify→fix), git worktree isolation per experiment, heuristic task-to-worker allocation via file-path overlap scoring"
+  code_organization: "124K LOC TypeScript, plugin hook SDK with process isolation (1.5s timeout, SIGTERM→SIGKILL escalation), monotonic worker indexing"
+  security_approach: "plugin process isolation via child process spawning, no shared state between workers, bounded fix loops (max 3 retries)"
+  context_strategy: "no built-in context management — delegates to host Codex CLI agent"
+  documentation: "agent roles and pipeline stages documented, Korean keywords in role-router (테스트, 커버리지, 디자인), no license file"
 
 features:
   sandbox: none

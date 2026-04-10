@@ -14,13 +14,12 @@ category: workflow-engine
 maturity: beta
 deployment: docker
 
-ratings:
-  architecture: B
-  code_quality: B-
-  security: B-
-  context_management: B
-  documentation: B
-  overall: B-
+characteristics:
+  architecture: "14-layer middleware chain over LangGraph, order-dependent (ClarificationMiddleware must be last), FastAPI + Next.js dual backend"
+  code_organization: "Python backend + TypeScript frontend, v2.0 ground-up rewrite sharing zero code with v1, LangGraph tightly coupled"
+  security_approach: "no auth, no RBAC — designed for trusted corporate network deployment, public use requires external auth layer"
+  context_strategy: "summarize-based compaction, DanglingToolCallMiddleware patches orphan tool calls from interrupted sessions"
+  documentation: "v2.0 rewrite docs exist, middleware ordering undocumented outside the source code"
 
 features:
   sandbox: docker

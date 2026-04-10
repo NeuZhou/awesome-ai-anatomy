@@ -13,13 +13,12 @@ category: security-framework
 maturity: production
 deployment: pip
 
-ratings:
-  architecture: B+
-  code_quality: B+
-  security: B
-  context_management: C
-  documentation: A-
-  overall: B+
+characteristics:
+  architecture: "onion-shape: Guard wraps Runner wraps ValidatorService wraps individual Validators, async validator execution by default"
+  code_organization: "18K LOC Python in 178 files, 1076-line Guard central orchestrator class, Pydantic v2 + LiteLLM + OpenTelemetry"
+  security_approach: "validators pip-install from git URLs via Validator Hub (npm-for-LLM-constraints), supply chain risk on Hub packages"
+  context_strategy: "streaming chunk accumulation: accumulates LLM response chunks until sentence boundary before validating"
+  documentation: "API docs and validator catalog thorough, jsonformer escape hatch under @experimental decorator, reask loop mechanics less documented"
 
 features:
   sandbox: none

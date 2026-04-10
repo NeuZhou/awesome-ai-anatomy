@@ -13,13 +13,12 @@ category: coding-agent
 maturity: beta
 deployment: npm
 
-ratings:
-  architecture: B+
-  code_quality: B
-  security: B-
-  context_management: B
-  documentation: B-
-  overall: B
+characteristics:
+  architecture: "7-package monorepo with game-engine layering: pi-ai (renderer abstraction), pi-agent-core (game loop), pi-tui (scene graph), pi-coding-agent (content)"
+  code_organization: "147K LOC TypeScript across 583 .ts files, strict dependency graph (pi-tui has zero dependency on pi-ai), lazy provider loading via dynamic import + promise caching"
+  security_approach: "stealth mode renames tools to match Claude Code's exact casing for compatibility, no independent security layer"
+  context_strategy: "summarize-based compaction, steering/follow-up two-lane input queue during agent execution"
+  documentation: "shittycodingagent.ai as honest branding, internal package boundaries need docs, 10 provider configs via registry"
 
 features:
   sandbox: none

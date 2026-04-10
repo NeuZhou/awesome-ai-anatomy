@@ -13,13 +13,12 @@ category: coding-agent
 maturity: production
 deployment: binary
 
-ratings:
-  architecture: A
-  code_quality: A
-  security: A
-  context_management: B
-  documentation: B+
-  overall: A
+characteristics:
+  architecture: "queue-pair async event system (Sender<Submission>/Receiver<Event>), 88 Rust workspace crates, dual Cargo+Bazel build"
+  code_organization: "549K LOC Rust across 1389 files, 162 test files, strict crate boundaries with codex-core (176K), codex-tui (112K), codex-cli (5K)"
+  security_approach: "4-layer: seatbelt (macOS) + landlock/seccomp/bubblewrap (Linux) + restricted token/ACL (Windows) + Guardian AI auto-approval (risk_score < 80) + MITM network proxy"
+  context_strategy: "two-phase memory extraction: per-rollout raw extraction then cross-rollout consolidation, summarize-based compaction"
+  documentation: "crate-level docs, architecture decision records, cross-crate architecture requires reading the code"
 
 features:
   sandbox: landlock

@@ -13,13 +13,12 @@ category: coding-agent
 maturity: production
 deployment: npm
 
-ratings:
-  architecture: C+
-  code_quality: B-
-  security: B
-  context_management: C
-  documentation: B+
-  overall: B-
+characteristics:
+  architecture: "4-layer hierarchy (Extension→Controller→Task→ToolExecutor), 3756-line Task god object, callback-injection coupling with 20+ constructor params"
+  code_organization: "560K LOC TypeScript, VS Code extension + React webview, npm package still named 'claude-dev'"
+  security_approach: "human-in-the-loop approval by default via webview polling, YOLO mode toggle auto-approves all actions including shell"
+  context_strategy: "truncation-based: drops oldest messages when context window is full, no summarization"
+  documentation: ".clinerules/cline-overview.md internal architecture doc, hooks and prompt variant systems documented"
 
 features:
   sandbox: none

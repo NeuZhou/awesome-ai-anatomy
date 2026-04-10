@@ -13,13 +13,12 @@ category: memory-system
 maturity: experimental
 deployment: pip
 
-ratings:
-  architecture: B+
-  code_quality: B
-  security: C+
-  context_management: A-
-  documentation: A-
-  overall: B
+characteristics:
+  architecture: "4-layer memory stack (identity→essential facts→topic-scoped recall→full search), ChromaDB palace metaphor with wings/rooms/halls/tunnels/closets/drawers"
+  code_organization: "15.5K LOC Python in 25 files, 19 MCP tools, no type hints, no mypy, version 3.0.14 on a 4-day-old project"
+  security_approach: "shell injection in hooks (issue #110) — SESSION_ID used before sanitization, no input validation on MCP tool parameters"
+  context_strategy: "layered loading: ~600 token wake-up cost (identity + essential facts), topic-scoped recall on demand, full ChromaDB search only when needed"
+  documentation: "April 7 correction note acknowledging wrong AAAK token counting and misleading benchmarks, auto-teach via MCP status tool response"
 
 features:
   sandbox: none

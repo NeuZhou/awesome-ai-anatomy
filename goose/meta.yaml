@@ -14,13 +14,12 @@ category: coding-agent
 maturity: production
 deployment: binary
 
-ratings:
-  architecture: A-
-  code_quality: A
-  security: B+
-  context_management: B+
-  documentation: B+
-  overall: A-
+characteristics:
+  architecture: "MCP-first extension bus (6 extension types: platform, builtin, stdio, streamable_http, remote, bundled), thin agent loop dispatching to extensions"
+  code_organization: "124K Rust + 74K TypeScript, Tokio async runtime, Axum HTTP server, Electron desktop app, clean crate boundaries"
+  security_approach: "5-inspector tool pipeline: SecurityInspector → EgressInspector → AdversaryInspector (LLM-based) → PermissionInspector → RepetitionInspector, 31-entry env var blocklist"
+  context_strategy: "tool-pair summarization: background-summarizes old tool request/response pairs while current turn executes"
+  documentation: "README and extension API docs cover surface, 30+ provider registry via 10-line JSON declarative config"
 
 features:
   sandbox: process_isolation

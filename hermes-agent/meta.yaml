@@ -13,13 +13,12 @@ category: coding-agent
 maturity: beta
 deployment: pip
 
-ratings:
-  architecture: B
-  code_quality: B-
-  security: B-
-  context_management: B+
-  documentation: B-
-  overall: B-
+characteristics:
+  architecture: "OpenClaw clone structure (SOUL.md/MEMORY.md/AGENTS.md), 9000-line single-file agent loop (run_agent.py), self-improving skill system"
+  code_organization: "260K LOC Python, skill auto-creation and self-patching from experience, 'hermes claw migrate' imports OpenClaw config"
+  security_approach: "memory-threat-detection scans memory writes before persisting, subagent restrictions (no code exec, no memory writes, no user interaction)"
+  context_strategy: "frozen memory snapshots: BuiltinMemoryProvider snapshots MEMORY.md at session start for prompt-cache optimization, FTS5 session search for cross-session recall"
+  documentation: "self-improving skill system documented, migration path from OpenClaw under-specified"
 
 features:
   sandbox: docker
