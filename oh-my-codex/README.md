@@ -1,4 +1,4 @@
-# oh-my-codex: 30 Agents, Git Worktrees, and the Same Dev Who Shipped OMC Did It Again
+﻿# oh-my-codex: 30 Agents, Git Worktrees, and the Same Dev Who Shipped OMC Did It Again
 
 > The same developer's second take on multi-agent orchestration is where the real lessons live. OMX solves every problem OMC left open — file conflicts, no plugin system, fixed worker count — each with a different architectural choice. This is what iterative learning looks like in code.
 
@@ -7,7 +7,6 @@
 - **What it is:** Multi-agent orchestration layer for OpenAI Codex CLI — 30 specialized agents, a 5-phase team pipeline, dynamic worker scaling, hook plugins, and an automated research loop, all in ~124K lines of TypeScript.
 - **Why it matters:** The same developer who built oh-my-claudecode (26K stars, Claude Code plugin) rebuilt the concept from scratch for Codex CLI, solving the problems OMC left unsolved — and the architecture choices show exactly what he learned.
 - **What you'll learn:** How to build a plugin-based hook system, allocate tasks across workers using file-path heuristics, and run autonomous experiment loops with git worktrees.
-- **Rating:** 5/5
 - **Patterns to steal:** [Plugin Hook SDK], [Heuristic Task Allocation], [Autonomous Research Loops], [Git Worktree Isolation], [Phase-Gated Pipeline]
 
 ## Why Should You Care?
@@ -29,6 +28,15 @@ This is Yeachan Heo's second take on the multi-agent orchestration problem. His 
 | Install Method | npm package (`omx` CLI) |
 | Data as of | April 2026 |
 
+## Characteristics
+
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | 30-agent team with 5-phase pipeline (plan→prd→exec→verify→fix), git worktree isolation per experiment, heuristic task-to-worker allocation via file-path overlap scoring |
+| Code Organization | 124K LOC TypeScript, plugin hook SDK with process isolation (1.5s timeout, SIGTERM→SIGKILL escalation), monotonic worker indexing |
+| Security Approach | plugin process isolation via child process spawning, no shared state between workers, bounded fix loops (max 3 retries) |
+| Context Strategy | no built-in context management — delegates to host Codex CLI agent |
+| Documentation | agent roles and pipeline stages documented, Korean keywords in role-router (테스트, 커버리지, 디자인), no license file |
 ## Architecture
 
 ![Architecture](architecture.png)
@@ -91,7 +99,7 @@ graph TB
 
 - **30 agent roles** across 5 categories: build (8), review (6), domain (10), product (4), coordination (2) — each with defined model class, reasoning effort, and tool access pattern
 - **5-phase team pipeline:** `plan → prd → exec → verify → fix` with a bounded fix loop (default max 3 attempts)
-- **File-based IPC** with mkdir-based locking — inherited from OMC and refined with stale lock detection at 5 minutes, exponential backoff polling (25ms → 500ms), and configurable lock timeout (1s–120s)
+- **File-based IPC** with mkdir-based locking — inherited from OMC and refined with stale lock detection at 5 minutes, exponential backoff polling (25ms → 500ms), and configurable lock timeout (1s—120s)
 - **Hook plugin system** with a sandboxed SDK — plugins are `.mjs` files in `.omx/hooks/`, spawned as child processes, killed after timeout (default 1.5s)
 - **AutoResearch** — autonomous experiment loop with git worktree isolation, evaluator contracts, and keep/discard decisions based on score improvement
 
@@ -137,7 +145,7 @@ Some frameworks use an LLM call to decide which agent should handle a task. OMX 
 
 **Problem:** You have N workers and M tasks. You need to assign tasks so workers specialize naturally without explicit configuration.
 
-**Solution:** Score each worker by: role match (+18/+12), file-path overlap (+12 per shared path hint), domain overlap (+4 per keyword), and load penalty (−4 per existing task). Workers that already touched `src/team/` score higher for new `src/team/` tasks. Specialization emerges from history.
+**Solution:** Score each worker by: role match (+18/+12), file-path overlap (+12 per shared path hint), domain overlap (+4 per keyword), and load penalty (âˆ’4 per existing task). Workers that already touched `src/team/` score higher for new `src/team/` tasks. Specialization emerges from history.
 
 **How to steal it:** In your task queue, maintain a `scope_hints: Set<string>` per worker. On each assignment, add `path:{normalized}` and `domain:{keyword}` from the task description. Score candidates by `overlap * 4 - assignments * 4`. Pick the highest. ~150 lines of code, zero LLM calls.
 
@@ -216,10 +224,10 @@ The allocation policy is a compact, well-structured task-routing module I've rea
 2. **Build worker state**: for each worker, collect scope hints from all currently assigned tasks
 3. **Score each worker** against the task:
   - Role match: +18 if the worker's primary role matches, +12 for secondary match, +9 for unassigned workers
-  - Path/domain overlap: +4 per overlapping hint (paths weighted 3× over domains)
-  - Negative overlap penalty: −3 if the task has hints but the worker has no overlap
-  - Load penalty: −4 per currently assigned task
-  - Blocked-task penalty: −1 extra per assignment for tasks with dependencies
+  - Path/domain overlap: +4 per overlapping hint (paths weighted 3Ã— over domains)
+  - Negative overlap penalty: âˆ’3 if the task has hints but the worker has no overlap
+  - Load penalty: âˆ’4 per currently assigned task
+  - Blocked-task penalty: âˆ’1 extra per assignment for tasks with dependencies
 4. **Tie-break** by overlap count, then assignment count, then original index
 
 The result: workers naturally specialize. Once a worker touches `src/team/`, it gets more `src/team/` tasks. This is emergent locality without explicit affinity configuration.
@@ -344,7 +352,7 @@ Every design choice has a cost. Three worth flagging:
 | Plugin result prefix | `dispatcher.ts` RESULT_PREFIX = "__OMX_PLUGIN_RESULT__ " | Verified |
 | oh-my-claudecode 26K stars (comparison) | Previous teardown data + GitHub | Per last verified data |
 | Scoring: role match +18, path overlap *4, load -4 | `allocation-policy.ts` scoreWorker function | Verified against source |
-| Korean keywords in role-router | `role-router.ts` ROLE_KEYWORDS arrays contain Korean terms | Verified (테스트, 커버리지, 디자인, etc.) |
+| Korean keywords in role-router | `role-router.ts` ROLE_KEYWORDS arrays contain Korean terms | Verified (í…ŒìŠ¤íŠ¸, ì»¤ë²„ë¦¬ì§€, ë””ìžì¸, etc.) |
 | 4 MCP servers | `src/mcp/` directory: code-intel-server, memory-server, state-server, trace-server | Verified |
 | 5 notification platforms | `src/notifications/dispatcher.ts`: Discord, Discord Bot, Telegram, Slack, Webhook | Verified |
 | AutoResearch keep policies | `autoresearch/contracts.ts`: 'score_improvement' \| 'pass_only' | Verified |

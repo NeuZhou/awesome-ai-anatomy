@@ -1,4 +1,4 @@
-# Goose: The Rust Agent That Treats MCP as a First-Class Citizen
+﻿# Goose: The Rust Agent That Treats MCP as a First-Class Citizen
 
 > Goose is more than a "Rust agent." The agent loop is deliberately thin because the real insight is the MCP extension bus, with the LLM acting as a scheduler. That distinction matters more than the language choice.
 
@@ -20,16 +20,15 @@ Goose is an on-machine AI agent that runs shell commands, edits files, manages e
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | A- | MCP as first-class extension protocol; agent loop is thin, extensions do the real work |
-| Code Quality | A | 124K Rust LOC with Tokio async, clean crate boundaries, Axum HTTP layer |
-| Security | B+ | Extension sandboxing via MCP process isolation; no per-tool permission model like Codex |
-| Documentation | B+ | README and extension API docs cover the surface; internal architecture requires code reading |
-| **Overall** | **A-** | **MCP-first design ages better than tool-specific integrations; 30+ provider support via registry pattern is well-executed** |
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | MCP-first extension bus (6 extension types: platform, builtin, stdio, streamable_http, remote, bundled), thin agent loop dispatching to extensions |
+| Code Organization | 124K Rust + 74K TypeScript, Tokio async runtime, Axum HTTP server, Electron desktop app, clean crate boundaries |
+| Security Approach | 5-inspector tool pipeline: SecurityInspector → EgressInspector → AdversaryInspector (LLM-based) → PermissionInspector → RepetitionInspector, 31-entry env var blocklist |
+| Context Strategy | tool-pair summarization: background-summarizes old tool request/response pairs while current turn executes |
+| Documentation | README and extension API docs cover surface, 30+ provider registry via 10-line JSON declarative config |
 ## Architecture
 
 
@@ -269,23 +268,23 @@ The idea of background-summarizing old tool request/response pairs while the cur
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 37,343 stars | GitHub API (`/repos/aaif-goose/goose`) | ✅ Verified |
-| 3,589 forks | GitHub API | ✅ Verified |
-| ~124K Rust LOC | `Get-ChildItem -Recurse -Include *.rs \| Get-Content \| Measure-Object -Line` on crates/ | ✅ Verified (124,627 lines) |
-| ~74K TypeScript LOC | Same method on ui/ directory (.ts, .tsx, .js, .jsx) | ✅ Verified (74,141 lines) |
-| Apache-2.0 license | LICENSE file header | ✅ Verified |
-| First commit 2024-08-23 | GitHub API `created_at` | ✅ Verified |
-| Latest release v1.29.1 | GitHub API `/releases/latest` | ✅ Verified (2026-04-03) |
-| Version in Cargo.toml: 1.30.0 | `crates/goose/Cargo.toml` workspace version | ✅ Verified |
-| 30+ providers | Provider modules in `crates/goose/src/providers/mod.rs` | ✅ Verified (30+ pub mod entries) |
-| 5 tool inspectors | `create_tool_inspection_manager()` in agent.rs | ✅ Verified |
-| 6 extension types | `ExtensionConfig` enum in extension.rs | ✅ Verified (Sse, Stdio, Builtin, Platform, StreamableHttp, Frontend, InlinePython = 7 variants, Sse deprecated) |
-| `crates/goose/src/agents/agent.rs` exists | File read | ✅ Verified |
-| `crates/goose/src/agents/extension.rs` exists | File read | ✅ Verified |
-| `crates/goose/src/security/mod.rs` exists | File read | ✅ Verified |
-| 31 disallowed env vars | `DISALLOWED_KEYS` array in extension.rs | ✅ Verified |
-| Default max turns = 1000 | `DEFAULT_MAX_TURNS` constant in agent.rs | ✅ Verified |
-| Default compaction threshold = 0.8 | `DEFAULT_COMPACTION_THRESHOLD` in context_mgmt/mod.rs | ✅ Verified |
+| 37,343 stars | GitHub API (`/repos/aaif-goose/goose`) | âœ… Verified |
+| 3,589 forks | GitHub API | âœ… Verified |
+| ~124K Rust LOC | `Get-ChildItem -Recurse -Include *.rs \| Get-Content \| Measure-Object -Line` on crates/ | âœ… Verified (124,627 lines) |
+| ~74K TypeScript LOC | Same method on ui/ directory (.ts, .tsx, .js, .jsx) | âœ… Verified (74,141 lines) |
+| Apache-2.0 license | LICENSE file header | âœ… Verified |
+| First commit 2024-08-23 | GitHub API `created_at` | âœ… Verified |
+| Latest release v1.29.1 | GitHub API `/releases/latest` | âœ… Verified (2026-04-03) |
+| Version in Cargo.toml: 1.30.0 | `crates/goose/Cargo.toml` workspace version | âœ… Verified |
+| 30+ providers | Provider modules in `crates/goose/src/providers/mod.rs` | âœ… Verified (30+ pub mod entries) |
+| 5 tool inspectors | `create_tool_inspection_manager()` in agent.rs | âœ… Verified |
+| 6 extension types | `ExtensionConfig` enum in extension.rs | âœ… Verified (Sse, Stdio, Builtin, Platform, StreamableHttp, Frontend, InlinePython = 7 variants, Sse deprecated) |
+| `crates/goose/src/agents/agent.rs` exists | File read | âœ… Verified |
+| `crates/goose/src/agents/extension.rs` exists | File read | âœ… Verified |
+| `crates/goose/src/security/mod.rs` exists | File read | âœ… Verified |
+| 31 disallowed env vars | `DISALLOWED_KEYS` array in extension.rs | âœ… Verified |
+| Default max turns = 1000 | `DEFAULT_MAX_TURNS` constant in agent.rs | âœ… Verified |
+| Default compaction threshold = 0.8 | `DEFAULT_COMPACTION_THRESHOLD` in context_mgmt/mod.rs | âœ… Verified |
 
 </details>
 

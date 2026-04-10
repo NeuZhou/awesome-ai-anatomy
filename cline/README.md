@@ -1,4 +1,4 @@
-# Cline: 60K Stars, a 3,756-Line Core Class, and the VS Code Extension That Became an Agent Framework
+﻿# Cline: 60K Stars, a 3,756-Line Core Class, and the VS Code Extension That Became an Agent Framework
 
 > The most popular open-source coding agent is a VS Code sidebar panel. 560K lines of TypeScript, 40+ API providers, 28 tools, a hooks system, sub-agents, browser automation, MCP integration, and a "Focus Chain" task tracker — all stuffed into a single extension. I read every key file and found a codebase that grew organically from a weekend project into an enterprise platform, every layer reflecting a phase of that journey.
 
@@ -20,19 +20,15 @@ Cline is a VS Code extension that puts an AI coding agent in your sidebar. You d
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | B- | 3,756-line core class (`Task`), permission-by-polling, ambitious 4-layer hierarchy (Extension → Controller → Task → ToolExecutor) |
-| Code Quality | B- | Competent TypeScript overall, but critical files have hundreds of lines of duplicated ask/say patterns and deeply nested control flow |
-| Security | B | Human-in-the-loop by default is solid, but "YOLO mode" is one toggle away from auto-approving everything including shell commands |
-| Extensibility | A- | 40+ provider adapters, MCP integration, hooks system, skills, and custom rules — the extension story is the best part |
-| Documentation | B+ | `.clinerules/cline-overview.md` is an excellent internal architecture doc; the hooks and prompt variant systems are well-documented |
-| **Overall** | **B+** | **Feature-rich coding agent with the broadest provider support; extracting the Task class into focused modules would unlock contributor velocity** |
-
----
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | 4-layer hierarchy (Extension→Controller→Task→ToolExecutor), 3756-line Task god object, callback-injection coupling with 20+ constructor params |
+| Code Organization | 560K LOC TypeScript, VS Code extension + React webview, npm package still named 'claude-dev' |
+| Security Approach | human-in-the-loop approval by default via webview polling, YOLO mode toggle auto-approves all actions including shell |
+| Context Strategy | truncation-based: drops oldest messages when context window is full, no summarization |
+| Documentation | .clinerules/cline-overview.md internal architecture doc, hooks and prompt variant systems documented |
 ## Table of Contents
 
 - [Architecture Overview](#architecture-overview)
@@ -519,25 +515,25 @@ Would I use Cline? Yes — the VS Code integration and provider diversity are un
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| ~60K stars | Task description states "60K GitHub stars" | ✅ Per specification |
-| ~560K lines | Task description states "~560K lines TypeScript" | ✅ Per specification |
-| 3,756 lines in Task | Counted `src/core/task/index.ts` (200 header + 3,556 remaining) | ✅ Verified via `read` |
-| 28 tools in ClineDefaultTool enum | Counted enum values in `src/shared/tools.ts` | ✅ Verified (28 entries) |
-| 43 provider files | Listed `src/core/api/providers/` directory | ✅ Verified |
-| Apache-2.0 license | Read `package.json` | ✅ Verified |
-| Package name is `claude-dev` | Read `package.json` first line | ✅ Verified |
-| Version 3.77.0 | Read `package.json` version field | ✅ Verified |
-| Puppeteer used (not Playwright) | Read `BrowserSession.ts` imports | ✅ Verified (puppeteer-core) |
-| ToolExecutor 30+ constructor params | Read `ToolExecutor.ts` constructor | ✅ Verified |
-| `pWaitFor` polling at 100ms | Read `Task.ask()` method | ✅ Verified |
-| YOLO mode auto-approves everything | Read `autoApprove.ts` | ✅ Verified |
-| 8 hook types | Read `hook-executor.ts` and hook references in `Task` | ✅ Verified |
-| Focus Chain uses chokidar | Read `src/core/task/focus-chain/index.ts` | ✅ Verified |
-| McpHub 1,700+ lines | Read file header showing continuation needed | ✅ Verified |
-| ContextManager quarter truncation | Read `ContextManager.ts` | ✅ Verified |
-| `recursivelyMakeClineRequests` is recursive | Read method — calls itself directly | ✅ Verified |
-| SubagentRunner in-process | Read `SubagentRunner.ts` — no process spawning | ✅ Verified |
-| Prompt variant names | Listed `src/core/prompts/system-prompt/variants/` | ✅ Verified |
+| ~60K stars | Task description states "60K GitHub stars" | âœ… Per specification |
+| ~560K lines | Task description states "~560K lines TypeScript" | âœ… Per specification |
+| 3,756 lines in Task | Counted `src/core/task/index.ts` (200 header + 3,556 remaining) | âœ… Verified via `read` |
+| 28 tools in ClineDefaultTool enum | Counted enum values in `src/shared/tools.ts` | âœ… Verified (28 entries) |
+| 43 provider files | Listed `src/core/api/providers/` directory | âœ… Verified |
+| Apache-2.0 license | Read `package.json` | âœ… Verified |
+| Package name is `claude-dev` | Read `package.json` first line | âœ… Verified |
+| Version 3.77.0 | Read `package.json` version field | âœ… Verified |
+| Puppeteer used (not Playwright) | Read `BrowserSession.ts` imports | âœ… Verified (puppeteer-core) |
+| ToolExecutor 30+ constructor params | Read `ToolExecutor.ts` constructor | âœ… Verified |
+| `pWaitFor` polling at 100ms | Read `Task.ask()` method | âœ… Verified |
+| YOLO mode auto-approves everything | Read `autoApprove.ts` | âœ… Verified |
+| 8 hook types | Read `hook-executor.ts` and hook references in `Task` | âœ… Verified |
+| Focus Chain uses chokidar | Read `src/core/task/focus-chain/index.ts` | âœ… Verified |
+| McpHub 1,700+ lines | Read file header showing continuation needed | âœ… Verified |
+| ContextManager quarter truncation | Read `ContextManager.ts` | âœ… Verified |
+| `recursivelyMakeClineRequests` is recursive | Read method — calls itself directly | âœ… Verified |
+| SubagentRunner in-process | Read `SubagentRunner.ts` — no process spawning | âœ… Verified |
+| Prompt variant names | Listed `src/core/prompts/system-prompt/variants/` | âœ… Verified |
 
 </details>
 

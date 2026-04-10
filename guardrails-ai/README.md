@@ -1,4 +1,4 @@
-# Guardrails AI: A 1076-Line Core Class Guarding Your LLM's Output — and the Reask Loop That Makes It Work
+﻿# Guardrails AI: A 1076-Line Core Class Guarding Your LLM's Output — and the Reask Loop That Makes It Work
 
 > Guardrails AI is closer to a package manager with a validation engine bolted on than to a security tool — and that distinction matters more than the branding suggests.
 
@@ -20,16 +20,15 @@ Guardrails AI wraps LLM API calls and validates the output against a schema you 
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | B+ | Single responsibility: validate LLM output against schemas. Validator Hub (pip-install from git) is a distribution model worth noting |
-| Code Quality | B+ | 18K LOC in 178 files; Guard class (1076 lines) holds too much state but the reask loop logic is well-separated |
-| Security | B | Validators pip-install from git URLs — supply chain risk if Hub packages are compromised |
-| Documentation | A- | API docs and validator catalog are thorough; internal reask loop mechanics less documented |
-| **Overall** | **B+** | **Focused scope, reask loop is the key innovation; 1076-line Guard class needs decomposition** |
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | onion-shape: Guard wraps Runner wraps ValidatorService wraps individual Validators, async validator execution by default |
+| Code Organization | 18K LOC Python in 178 files, 1076-line Guard central orchestrator class, Pydantic v2 + LiteLLM + OpenTelemetry |
+| Security Approach | validators pip-install from git URLs via Validator Hub (npm-for-LLM-constraints), supply chain risk on Hub packages |
+| Context Strategy | streaming chunk accumulation: accumulates LLM response chunks until sentence boundary before validating |
+| Documentation | API docs and validator catalog thorough, jsonformer escape hatch under @experimental decorator, reask loop mechanics less documented |
 ## Architecture
 
 
@@ -318,20 +317,20 @@ The honest take: if you're building a chatbot that needs to return valid JSON wi
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 6,635 stars | GitHub API `Invoke-RestMethod` | ✅ Verified (2026-04-06) |
-| 561 forks | GitHub API `Invoke-RestMethod` | ✅ Verified (2026-04-06) |
-| Apache-2.0 license | GitHub API `license.spdx_id` | ✅ Verified |
-| 18,079 lines of Python | `Get-Content | Measure-Object -Line` on 178 .py files in `guardrails/` | ✅ Verified |
-| First commit 2023-01-29 | GitHub API `created_at` | ✅ Verified |
-| v0.10.0 | `pyproject.toml` version field | ✅ Verified |
-| `guard.py` line count | `Get-Content | Measure-Object -Line` | ✅ Verified: 1,076 lines |
-| `runner.py` line count | `Get-Content | Measure-Object -Line` | ✅ Verified: 457 lines |
-| 8 OnFailAction variants | `types/on_fail.py` source | ✅ Verified |
-| RAIL XML parsing in `rail_schema.py` | File exists, 815 lines | ✅ Verified |
-| `_configure_hub_telemtry` typo | `guard.py` source grep | ✅ Verified |
-| `text2sql.py` exists | `applications/text2sql.py` file check | ✅ Verified |
-| Hub registry is JSON | `types/validator_registry.py` + `hub/registry.py` source | ✅ Verified |
-| `@experimental` decorator | `guardrails/decorators/experimental.py` file exists | ✅ Verified |
+| 6,635 stars | GitHub API `Invoke-RestMethod` | âœ… Verified (2026-04-06) |
+| 561 forks | GitHub API `Invoke-RestMethod` | âœ… Verified (2026-04-06) |
+| Apache-2.0 license | GitHub API `license.spdx_id` | âœ… Verified |
+| 18,079 lines of Python | `Get-Content | Measure-Object -Line` on 178 .py files in `guardrails/` | âœ… Verified |
+| First commit 2023-01-29 | GitHub API `created_at` | âœ… Verified |
+| v0.10.0 | `pyproject.toml` version field | âœ… Verified |
+| `guard.py` line count | `Get-Content | Measure-Object -Line` | âœ… Verified: 1,076 lines |
+| `runner.py` line count | `Get-Content | Measure-Object -Line` | âœ… Verified: 457 lines |
+| 8 OnFailAction variants | `types/on_fail.py` source | âœ… Verified |
+| RAIL XML parsing in `rail_schema.py` | File exists, 815 lines | âœ… Verified |
+| `_configure_hub_telemtry` typo | `guard.py` source grep | âœ… Verified |
+| `text2sql.py` exists | `applications/text2sql.py` file check | âœ… Verified |
+| Hub registry is JSON | `types/validator_registry.py` + `hub/registry.py` source | âœ… Verified |
+| `@experimental` decorator | `guardrails/decorators/experimental.py` file exists | âœ… Verified |
 
 </details>
 

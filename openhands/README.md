@@ -1,4 +1,4 @@
-# OpenHands/OpenHands: The 70K-Star Agent That's Rewriting Itself While You Watch
+﻿# OpenHands/OpenHands: The 70K-Star Agent That's Rewriting Itself While You Watch
 
 > OpenHands is in the middle of an ambitious architecture migration. The V0 "legacy" agent loop is 1,391 lines of event-driven Python with a 487-line stuck detector. The V1 replacement lives in a separate SDK repo that doesn't exist yet in this tree. Every core file has a deprecation banner dated April 1, 2026. That date has passed. The old code is still running.
 
@@ -21,17 +21,15 @@ OpenHands is a web-based AI agent platform for software development. It runs cod
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | B+ | Ambitious multi-agent design with Docker sandboxing; V0/V1 transition creates confusion |
-| Code Quality | B | Solid Python with type hints; 287K lines with clear module boundaries but God Object in controller |
-| Security | A- | Three-layer security (GraySwan + Invariant + LLM) is the most structured approach in any open-source agent |
-| Memory/Context | A | 10 condenser strategies including structured summary and amortized forgetting — best in class |
-| Documentation | B- | Code comments are good; architectural docs assume you know the V0/V1 split |
-| **Overall** | **B+** | **The condenser system and security architecture are unique in the open-source agent space; the V0/V1 migration debt is the defining architectural story right now** |
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | event-driven agent loop (1391 lines), 6 agent types, Docker sandbox per session, V0/V1 architecture coexisting mid-migration |
+| Code Organization | 400K LOC (287K Python + 114K TypeScript), FastAPI server, LiteLLM providers, 21157-node GitNexus index with 1102 clusters |
+| Security Approach | 3-layer: GraySwan (adversarial testing) + Invariant (runtime policy) + LLM-analyzer (semantic review of agent actions) |
+| Context Strategy | 10-condenser pipeline: progressive compression from observation masking to structured summarization to amortized forgetting |
+| Documentation | code comments solid, architectural docs assume familiarity with V0/V1 split, deprecation banners dated April 1 2026 |
 ## Architecture
 
 ![Architecture](architecture.png)
@@ -159,9 +157,9 @@ The `AmortizedForgettingCondenser` (69 lines) is clever: instead of hard-truncat
 
 ```
 SecurityAnalyzer (base)
-├── GraySwanAnalyzer     → External API (Cygnal) — ML-based risk scoring
-├── InvariantAnalyzer    → Policy engine — rule-based action filtering
-└── LLMRiskAnalyzer      → LLM-based — asks the model to evaluate its own actions
+â”œâ”€â”€ GraySwanAnalyzer     → External API (Cygnal) — ML-based risk scoring
+â”œâ”€â”€ InvariantAnalyzer    → Policy engine — rule-based action filtering
+â””â”€â”€ LLMRiskAnalyzer      → LLM-based — asks the model to evaluate its own actions
 ```
 
 **GraySwan** (208 lines) calls an external API (Cygnal) with the recent conversation history, gets back a risk score, and maps it to LOW/MEDIUM/HIGH using configurable thresholds. It converts the OpenHands event stream to OpenAI message format before sending. This is the "phone a friend" approach — outsource the security judgment to a specialized model.
@@ -213,19 +211,19 @@ OpenHands uses an event sourcing architecture. Everything is an `Event` — acti
 
 ```
 User message → MessageAction → EventStream
-                                    ↓
+                                    â†“
 AgentController.on_event() → step() → agent.step(state)
-                                    ↓
+                                    â†“
                               Action (e.g., CmdRunAction)
-                                    ↓
+                                    â†“
                           SecurityAnalyzer.security_risk()
-                                    ↓
+                                    â†“
                           Runtime.execute(action)
-                                    ↓
+                                    â†“
                           Observation (e.g., CmdOutputObservation)
-                                    ↓
+                                    â†“
                               EventStream → AgentController
-                                    ↓
+                                    â†“
                               Next step...
 ```
 

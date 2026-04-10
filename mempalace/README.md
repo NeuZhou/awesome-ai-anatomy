@@ -1,4 +1,4 @@
-# MemPalace: 9,000 Lines of Python, 30,000 Stars, and an Actress
+﻿# MemPalace: 9,000 Lines of Python, 30,000 Stars, and an Actress
 
 > A Resident Evil star and a developer open-sourced a ChromaDB wrapper with a metaphor layer. Four days later it has 30K stars and a community that already debunked half the README claims. The 4-layer memory stack is a good idea. The AAAK dialect is not. The benchmarks are real — once you read the asterisks.
 
@@ -21,20 +21,15 @@ MemPalace is an AI memory system that stores verbatim conversation text in Chrom
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | B+ | 4-layer memory stack is clean design — wake-up cost of ~600 tokens is smart |
-| Code Quality | B | Clear Python, 25 files, no God Objects — but zero type hints, no mypy |
-| Security | C+ | Shell injection in hooks is a known issue (issue #110, actively discussed) |
-| Benchmarks | B | 96.6% R@5 on LongMemEval is real and reproduced — AAAK claims were corrected in the April 7 update |
-| Documentation | A- | The April 7 correction note is a model for how to handle community feedback |
-| Innovation | B | Palace metaphor over ChromaDB adds real retrieval value (+34% R@10 with filtering) |
-| **Overall** | **B** | **Good bones, launched with bold claims, corrected quickly. The memory stack design is worth studying. AAAK needs iteration before it delivers on its promise.** |
-
----
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | 4-layer memory stack (identity→essential facts→topic-scoped recall→full search), ChromaDB palace metaphor with wings/rooms/halls/tunnels/closets/drawers |
+| Code Organization | 15.5K LOC Python in 25 files, 19 MCP tools, no type hints, no mypy, version 3.0.14 on a 4-day-old project |
+| Security Approach | shell injection in hooks (issue #110) — SESSION_ID used before sanitization, no input validation on MCP tool parameters |
+| Context Strategy | layered loading: ~600 token wake-up cost (identity + essential facts), topic-scoped recall on demand, full ChromaDB search only when needed |
+| Documentation | April 7 correction note acknowledging wrong AAAK token counting and misleading benchmarks, auto-teach via MCP status tool response |
 ## Architecture
 
 ![Architecture](architecture.png)

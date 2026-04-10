@@ -1,4 +1,4 @@
-# MiroFish: What 'Collective Intelligence' Means Inside a 50K-Star Simulation Engine
+﻿# MiroFish: What 'Collective Intelligence' Means Inside a 50K-Star Simulation Engine
 
 > I expected to find some clever collective intelligence algorithm — particle swarm, ant colony, or at least some evolutionary computation variant. Cloned the repo, read the code. The core prediction capability runs entirely on LLM role-playing + social media simulation. That finding made me rethink what "collective intelligence" means in 2026.
 
@@ -20,16 +20,15 @@ What MiroFish does, in plain terms: you feed it a document (news article, policy
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | B- | Delegates simulation to OASIS; Flask orchestration manages 5+ LLM call points |
-| Code Quality | B- | 38.8K LOC; encoding hacks for Windows (force UTF-8 at startup), OASIS integration could be tighter |
-| Security | C+ | No input sanitization on uploads; auth layer needed for production |
-| Documentation | B- | README emphasizes "collective intelligence"; code docs could better explain the simulation methodology |
-| **Overall** | **B-** | **LLM social simulation is a novel framing that resonated with 50K users; tighter input validation and OASIS coupling are the main improvement areas** |
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | Vue.js wizard UI → Flask API → 5+ LLM call chain (ontology→profiles→sim config→agent behavior→report), core simulation delegated to OASIS (camel-ai) |
+| Code Organization | 38.8K LOC (20K Python + 18.8K Vue/JS), 60 source files, backend/app/services/ one file per pipeline stage |
+| Security Approach | no input sanitization on uploads, no auth layer, builtins.open monkey-patch forces UTF-8 on Windows |
+| Context Strategy | no context management — stateless simulation pipeline, each run is independent |
+| Documentation | README emphasizes 'collective intelligence' framing, simulation methodology under-documented |
 ## Architecture
 
 
@@ -107,7 +106,7 @@ unused_tools = all_tools - used_tools
 unused_hint = ""
 if unused_tools and tool_calls_count < self.MAX_TOOL_CALLS_PER_SECTION:
  unused_hint = REACT_UNUSED_TOOLS_HINT.format(
- unused_list="、".join(unused_tools)
+ unused_list="ã€".join(unused_tools)
  )
 ```
 
@@ -139,7 +138,7 @@ The generation process supports real-time file writes (save after each profile i
 
 How the simulation runs: the Flask backend spawns a subprocess running `run_parallel_simulation.py`, which uses `asyncio.gather` to launch Twitter and Reddit platform simulations in parallel. Each platform maintains its own SQLite database recording all agent actions.
 
-The time simulation design hard-codes Chinese daily patterns (activity 0.05 from midnight–5am, activity 1.5 from 7–10pm). While the README claims to support "predicting everything," this default config is clearly built for Chinese public opinion scenarios.
+The time simulation design hard-codes Chinese daily patterns (activity 0.05 from midnight—5am, activity 1.5 from 7—10pm). While the README claims to support "predicting everything," this default config is clearly built for Chinese public opinion scenarios.
 
 An interesting detail: on Windows, the simulation script monkey-patches the built-in `open()` function, forcing all file operations without explicit encoding to use UTF-8:
 
@@ -254,22 +253,22 @@ The `builtins.open` monkey-patch in the code is the "nuclear option" for Windows
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 50,223 stars | GitHub API `stargazers_count` | ✅ Verified (2026-04-06) |
-| 7,385 forks | GitHub API `forks_count` | ✅ Verified |
-| Python + Vue.js | Repo file structure | ✅ Verified |
-| ~38,800 LOC | PowerShell `Measure-Object -Line` on *.py + *.vue + *.js | ✅ Verified (Python 20,025 + Vue/JS 18,790) |
-| AGPL-3.0 License | `LICENSE` file header | ✅ Verified |
-| Created 2025-11-26 | GitHub API `created_at` | ✅ Verified |
-| 60 source files | `Get-ChildItem -Include *.py,*.vue,*.js \| Measure-Object` | ✅ Verified |
-| OASIS (camel-oasis==0.2.5) | `requirements.txt` | ✅ Verified |
-| Zep Cloud dependency | `requirements.txt` (zep-cloud==3.13.0) + `config.py` | ✅ Verified |
-| `backend/app/services/report_agent.py` exists | File read | ✅ Verified |
-| `backend/scripts/run_parallel_simulation.py` exists | File read | ✅ Verified |
-| monkey-patch `builtins.open` | `run_parallel_simulation.py:30` | ✅ Verified |
-| No test files | Repo file structure | ✅ Verified (only test_profile_format.py) |
-| Shanda Group support | `README.md` Acknowledgments | ✅ Verified |
-| Dual-platform parallel simulation | `run_parallel_simulation.py` + `asyncio.gather` | ✅ Verified |
-| IPC via filesystem | `ParallelIPCHandler` class | ✅ Verified |
+| 50,223 stars | GitHub API `stargazers_count` | âœ… Verified (2026-04-06) |
+| 7,385 forks | GitHub API `forks_count` | âœ… Verified |
+| Python + Vue.js | Repo file structure | âœ… Verified |
+| ~38,800 LOC | PowerShell `Measure-Object -Line` on *.py + *.vue + *.js | âœ… Verified (Python 20,025 + Vue/JS 18,790) |
+| AGPL-3.0 License | `LICENSE` file header | âœ… Verified |
+| Created 2025-11-26 | GitHub API `created_at` | âœ… Verified |
+| 60 source files | `Get-ChildItem -Include *.py,*.vue,*.js \| Measure-Object` | âœ… Verified |
+| OASIS (camel-oasis==0.2.5) | `requirements.txt` | âœ… Verified |
+| Zep Cloud dependency | `requirements.txt` (zep-cloud==3.13.0) + `config.py` | âœ… Verified |
+| `backend/app/services/report_agent.py` exists | File read | âœ… Verified |
+| `backend/scripts/run_parallel_simulation.py` exists | File read | âœ… Verified |
+| monkey-patch `builtins.open` | `run_parallel_simulation.py:30` | âœ… Verified |
+| No test files | Repo file structure | âœ… Verified (only test_profile_format.py) |
+| Shanda Group support | `README.md` Acknowledgments | âœ… Verified |
+| Dual-platform parallel simulation | `run_parallel_simulation.py` + `asyncio.gather` | âœ… Verified |
+| IPC via filesystem | `ParallelIPCHandler` class | âœ… Verified |
 
 </details>
 

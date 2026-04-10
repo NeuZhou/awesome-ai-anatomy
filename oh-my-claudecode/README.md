@@ -1,4 +1,4 @@
-# oh-my-claudecode: 19 Agents, File-Based IPC, and a Very Ambitious Plugin
+﻿# oh-my-claudecode: 19 Agents, File-Based IPC, and a Very Ambitious Plugin
 
 > Someone took Claude Code and strapped a 19-agent team orchestration system on top of it. I read through 194K lines of TypeScript to figure out if it works.
 
@@ -23,16 +23,15 @@ The weird part: it also spawns Codex and Gemini CLI workers alongside Claude. So
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | B+ | 19-agent orchestration via file-based IPC with mkdir locking; model tier routing (Haiku/Opus) for cost control |
-| Code Quality | B | 194K LOC TypeScript; file-based dispatch is clever but mkdir locking has no deadlock prevention |
-| Security | B- | Depends entirely on Claude Code's internals; one Anthropic release can break the plugin |
-| Documentation | B | Agent roles and phase pipeline documented; IPC protocol and failure modes are not |
-| **Overall** | **B** | **Tri-model team (Claude+Codex+Gemini) via tmux is ambitious; fragility from host dependency is the real risk** |
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | 19-agent team via file-based IPC (inbox/outbox JSONL), mkdir-based cross-process locking with stale lock detection, tri-model coordination (Claude+Codex+Gemini) |
+| Code Organization | 194K LOC TypeScript, Claude Code plugin that also ships as npm package, phase controller infers state from task status distribution |
+| Security Approach | inherits Claude Code's permission model, no independent security layer — one Anthropic release can break the plugin |
+| Context Strategy | no built-in context management — delegates to host agent (Claude Code/Codex/Gemini CLI) |
+| Documentation | agent roles and 5-phase pipeline (plan→prd→exec→verify→fix) documented, IPC protocol and failure modes undocumented |
 ## Architecture
 
 
@@ -50,20 +49,20 @@ This is the thing that makes OMC architecturally unique. Instead of thread pools
 
 ```
 .omc/state/team/{team-name}/
-├── dispatch/
-│ ├── requests.json ← task queue (mutex-locked via mkdir)
-│ └── .lock/ ← directory-based lock (O_EXCL mkdir)
-├── workers/
-│ ├── worker-0/
-│ │ ├── inbox.jsonl ← messages TO this worker
-│ │ ├── outbox.jsonl ← messages FROM this worker
-│ │ └── heartbeat.json
-│ └── worker-1/
-│ └── ...
-├── tasks/
-│ ├── task-001.json
-│ └── task-002.json
-└── shutdown.signal ← graceful shutdown
+â”œâ”€â”€ dispatch/
+â”‚ â”œâ”€â”€ requests.json â† task queue (mutex-locked via mkdir)
+â”‚ â””â”€â”€ .lock/ â† directory-based lock (O_EXCL mkdir)
+â”œâ”€â”€ workers/
+â”‚ â”œâ”€â”€ worker-0/
+â”‚ â”‚ â”œâ”€â”€ inbox.jsonl â† messages TO this worker
+â”‚ â”‚ â”œâ”€â”€ outbox.jsonl â† messages FROM this worker
+â”‚ â”‚ â””â”€â”€ heartbeat.json
+â”‚ â””â”€â”€ worker-1/
+â”‚ â””â”€â”€ ...
+â”œâ”€â”€ tasks/
+â”‚ â”œâ”€â”€ task-001.json
+â”‚ â””â”€â”€ task-002.json
+â””â”€â”€ shutdown.signal â† graceful shutdown
 ```
 
 The locking mechanism is `mkdir`-based (O_EXCL flag) — creating a directory is atomic on all filesystems, so it works as a cross-process mutex without needing advisory file locks. Stale locks are detected and cleaned up after 5 minutes.
@@ -125,7 +124,7 @@ One thing to keep in mind: as a **plugin** that depends on Claude Code's interna
 |---------|-----------------|----------|-------------|-------------|
 | Architecture | Plugin on Claude Code | Standalone (LangGraph) | Standalone (Python) | Standalone |
 | Agent count | 19 specialized | 1 lead + subagents | 1 lead + subagents | 1 |
-| Multi-model | ✅ Claude+Codex+Gemini | ❌ Single provider | ✅ Any provider | ❌ Claude only |
+| Multi-model | âœ… Claude+Codex+Gemini | âŒ Single provider | âœ… Any provider | âŒ Claude only |
 | IPC mechanism | File-based (inbox/outbox) | Thread pool | In-process delegate | N/A |
 | Team pipeline | plan→exec→verify→fix | N/A | N/A | N/A |
 | Model routing | Haiku/Sonnet/Opus tiers | Config-based | Config-based | N/A |
@@ -149,12 +148,12 @@ One thing to keep in mind: as a **plugin** that depends on Claude Code's interna
 
 | Claim | Method | Result |
 |-------|--------|--------|
-| 24,423 stars | GitHub API | ✅ |
-| 194K LOC | wc -l on src/**/*.ts | ✅ |
-| 19 agents | Counted in definitions.ts | ✅ |
-| 125 files in team/ | ls count | ✅ |
-| mkdir-based locking | dispatch-queue.ts source | ✅ |
-| File paths referenced | Verified exist in clone | ✅ |
+| 24,423 stars | GitHub API | âœ… |
+| 194K LOC | wc -l on src/**/*.ts | âœ… |
+| 19 agents | Counted in definitions.ts | âœ… |
+| 125 files in team/ | ls count | âœ… |
+| mkdir-based locking | dispatch-queue.ts source | âœ… |
+| File paths referenced | Verified exist in clone | âœ… |
 
 </details>
 

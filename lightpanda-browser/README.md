@@ -1,4 +1,4 @@
-# Lightpanda: The Zig Browser That's 9x Faster Than Chrome — Thanks to a Bitcast Trick Nobody Uses
+﻿# Lightpanda: The Zig Browser That's 9x Faster Than Chrome — Thanks to a Bitcast Trick Nobody Uses
 
 > I spent a week inside 90K lines of Zig to understand what it takes to build a browser engine from zero — not a Chromium fork, not a WebKit patch, but a real parser-to-CDP pipeline written in a language most web developers have never touched.
 
@@ -22,16 +22,15 @@ The pitch: 9x faster than Chrome, 16x less memory, instant startup. The reality:
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | A | From-scratch browser: Zig parser to V8 to CDP, no Chromium dependency. html5ever via Rust FFI for correct HTML parsing |
-| Code Quality | A | 90K Zig LOC, bitcast dispatch for tagged unions avoids vtable overhead; Go test runner for CDP conformance |
-| Security | B | BoringSSL for TLS, but no process isolation — single-process model means a V8 exploit owns the host |
-| Documentation | B | Architecture is inferable from code structure; no formal spec for which CDP commands are supported vs stubbed |
-| **Overall** | **A-** | **Building a browser from scratch in Zig is a legitimate technical achievement; 9x/16x benchmarks are real but scope-limited** |
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | from-scratch browser pipeline: libcurl → html5ever (Rust FFI) → Zig DOM → V8 JS → CDP WebSocket, 15 CDP domains in 7123 lines |
+| Code Organization | 91K Zig + 744 Rust FFI, Page.zig (3660 lines) as lifecycle manager, Go test runner for CDP conformance |
+| Security Approach | BoringSSL for TLS, single-process model with no process isolation — V8 exploit owns the host |
+| Context Strategy | no context management — stateless headless browser, one CDP connection per server instance |
+| Documentation | architecture inferable from code structure, no formal spec for CDP command support vs stubs |
 ## Architecture
 
 
@@ -137,10 +136,10 @@ Is this worth the cleverness? For a hot path that processes every CDP message, a
 
 Each domain handler follows the same structure — it receives a `Command`, parses domain-specific params, executes against the browser state, and sends back results. The 15 implemented domains are: Accessibility, Browser, CSS, DOM, Emulation, Fetch, Input, Inspector, Log, LP (proprietary), Network, Page, Performance, Runtime, Security, Storage, and Target.
 
-### 2. The html5ever FFI: Zig ↔ Rust ↔ Zig
+### 2. The html5ever FFI: Zig â†” Rust â†” Zig
 
 
-![2. The html5ever FFI: Zig ↔ Rust ↔ Zig](lightpanda-browser-3.png)
+![2. The html5ever FFI: Zig â†” Rust â†” Zig](lightpanda-browser-3.png)
 
 Lightpanda doesn't write its own HTML parser. It delegates to Servo's `html5ever`, a mature, spec-compliant HTML5 parser written in Rust. The FFI boundary is surprisingly clean — and surprisingly callback-heavy.
 
@@ -337,26 +336,26 @@ There's a `LP` CDP domain (the only non-standard one) in `domains/lp.zig`. This 
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 27,287 stars | GitHub API | ✅ Verified (2026-04-06) |
-| 1,120 forks | GitHub API | ✅ Verified (2026-04-06) |
-| ~91K lines of Zig | line count of src/**/*.zig | ✅ 90,498 lines in 328 files |
-| 744 lines of Rust | line count of src/html5ever/*.rs | ✅ Verified |
-| AGPL-3.0 license | GitHub API | ✅ Verified |
-| First commit 2023-02-07 | GitHub API created_at | ✅ Verified |
-| Latest release 0.2.8 | GitHub Releases API | ✅ 2026-04-02 |
-| 15 CDP domains | ls src/cdp/domains/*.zig | ✅ 17 files (15 domains + lp + testing helper) |
-| 60+ Web API files | ls src/browser/webapi/**/*.zig | ✅ 60 top-level + subdirectory files |
-| Page.zig ~3,660 lines | count of src/browser/Page.zig | ✅ 3,663 lines |
-| 334 HTML test files | count of src/**/*.html | ✅ 334 files |
-| V8 via zig-v8-fork | build.zig.zon dependency | ✅ v0.3.7 |
-| html5ever from Servo | Cargo.toml dependency | ✅ Verified |
-| libcurl integration | build.zig linkCurl function | ✅ curl-8.18.0 |
-| BoringSSL for TLS | build.zig buildBoringSsl | ✅ via boringssl-zig |
-| "9x faster, 16x less memory" claim | README benchmarks link | ✅ Links to benchmarks repo |
-| Zig 0.15.2 requirement | build.zig.zon minimum_zig_version | ✅ Verified |
-| MCP server support | src/mcp/ directory (5 files) | ✅ 1,733 lines |
-| No CORS implementation | README status checklist | ✅ Unchecked, issue #2015 |
-| 14 callbacks in html5ever FFI | src/html5ever/lib.rs function signature | ✅ Counted |
+| 27,287 stars | GitHub API | âœ… Verified (2026-04-06) |
+| 1,120 forks | GitHub API | âœ… Verified (2026-04-06) |
+| ~91K lines of Zig | line count of src/**/*.zig | âœ… 90,498 lines in 328 files |
+| 744 lines of Rust | line count of src/html5ever/*.rs | âœ… Verified |
+| AGPL-3.0 license | GitHub API | âœ… Verified |
+| First commit 2023-02-07 | GitHub API created_at | âœ… Verified |
+| Latest release 0.2.8 | GitHub Releases API | âœ… 2026-04-02 |
+| 15 CDP domains | ls src/cdp/domains/*.zig | âœ… 17 files (15 domains + lp + testing helper) |
+| 60+ Web API files | ls src/browser/webapi/**/*.zig | âœ… 60 top-level + subdirectory files |
+| Page.zig ~3,660 lines | count of src/browser/Page.zig | âœ… 3,663 lines |
+| 334 HTML test files | count of src/**/*.html | âœ… 334 files |
+| V8 via zig-v8-fork | build.zig.zon dependency | âœ… v0.3.7 |
+| html5ever from Servo | Cargo.toml dependency | âœ… Verified |
+| libcurl integration | build.zig linkCurl function | âœ… curl-8.18.0 |
+| BoringSSL for TLS | build.zig buildBoringSsl | âœ… via boringssl-zig |
+| "9x faster, 16x less memory" claim | README benchmarks link | âœ… Links to benchmarks repo |
+| Zig 0.15.2 requirement | build.zig.zon minimum_zig_version | âœ… Verified |
+| MCP server support | src/mcp/ directory (5 files) | âœ… 1,733 lines |
+| No CORS implementation | README status checklist | âœ… Unchecked, issue #2015 |
+| 14 callbacks in html5ever FFI | src/html5ever/lib.rs function signature | âœ… Counted |
 
 </details>
 

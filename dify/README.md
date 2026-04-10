@@ -1,4 +1,4 @@
-# Dify: 1.2 Million Lines of "Make AI Easy" and the Complexity It Creates
+﻿# Dify: 1.2 Million Lines of "Make AI Easy" and the Complexity It Creates
 
 > I went through Dify's source code expecting a low-code wrapper around OpenAI. What I found was a full-blown platform operating system — with its own graph engine, a plugin daemon that runs as a separate process, and support for 30+ vector databases. It's the most ambitious open-source AI project on GitHub — and I mean that as both a compliment and a warning, and that ambition is both its strength and its weight.
 
@@ -20,16 +20,15 @@ Dify is a platform for building AI applications through a visual drag-and-drop i
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | B+ | Graphon engine extracted to standalone PyPI package; 7+ Docker containers and 1600-line docker-compose is real operational overhead |
-| Code Quality | B | 1.28M LOC across Python+TypeScript; graph engine is clean, but plugin daemon adds a second process boundary to debug |
-| Security | B- | SSRF proxy (Squid) is good, but code sandbox isolation relies on a separate Go process with limited audit surface |
-| Documentation | A | End-user docs are thorough; 30+ vector DB integrations each documented |
-| **Overall** | **B+** | **Most feature-complete open-source AI platform; complexity cost is high — graphon extraction was the right call** |
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | graphon DAG engine extracted to standalone PyPI package, 7+ Docker containers, plugin daemon as separate process |
+| Code Organization | 1.28M LOC (513K Python + 770K TypeScript), Flask/Gunicorn + Celery + Next.js + ReactFlow, 1600-line docker-compose |
+| Security Approach | SSRF proxy (Squid) for HTTP node isolation, Go-based code sandbox for user-submitted code execution |
+| Context Strategy | no built-in context management; child engine spawning gives each loop iteration fresh VariablePool and runtime state |
+| Documentation | end-user docs thorough, 30+ vector DB integrations individually documented, 400+ env vars in docker-compose |
 ## Architecture
 
 ![Architecture](architecture.png)
@@ -309,7 +308,7 @@ Dify doesn't load plugins in-process. It runs a Go-based plugin daemon (`dify-pl
 
 ## Hooks & Easter Eggs
 
-- The code sandbox default width/height in test node creation is `114 × 514`. If you know, you know. (From `workflow_entry.py:_create_single_node_graph`)
+- The code sandbox default width/height in test node creation is `114 Ã— 514`. If you know, you know. (From `workflow_entry.py:_create_single_node_graph`)
 - The `WORKFLOW_CALL_MAX_DEPTH` defaults to 5. That means workflows can call sub-workflows up to 5 levels deep. The recursion guard exists because users absolutely will build infinite loops if you let them.
 - The SSRF proxy isn't just for security theater — every HTTP request node and plugin HTTP call routes through Squid. This is one of the few AI platforms that takes SSRF seriously at the infrastructure level rather than just URL-pattern-matching.
 - Dify supports both PostgreSQL and MySQL as the primary database, which is unusual for a project this size. The migration system handles both dialects.
@@ -324,23 +323,23 @@ Dify doesn't load plugins in-process. It runs a Go-based plugin daemon (`dify-pl
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 136,306 stars | GitHub API (`stargazers_count`) | ✅ Verified |
-| 21,259 forks | GitHub API (`forks_count`) | ✅ Verified |
-| ~1,283,000 LOC (513K Python + 770K TS) | PowerShell `Get-Content \| Measure-Object -Line` | ✅ Verified |
-| First commit April 2023 | GitHub API (`created_at: 2023-04-12`) | ✅ Verified |
-| Latest release v1.13.3 | GitHub API releases/latest (`tag_name: 1.13.3`) | ✅ Verified |
-| Modified Apache 2.0 license | `LICENSE` file content | ✅ Verified |
-| `graphon>=0.1.2` dependency | `api/pyproject.toml:31` | ✅ Verified |
-| `workflow_entry.py` exists | File read via `read` tool | ✅ Verified |
-| `node_factory.py` exists | File read via `read` tool | ✅ Verified |
-| `dataset_retrieval.py` ~1,800 lines | File has `[1774 more lines]` at offset 101 → ~1,875 total | ✅ Verified |
-| 7+ containers in docker-compose | Container definitions: api, worker, worker_beat, web, db, redis, nginx, sandbox, plugin_daemon, ssrf_proxy | ✅ Verified |
-| 30+ vector DB support | docker-compose env vars list Weaviate, Qdrant, pgvector, Milvus, Chroma, ES, OpenSearch, OceanBase, TiDB, Oracle, etc. | ✅ Verified |
-| `WORKFLOW_MAX_EXECUTION_STEPS=500` | docker-compose env var | ✅ Verified |
-| `WORKFLOW_MAX_EXECUTION_TIME=1200` | docker-compose env var | ✅ Verified |
-| `WORKFLOW_CALL_MAX_DEPTH=5` | docker-compose env var | ✅ Verified |
-| Node dimensions `114 × 514` | `workflow_entry.py:_create_single_node_graph` default params | ✅ Verified |
-| Plugin daemon runs as separate container | docker-compose `plugin_daemon` service with image `langgenius/dify-plugin-daemon:0.5.3-local` | ✅ Verified |
+| 136,306 stars | GitHub API (`stargazers_count`) | âœ… Verified |
+| 21,259 forks | GitHub API (`forks_count`) | âœ… Verified |
+| ~1,283,000 LOC (513K Python + 770K TS) | PowerShell `Get-Content \| Measure-Object -Line` | âœ… Verified |
+| First commit April 2023 | GitHub API (`created_at: 2023-04-12`) | âœ… Verified |
+| Latest release v1.13.3 | GitHub API releases/latest (`tag_name: 1.13.3`) | âœ… Verified |
+| Modified Apache 2.0 license | `LICENSE` file content | âœ… Verified |
+| `graphon>=0.1.2` dependency | `api/pyproject.toml:31` | âœ… Verified |
+| `workflow_entry.py` exists | File read via `read` tool | âœ… Verified |
+| `node_factory.py` exists | File read via `read` tool | âœ… Verified |
+| `dataset_retrieval.py` ~1,800 lines | File has `[1774 more lines]` at offset 101 → ~1,875 total | âœ… Verified |
+| 7+ containers in docker-compose | Container definitions: api, worker, worker_beat, web, db, redis, nginx, sandbox, plugin_daemon, ssrf_proxy | âœ… Verified |
+| 30+ vector DB support | docker-compose env vars list Weaviate, Qdrant, pgvector, Milvus, Chroma, ES, OpenSearch, OceanBase, TiDB, Oracle, etc. | âœ… Verified |
+| `WORKFLOW_MAX_EXECUTION_STEPS=500` | docker-compose env var | âœ… Verified |
+| `WORKFLOW_MAX_EXECUTION_TIME=1200` | docker-compose env var | âœ… Verified |
+| `WORKFLOW_CALL_MAX_DEPTH=5` | docker-compose env var | âœ… Verified |
+| Node dimensions `114 Ã— 514` | `workflow_entry.py:_create_single_node_graph` default params | âœ… Verified |
+| Plugin daemon runs as separate container | docker-compose `plugin_daemon` service with image `langgenius/dify-plugin-daemon:0.5.3-local` | âœ… Verified |
 
 </details>
 

@@ -1,4 +1,4 @@
-# Hermes Agent: The "OpenClaw Killer" That Ships a `hermes claw migrate` Command
+﻿# Hermes Agent: The "OpenClaw Killer" That Ships a `hermes claw migrate` Command
 
 > Someone on HN called Hermes "the OpenClaw killer." I went and read the source code. Turns out it's a Python evolution of the same ideas with novel additions.
 
@@ -21,16 +21,15 @@ If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SO
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | B | OpenClaw clone structure (SOUL.md/MEMORY.md/AGENTS.md) with FTS5 session search and frozen memory snapshots added |
-| Code Quality | B- | 9000-line single-file agent loop; subagents can't run code or write memory, limiting real utility |
-| Security | B- | Subagent restrictions prioritize safety over flexibility — reasonable for an open platform |
-| Documentation | B- | Self-improving skill system is documented, but migration path from OpenClaw is under-specified |
-| **Overall** | **B** | **Self-improving skills and frozen memory snapshots are novel; extracting the 9,000-line loop into modules would unblock growth** |
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | OpenClaw clone structure (SOUL.md/MEMORY.md/AGENTS.md), 9000-line single-file agent loop (run_agent.py), self-improving skill system |
+| Code Organization | 260K LOC Python, skill auto-creation and self-patching from experience, 'hermes claw migrate' imports OpenClaw config |
+| Security Approach | memory-threat-detection scans memory writes before persisting, subagent restrictions (no code exec, no memory writes, no user interaction) |
+| Context Strategy | frozen memory snapshots: BuiltinMemoryProvider snapshots MEMORY.md at session start for prompt-cache optimization, FTS5 session search for cross-session recall |
+| Documentation | self-improving skill system documented, migration path from OpenClaw under-specified |
 ## Architecture
 
 
@@ -294,23 +293,23 @@ No cost budgets, same as DeerFlow. For an agent that advertises Modal and Dayton
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 26,911 stars | GitHub API (`/repos/NousResearch/hermes-agent`) | ✅ Verified |
-| 3,523 forks | GitHub API | ✅ Verified |
-| Language: Python | GitHub API `language` | ✅ Verified |
-| License: MIT | GitHub API `license.spdx_id` | ✅ Verified |
-| Creator: Nous Research | GitHub org + README | ✅ Verified |
-| First commit 2025-07-22 | GitHub API `created_at` | ✅ Verified |
-| Latest release v2026.4.3 | GitHub API `/releases/latest` | ✅ Verified (2026-04-03) |
-| ~260K lines of code | Reported in At a Glance table | ✅ Consistent with repo analysis |
-| `run_agent.py` is 9,000+ lines | `wc -l` on source file | ✅ Verified |
-| 6 terminal backends | Backend implementations (Local/Docker/SSH/Daytona/Singularity/Modal) | ✅ Verified |
-| `hermes claw migrate` command | CLI source + `--help` output | ✅ Verified |
-| FTS5 session search | `session_search_tool.py` + SQLite schema | ✅ Verified |
-| Frozen memory snapshot | `builtin_memory_provider.py` `system_prompt_block()` | ✅ Verified |
-| `DELEGATE_BLOCKED_TOOLS` frozenset | `delegate_tool.py` source | ✅ Verified (5 blocked tools) |
-| MAX_CONCURRENT_CHILDREN = 3 | `delegate_tool.py` constant | ✅ Verified |
-| Memory threat scanning | `_MEMORY_THREAT_PATTERNS` in memory tool | ✅ Verified |
-| 6 IM channels | Gateway implementations | ✅ Verified (Telegram/Discord/Slack/WhatsApp/Signal/Email) |
+| 26,911 stars | GitHub API (`/repos/NousResearch/hermes-agent`) | âœ… Verified |
+| 3,523 forks | GitHub API | âœ… Verified |
+| Language: Python | GitHub API `language` | âœ… Verified |
+| License: MIT | GitHub API `license.spdx_id` | âœ… Verified |
+| Creator: Nous Research | GitHub org + README | âœ… Verified |
+| First commit 2025-07-22 | GitHub API `created_at` | âœ… Verified |
+| Latest release v2026.4.3 | GitHub API `/releases/latest` | âœ… Verified (2026-04-03) |
+| ~260K lines of code | Reported in At a Glance table | âœ… Consistent with repo analysis |
+| `run_agent.py` is 9,000+ lines | `wc -l` on source file | âœ… Verified |
+| 6 terminal backends | Backend implementations (Local/Docker/SSH/Daytona/Singularity/Modal) | âœ… Verified |
+| `hermes claw migrate` command | CLI source + `--help` output | âœ… Verified |
+| FTS5 session search | `session_search_tool.py` + SQLite schema | âœ… Verified |
+| Frozen memory snapshot | `builtin_memory_provider.py` `system_prompt_block()` | âœ… Verified |
+| `DELEGATE_BLOCKED_TOOLS` frozenset | `delegate_tool.py` source | âœ… Verified (5 blocked tools) |
+| MAX_CONCURRENT_CHILDREN = 3 | `delegate_tool.py` constant | âœ… Verified |
+| Memory threat scanning | `_MEMORY_THREAT_PATTERNS` in memory tool | âœ… Verified |
+| 6 IM channels | Gateway implementations | âœ… Verified (Telegram/Discord/Slack/WhatsApp/Signal/Email) |
 
 </details>
 

@@ -1,4 +1,4 @@
-# OpenAI Codex CLI: 549K Lines of Rust, a Guardian AI That Reviews Its Own AI, and the Most Paranoid Sandbox in Any Coding Agent
+﻿# OpenAI Codex CLI: 549K Lines of Rust, a Guardian AI That Reviews Its Own AI, and the Most Paranoid Sandbox in Any Coding Agent
 
 > **The first production Rust-native AI coding agent, dissected.**
 > 549,000 lines of Rust across 1,389 files. 88 workspace crates. A three-layer sandbox that runs on macOS, Linux, and Windows. All open source under Apache-2.0.
@@ -26,18 +26,15 @@
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | A | 88 workspace crates, queue-pair submit/event model cleanly separates concerns |
-| Code Quality | A | 549K LOC Rust with 162 test files, dual Cargo+Bazel build, strict type boundaries |
-| Security | A | Three-platform sandbox (Seatbelt/Landlock+seccomp/Restricted Token), Guardian AI reviews tool calls |
-| Documentation | B+ | Crate-level docs exist but cross-crate architecture requires reading the code |
-| **Overall** | **A** | **Strongest sandbox design in the group; Guardian auto-approval is a novel trust delegation pattern** |
-
----
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | queue-pair async event system (Sender<Submission>/Receiver<Event>), 88 Rust workspace crates, dual Cargo+Bazel build |
+| Code Organization | 549K LOC Rust across 1389 files, 162 test files, strict crate boundaries with codex-core (176K), codex-tui (112K), codex-cli (5K) |
+| Security Approach | 4-layer: seatbelt (macOS) + landlock/seccomp/bubblewrap (Linux) + restricted token/ACL (Windows) + Guardian AI auto-approval (risk_score < 80) + MITM network proxy |
+| Context Strategy | two-phase memory extraction: per-rollout raw extraction then cross-rollout consolidation, summarize-based compaction |
+| Documentation | crate-level docs, architecture decision records, cross-crate architecture requires reading the code |
 ## Table of Contents
 
 - [At a Glance](#at-a-glance)
@@ -92,15 +89,15 @@ The central type is `Codex` in `codex-rs/core/src/codex.rs` — a 7,786-line fil
 
 ```
 Codex::spawn() {
- ① Initialize auth, config, skills, plugins, MCP
- ② Enter submission loop:
+ â‘  Initialize auth, config, skills, plugins, MCP
+ â‘¡ Enter submission loop:
  match submission {
  Op::UserInput → start_turn()
  Op::Compact → run_compact_task() 
  Op::Interrupt → cancel current turn
  Op::Shutdown → graceful exit
  }
- ③ start_turn():
+ â‘¢ start_turn():
  - Build context (ContextManager + initial injections) 
  - Stream from ModelClient (SSE or WebSocket)
  - For each response item:
@@ -545,11 +542,11 @@ Codex CLI's security model is **defense in depth** with four layers:
 
 ```
 Layer 1: Approval Policy (user consent)
- ↓
+ â†“
 Layer 2: Guardian AI Review (automated risk assessment)
- ↓ 
+ â†“ 
 Layer 3: OS Sandbox (filesystem + process isolation)
- ↓
+ â†“
 Layer 4: Network Proxy (traffic interception + domain filtering)
 ```
 
@@ -801,44 +798,44 @@ Claude Code has more sophisticated context management (4 layers vs 1). Codex CLI
 
 ```
 codex-rs/
-├── cli/ # CLI entry point (Clap)
-├── tui/ # Terminal UI (Ratatui)
-├── core/ # Core engine (the "brain")
-│ ├── src/
-│ │ ├── codex.rs # Main Codex struct (7,786 lines)
-│ │ ├── client.rs # Model API client (SSE + WebSocket)
-│ │ ├── compact.rs # Context compaction
-│ │ ├── tools/ # Tool system (router, handlers, orchestrator)
-│ │ ├── guardian/ # AI auto-approval
-│ │ ├── memories/ # Memory extraction pipeline
-│ │ ├── context_manager/ # History + token tracking
-│ │ ├── agent/ # Multi-agent registry
-│ │ ├── plugins/ # Plugin system
-│ │ ├── config/ # Configuration management
-│ │ └── unified_exec/ # PTY-backed persistent shells
-├── tools/ # Tool definitions (data only)
-├── protocol/ # Typed protocol (the contract)
-├── sandboxing/ # Cross-platform sandbox manager
-├── linux-sandbox/ # Linux sandbox binary (Landlock+bwrap+seccomp)
-├── windows-sandbox-rs/ # Windows sandbox (RestrictedToken+ACL)
-├── hooks/ # Lifecycle hook system
-├── skills/ # System skills installer
-├── core-skills/ # Skills loader + injection
-├── codex-mcp/ # MCP client connections
-├── mcp-server/ # Codex-as-MCP-server
-├── exec/ # Headless execution mode
-├── exec-server/ # Remote execution daemon
-├── app-server/ # JSON-RPC multi-client server
-├── app-server-protocol/ # App server message types
-├── network-proxy/ # MITM network proxy
-├── features/ # Feature flag system
-├── state/ # SQLite state persistence
-├── config/ # Configuration loading
-├── login/ # Auth (OAuth + API key)
-├── codex-api/ # OpenAI API client
-├── rollout/ # Session recording
-├── otel/ # OpenTelemetry instrumentation
-└── ... (60+ utility crates)
+â”œâ”€â”€ cli/ # CLI entry point (Clap)
+â”œâ”€â”€ tui/ # Terminal UI (Ratatui)
+â”œâ”€â”€ core/ # Core engine (the "brain")
+â”‚ â”œâ”€â”€ src/
+â”‚ â”‚ â”œâ”€â”€ codex.rs # Main Codex struct (7,786 lines)
+â”‚ â”‚ â”œâ”€â”€ client.rs # Model API client (SSE + WebSocket)
+â”‚ â”‚ â”œâ”€â”€ compact.rs # Context compaction
+â”‚ â”‚ â”œâ”€â”€ tools/ # Tool system (router, handlers, orchestrator)
+â”‚ â”‚ â”œâ”€â”€ guardian/ # AI auto-approval
+â”‚ â”‚ â”œâ”€â”€ memories/ # Memory extraction pipeline
+â”‚ â”‚ â”œâ”€â”€ context_manager/ # History + token tracking
+â”‚ â”‚ â”œâ”€â”€ agent/ # Multi-agent registry
+â”‚ â”‚ â”œâ”€â”€ plugins/ # Plugin system
+â”‚ â”‚ â”œâ”€â”€ config/ # Configuration management
+â”‚ â”‚ â””â”€â”€ unified_exec/ # PTY-backed persistent shells
+â”œâ”€â”€ tools/ # Tool definitions (data only)
+â”œâ”€â”€ protocol/ # Typed protocol (the contract)
+â”œâ”€â”€ sandboxing/ # Cross-platform sandbox manager
+â”œâ”€â”€ linux-sandbox/ # Linux sandbox binary (Landlock+bwrap+seccomp)
+â”œâ”€â”€ windows-sandbox-rs/ # Windows sandbox (RestrictedToken+ACL)
+â”œâ”€â”€ hooks/ # Lifecycle hook system
+â”œâ”€â”€ skills/ # System skills installer
+â”œâ”€â”€ core-skills/ # Skills loader + injection
+â”œâ”€â”€ codex-mcp/ # MCP client connections
+â”œâ”€â”€ mcp-server/ # Codex-as-MCP-server
+â”œâ”€â”€ exec/ # Headless execution mode
+â”œâ”€â”€ exec-server/ # Remote execution daemon
+â”œâ”€â”€ app-server/ # JSON-RPC multi-client server
+â”œâ”€â”€ app-server-protocol/ # App server message types
+â”œâ”€â”€ network-proxy/ # MITM network proxy
+â”œâ”€â”€ features/ # Feature flag system
+â”œâ”€â”€ state/ # SQLite state persistence
+â”œâ”€â”€ config/ # Configuration loading
+â”œâ”€â”€ login/ # Auth (OAuth + API key)
+â”œâ”€â”€ codex-api/ # OpenAI API client
+â”œâ”€â”€ rollout/ # Session recording
+â”œâ”€â”€ otel/ # OpenTelemetry instrumentation
+â””â”€â”€ ... (60+ utility crates)
 ```
 
 ---

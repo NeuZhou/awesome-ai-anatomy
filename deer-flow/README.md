@@ -1,4 +1,4 @@
-# DeerFlow 2.0: How ByteDance's Agent Framework Actually Works
+﻿# DeerFlow 2.0: How ByteDance's Agent Framework Actually Works
 
 > I read through the DeerFlow 2.0 source code to understand what's inside a 58K-star agent harness. Here's what I found, what impressed me, and what didn't.
 
@@ -21,16 +21,15 @@ DeerFlow is an orchestration layer that lets one LLM manage sub-agents, run sand
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | B | 14-layer middleware chain is a clean pattern but order-dependent; LangGraph dependency couples tightly |
-| Code Quality | B | DanglingToolCallMiddleware patches orphan tool calls — a pragmatic fix that most frameworks skip entirely |
-| Security | B- | Designed for corporate network deployment; public use needs auth layer |
-| Documentation | B | v2.0 rewrite docs exist, middleware ordering is not documented outside the code |
-| **Overall** | **B** | **Cleanest middleware extensibility pattern in our survey; auth layer needed for public deployment** |
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | 14-layer middleware chain over LangGraph, order-dependent (ClarificationMiddleware must be last), FastAPI + Next.js dual backend |
+| Code Organization | Python backend + TypeScript frontend, v2.0 ground-up rewrite sharing zero code with v1, LangGraph tightly coupled |
+| Security Approach | no auth, no RBAC — designed for trusted corporate network deployment, public use requires external auth layer |
+| Context Strategy | summarize-based compaction, DanglingToolCallMiddleware patches orphan tool calls from interrupted sessions |
+| Documentation | v2.0 rewrite docs exist, middleware ordering undocumented outside the source code |
 ## Architecture
 
 
@@ -259,20 +258,20 @@ DeerFlow's middleware-first approach gives it the cleanest extensibility story o
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 58,393 stars | GitHub API (`/repos/bytedance/deer-flow`) | ✅ Verified |
-| 7,312 forks | GitHub API | ✅ Verified |
-| Language: Python + TypeScript | GitHub API + repo structure | ✅ Verified (Python primary, Next.js frontend) |
-| License: MIT | GitHub API `license.spdx_id` | ✅ Verified |
-| First commit May 2025 | GitHub API `created_at`: 2025-05-07 | ✅ Verified |
-| v2.0 complete rewrite | README + changelog | ✅ Verified (Feb 2026, shares zero code with v1) |
-| 14+ middlewares | `_build_middlewares` function in source | ✅ Verified |
-| Loop detection: warn@3, kill@5 | `LoopDetectionMiddleware` source | ✅ Verified |
-| 3 concurrent subagents | ThreadPoolExecutor `max_workers=3` | ✅ Verified |
-| 15-min subagent timeout | SubAgent configuration | ✅ Verified |
-| Feishu/Slack/Telegram channels | IM bridge implementations | ✅ Verified |
-| mtime-based cache invalidation | Memory storage layer | ✅ Verified |
-| No auth/RBAC | API layer inspection | ✅ Verified (no authentication middleware) |
-| LangGraph foundation | `pyproject.toml` dependencies | ✅ Verified |
+| 58,393 stars | GitHub API (`/repos/bytedance/deer-flow`) | âœ… Verified |
+| 7,312 forks | GitHub API | âœ… Verified |
+| Language: Python + TypeScript | GitHub API + repo structure | âœ… Verified (Python primary, Next.js frontend) |
+| License: MIT | GitHub API `license.spdx_id` | âœ… Verified |
+| First commit May 2025 | GitHub API `created_at`: 2025-05-07 | âœ… Verified |
+| v2.0 complete rewrite | README + changelog | âœ… Verified (Feb 2026, shares zero code with v1) |
+| 14+ middlewares | `_build_middlewares` function in source | âœ… Verified |
+| Loop detection: warn@3, kill@5 | `LoopDetectionMiddleware` source | âœ… Verified |
+| 3 concurrent subagents | ThreadPoolExecutor `max_workers=3` | âœ… Verified |
+| 15-min subagent timeout | SubAgent configuration | âœ… Verified |
+| Feishu/Slack/Telegram channels | IM bridge implementations | âœ… Verified |
+| mtime-based cache invalidation | Memory storage layer | âœ… Verified |
+| No auth/RBAC | API layer inspection | âœ… Verified (no authentication middleware) |
+| LangGraph foundation | `pyproject.toml` dependencies | âœ… Verified |
 
 </details>
 

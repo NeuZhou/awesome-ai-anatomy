@@ -1,4 +1,4 @@
-# Pi Mono: The Game Framework Guy Built a Better Claude Code — and Hid a "Stealth Mode" Inside
+﻿# Pi Mono: The Game Framework Guy Built a Better Claude Code — and Hid a "Stealth Mode" Inside
 
 > Mario Zechner (the libGDX guy) built a Claude Code alternative, and you can tell it's from a game developer. Scene-graph thinking applied to LLM provider abstraction, lazy loading patterns borrowed from texture streaming, and a "stealth mode" that impersonates Claude Code's tool names to dodge Anthropic's rate limits.
 
@@ -20,16 +20,15 @@ Pi is a monorepo of seven npm packages that together form a full stack for build
 
 ---
 
-## Overall Rating
+## Characteristics
 
-| Dimension | Grade | Notes |
-|-----------|-------|-------|
-| Architecture | B+ | 7 npm packages, game-engine layering (pi-ai as renderer abstraction, pi-agent-core as game loop) |
-| Code Quality | B | 147K LOC across 583 .ts files; lazy provider loading borrowed from texture streaming patterns |
-| Security | B- | "Stealth mode" reuses Claude Code tool naming for compatibility; ToS implications worth monitoring |
-| Documentation | B- | shittycodingagent.ai is honest about scope; internal package boundaries need better docs |
-| **Overall** | **B** | **Game-engine architecture applied to LLM agents is a fresh perspective; stealth mode is a liability** |
-
+| Dimension | Description |
+|-----------|-------------|
+| Architecture | 7-package monorepo with game-engine layering: pi-ai (renderer abstraction), pi-agent-core (game loop), pi-tui (scene graph), pi-coding-agent (content) |
+| Code Organization | 147K LOC TypeScript across 583 .ts files, strict dependency graph (pi-tui has zero dependency on pi-ai), lazy provider loading via dynamic import + promise caching |
+| Security Approach | stealth mode renames tools to match Claude Code's exact casing for compatibility, no independent security layer |
+| Context Strategy | summarize-based compaction, steering/follow-up two-lane input queue during agent execution |
+| Documentation | shittycodingagent.ai as honest branding, internal package boundaries need docs, 10 provider configs via registry |
 ## Architecture
 
 
@@ -279,29 +278,29 @@ Coupling tool execution with tool rendering in a single definition means tools o
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 32,049 stars | GitHub API (`/repos/badlogic/pi-mono`) | ✅ Verified |
-| 3,488 forks | GitHub API | ✅ Verified |
-| 147,444 LOC | PowerShell line count across 583 .ts files | ✅ Verified |
-| First commit 2025-08-09 | GitHub API `created_at` | ✅ Verified |
-| Latest release v0.65.2 | npm registry `@mariozechner/pi-coding-agent` | ✅ Verified |
-| MIT License | LICENSE file | ✅ Verified |
-| 7 packages in monorepo | `packages/` directory listing | ✅ Verified (ai, agent, coding-agent, tui, web-ui, mom, pods) |
-| pi-ai: 37,165 lines | Package-level line count | ✅ Verified |
-| pi-agent-core: 3,152 lines | Package-level line count | ✅ Verified |
-| pi-coding-agent: 69,493 lines | Package-level line count | ✅ Verified |
-| pi-tui: 17,659 lines | Package-level line count | ✅ Verified |
-| pi-web-ui: 13,808 lines | Package-level line count | ✅ Verified |
-| pi-mom: 3,578 lines | Package-level line count | ✅ Verified |
-| pi-pods: 1,546 lines | Package-level line count | ✅ Verified |
-| Stealth mode `claudeCodeVersion = "2.1.75"` | `packages/ai/src/providers/anthropic.ts:68` | ✅ Verified |
-| Tool names list (17 tools) | `packages/ai/src/providers/anthropic.ts:72-89` | ✅ Verified |
-| Steering/followUp queue in Agent class | `packages/agent/src/agent.ts:110-114` | ✅ Verified |
-| `armin.ts` and `daxnuts.ts` exist | Directory listing of `modes/interactive/components/` | ✅ Verified |
-| `shittycodingagent.ai` URL | README.md anchor tag | ✅ Verified |
-| Lazy provider loading pattern | `packages/ai/src/providers/register-builtins.ts` | ✅ Verified |
-| 10 API types (KnownApi union) | `packages/ai/src/types.ts:3-13` | ✅ Verified |
-| AgentSession class >1500 lines | `packages/coding-agent/src/core/agent-session.ts` full read | ✅ Verified |
-| libGDX creator (Mario Zechner) | GitHub profile `badlogic` + libGDX repo | ✅ Known fact |
+| 32,049 stars | GitHub API (`/repos/badlogic/pi-mono`) | âœ… Verified |
+| 3,488 forks | GitHub API | âœ… Verified |
+| 147,444 LOC | PowerShell line count across 583 .ts files | âœ… Verified |
+| First commit 2025-08-09 | GitHub API `created_at` | âœ… Verified |
+| Latest release v0.65.2 | npm registry `@mariozechner/pi-coding-agent` | âœ… Verified |
+| MIT License | LICENSE file | âœ… Verified |
+| 7 packages in monorepo | `packages/` directory listing | âœ… Verified (ai, agent, coding-agent, tui, web-ui, mom, pods) |
+| pi-ai: 37,165 lines | Package-level line count | âœ… Verified |
+| pi-agent-core: 3,152 lines | Package-level line count | âœ… Verified |
+| pi-coding-agent: 69,493 lines | Package-level line count | âœ… Verified |
+| pi-tui: 17,659 lines | Package-level line count | âœ… Verified |
+| pi-web-ui: 13,808 lines | Package-level line count | âœ… Verified |
+| pi-mom: 3,578 lines | Package-level line count | âœ… Verified |
+| pi-pods: 1,546 lines | Package-level line count | âœ… Verified |
+| Stealth mode `claudeCodeVersion = "2.1.75"` | `packages/ai/src/providers/anthropic.ts:68` | âœ… Verified |
+| Tool names list (17 tools) | `packages/ai/src/providers/anthropic.ts:72-89` | âœ… Verified |
+| Steering/followUp queue in Agent class | `packages/agent/src/agent.ts:110-114` | âœ… Verified |
+| `armin.ts` and `daxnuts.ts` exist | Directory listing of `modes/interactive/components/` | âœ… Verified |
+| `shittycodingagent.ai` URL | README.md anchor tag | âœ… Verified |
+| Lazy provider loading pattern | `packages/ai/src/providers/register-builtins.ts` | âœ… Verified |
+| 10 API types (KnownApi union) | `packages/ai/src/types.ts:3-13` | âœ… Verified |
+| AgentSession class >1500 lines | `packages/coding-agent/src/core/agent-session.ts` full read | âœ… Verified |
+| libGDX creator (Mario Zechner) | GitHub profile `badlogic` + libGDX repo | âœ… Known fact |
 
 </details>
 
