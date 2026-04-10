@@ -79,6 +79,8 @@ Claude Code 在生产代码里塞了 18 种虚拟宠物。Pi Mono 可以复用 C
 
 ## 跨项目对比
 
+**[交互式对比工具](https://neuzhou.github.io/awesome-ai-anatomy/comparison.html)** -- 筛选、搜索、横向对比所有项目。
+
 我们维护了一份详细的 **[COMPARISON.md](COMPARISON.md)**，对 13 个项目进行横向分析：
 
 - 速查表（作者、Star 数、语言、类型、许可证）
@@ -91,7 +93,7 @@ Claude Code 在生产代码里塞了 18 种虚拟宠物。Pi Mono 可以复用 C
 - 所有项目的 Architecture 模式分类
 - Context 管理策略对比
 - 工具系统设计模式
-- 安全评级（A-F）
+- 安全态势评估
 - 反模式目录（附代码证据）
 - "从零造 Agent" 的综合建议
 

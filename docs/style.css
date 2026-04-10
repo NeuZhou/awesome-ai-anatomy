@@ -534,3 +534,33 @@ footer a:hover { color: var(--accent); }
   content: "\2713 ";
   color: #58a6ff;
 }
+
+/* Detail columns toggle */
+.detail-col { display: none; }
+.detail-col.visible { display: table-cell; }
+.detail-toggle-bar {
+  margin: 1.5rem 0 0;
+  display: flex;
+  gap: 8px;
+}
+.detail-toggle-btn {
+  padding: 6px 16px;
+  font-weight: 600;
+}
+.detail-toggle-btn.active {
+  background: rgba(88, 166, 255, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.worth-stealing-cell {
+  white-space: normal !important;
+  min-width: 250px;
+  max-width: 400px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+/* Mobile: detail columns as card rows */
+@media (max-width: 768px) {
+  .detail-col.visible { display: flex; }
+}

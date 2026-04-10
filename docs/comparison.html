@@ -21,6 +21,10 @@
     <h1>Project Comparison</h1>
     <p class="comparison-desc">Every AI agent README says it's fast, extensible, and secure. This table cuts through that. We compared each project on architecture patterns, security approach, and context strategy based on what's actually in the source -- not what the landing page claims.</p>
 
+    <div class="detail-toggle-bar">
+      <button id="toggle-details" class="filter-btn detail-toggle-btn">Show Details</button>
+    </div>
+
     <div class="filter-bar">
       <span class="filter-label">Select projects to compare:</span>
       <div class="multi-select" id="multi-select">
@@ -49,6 +53,12 @@
             <th>Sandbox</th>
             <th>Extensions</th>
             <th>Key Finding</th>
+            <th class="detail-col">Category</th>
+            <th class="detail-col">Maturity</th>
+            <th class="detail-col">Deployment</th>
+            <th class="detail-col">LOC</th>
+            <th class="detail-col">License</th>
+            <th class="detail-col">Worth Stealing</th>
           </tr>
         </thead>
         <tbody>
@@ -62,6 +72,12 @@
             <td data-label="Sandbox">Docker (7+ containers)</td>
             <td data-label="Extensions">plugins + workflow nodes</td>
             <td data-label="Key Finding" class="key-finding-cell">graphon engine, 7+ containers, 30+ vector DBs, plugin daemon</td>
+            <td data-label="Category" class="detail-col">workflow-engine</td>
+            <td data-label="Maturity" class="detail-col">production</td>
+            <td data-label="Deployment" class="detail-col">docker-compose</td>
+            <td data-label="LOC" class="detail-col">1,283,000</td>
+            <td data-label="License" class="detail-col">Modified Apache 2.0</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">Layer-based graph engine middleware (graphon); LLM-powered metadata filtering; Child engine spawning for iteration</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/claude-code" target="_blank">Claude Code</a></td>
@@ -73,6 +89,12 @@
             <td data-label="Sandbox">seatbelt (macOS)</td>
             <td data-label="Extensions">MCP</td>
             <td data-label="Key Finding" class="key-finding-cell">4-layer context cascade, hidden pet system (18 species)</td>
+            <td data-label="Category" class="detail-col">coding-agent</td>
+            <td data-label="Maturity" class="detail-col">production</td>
+            <td data-label="Deployment" class="detail-col">npm</td>
+            <td data-label="LOC" class="detail-col">510,000</td>
+            <td data-label="License" class="detail-col">Proprietary</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">4-layer context cascade: lossless before lossy; Streaming tool execution with RWLock; buildTool() factory over inheritance</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/openhands" target="_blank">OpenHands</a></td>
@@ -84,6 +106,12 @@
             <td data-label="Sandbox">Docker</td>
             <td data-label="Extensions">--</td>
             <td data-label="Key Finding" class="key-finding-cell">10 condensers, 3-layer security, 487-line stuck detector</td>
+            <td data-label="Category" class="detail-col">coding-agent</td>
+            <td data-label="Maturity" class="detail-col">production</td>
+            <td data-label="Deployment" class="detail-col">docker</td>
+            <td data-label="LOC" class="detail-col">400,000</td>
+            <td data-label="License" class="detail-col">MIT</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">10-condenser pipeline: most sophisticated context management; 3-layer security: defense-in-depth; 487-line stuck detector for breaking loops</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/cline" target="_blank">Cline</a></td>
@@ -95,6 +123,12 @@
             <td data-label="Sandbox">--</td>
             <td data-label="Extensions">MCP + hooks</td>
             <td data-label="Key Finding" class="key-finding-cell">3,756-line core, 43 providers, YOLO mode, hooks system</td>
+            <td data-label="Category" class="detail-col">coding-agent</td>
+            <td data-label="Maturity" class="detail-col">production</td>
+            <td data-label="Deployment" class="detail-col">npm</td>
+            <td data-label="LOC" class="detail-col">560,000</td>
+            <td data-label="License" class="detail-col">Apache-2.0</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">43 provider adapters with factory pattern; Hooks system for TaskStart/TaskResume/PreCompact events; Focus Chain task tracker</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/deer-flow" target="_blank">DeerFlow</a></td>
@@ -106,6 +140,12 @@
             <td data-label="Sandbox">Docker</td>
             <td data-label="Extensions">--</td>
             <td data-label="Key Finding" class="key-finding-cell">14-layer middleware, hash-based loop detection</td>
+            <td data-label="Category" class="detail-col">workflow-engine</td>
+            <td data-label="Maturity" class="detail-col">beta</td>
+            <td data-label="Deployment" class="detail-col">docker</td>
+            <td data-label="LOC" class="detail-col">--</td>
+            <td data-label="License" class="detail-col">MIT</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">Middleware-first architecture: 14+ composable middlewares; Hash-based loop detection (warn@3, kill@5); DanglingToolCallMiddleware for orphan calls</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/mirofish" target="_blank">MiroFish</a></td>
@@ -117,6 +157,12 @@
             <td data-label="Sandbox">--</td>
             <td data-label="Extensions">--</td>
             <td data-label="Key Finding" class="key-finding-cell">LLM social sim as 'collective intelligence', core is OASIS</td>
+            <td data-label="Category" class="detail-col">social-simulation</td>
+            <td data-label="Maturity" class="detail-col">beta</td>
+            <td data-label="Deployment" class="detail-col">pip</td>
+            <td data-label="LOC" class="detail-col">38,800</td>
+            <td data-label="License" class="detail-col">AGPL-3.0</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">Dual-platform parallel simulation with independent action logs; Forced multi-tool ReACT strategy with unused tool reminders</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/goose" target="_blank">Goose</a></td>
@@ -128,6 +174,12 @@
             <td data-label="Sandbox">process isolation</td>
             <td data-label="Extensions">MCP + 6 extension types</td>
             <td data-label="Key Finding" class="key-finding-cell">MCP-first bus, 5-inspector pipeline, 30+ LLMs</td>
+            <td data-label="Category" class="detail-col">coding-agent</td>
+            <td data-label="Maturity" class="detail-col">production</td>
+            <td data-label="Deployment" class="detail-col">binary</td>
+            <td data-label="LOC" class="detail-col">198,000</td>
+            <td data-label="License" class="detail-col">Apache-2.0</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">Declarative provider pattern via 10-line JSON; 31-key env var blocklist; Tool-pair background summarization</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/pi-mono" target="_blank">Pi Mono</a></td>
@@ -139,6 +191,12 @@
             <td data-label="Sandbox">--</td>
             <td data-label="Extensions">plugins (tool definitions)</td>
             <td data-label="Key Finding" class="key-finding-cell">Game-engine arch, stealth mode as Claude Code</td>
+            <td data-label="Category" class="detail-col">coding-agent</td>
+            <td data-label="Maturity" class="detail-col">beta</td>
+            <td data-label="Deployment" class="detail-col">npm</td>
+            <td data-label="LOC" class="detail-col">147,444</td>
+            <td data-label="License" class="detail-col">MIT</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">Lazy provider loading via dynamic import + promise caching; Steering/follow-up two-lane input queue; TUI-integrated tool rendering</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/mempalace" target="_blank">MemPalace</a></td>
@@ -150,6 +208,12 @@
             <td data-label="Sandbox">--</td>
             <td data-label="Extensions">MCP</td>
             <td data-label="Key Finding" class="key-finding-cell">4-layer memory stack, ChromaDB palace metaphor, +34% retrieval</td>
+            <td data-label="Category" class="detail-col">memory-system</td>
+            <td data-label="Maturity" class="detail-col">experimental</td>
+            <td data-label="Deployment" class="detail-col">pip</td>
+            <td data-label="LOC" class="detail-col">15,534</td>
+            <td data-label="License" class="detail-col">MIT</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">Layered loading pattern (~600 token wake-up); Auto-teach via MCP status tool response; PreCompact hook strategy; Temporal knowledge graph in SQLite</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/lightpanda-browser" target="_blank">Lightpanda</a></td>
@@ -161,6 +225,12 @@
             <td data-label="Sandbox">--</td>
             <td data-label="Extensions">MCP + CDP</td>
             <td data-label="Key Finding" class="key-finding-cell">From-scratch browser for AI agents, 9x Chrome, 16x less memory</td>
+            <td data-label="Category" class="detail-col">browser</td>
+            <td data-label="Maturity" class="detail-col">beta</td>
+            <td data-label="Deployment" class="detail-col">binary</td>
+            <td data-label="LOC" class="detail-col">91,000</td>
+            <td data-label="License" class="detail-col">AGPL-3.0</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">Comptime V8 bridge: zero runtime dispatch overhead; Arena-based memory (16x reduction); Integer bitcast CDP dispatch</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/codex-cli" target="_blank">OpenAI Codex CLI</a></td>
@@ -172,6 +242,12 @@
             <td data-label="Sandbox">seatbelt + landlock + restricted token (3-OS)</td>
             <td data-label="Extensions">MCP + plugins</td>
             <td data-label="Key Finding" class="key-finding-cell">Queue-pair arch, Guardian AI approval, 3-OS sandbox (17K LoC)</td>
+            <td data-label="Category" class="detail-col">coding-agent</td>
+            <td data-label="Maturity" class="detail-col">production</td>
+            <td data-label="Deployment" class="detail-col">binary</td>
+            <td data-label="LOC" class="detail-col">549,000</td>
+            <td data-label="License" class="detail-col">Apache-2.0</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">Guardian AI risk-scoring with auto-approve threshold; Queue-pair decoupling core from frontends; Progressive sandbox escalation; Two-phase memory extraction</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/hermes-agent" target="_blank">Hermes Agent</a></td>
@@ -183,6 +259,12 @@
             <td data-label="Sandbox">Docker</td>
             <td data-label="Extensions">self-improving skills</td>
             <td data-label="Key Finding" class="key-finding-cell">Self-improving skills, FTS5 search, frozen memory snapshots</td>
+            <td data-label="Category" class="detail-col">coding-agent</td>
+            <td data-label="Maturity" class="detail-col">beta</td>
+            <td data-label="Deployment" class="detail-col">pip</td>
+            <td data-label="LOC" class="detail-col">260,000</td>
+            <td data-label="License" class="detail-col">MIT</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">Scan memory writes before persisting (anti-injection); Full session transcripts + FTS5 search alongside curated memory</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/oh-my-claudecode" target="_blank">oh-my-claudecode</a></td>
@@ -194,6 +276,12 @@
             <td data-label="Sandbox">--</td>
             <td data-label="Extensions">none (Claude Code plugin)</td>
             <td data-label="Key Finding" class="key-finding-cell">19-agent team via file IPC, Haiku-to-Opus model routing</td>
+            <td data-label="Category" class="detail-col">dev-tool</td>
+            <td data-label="Maturity" class="detail-col">beta</td>
+            <td data-label="Deployment" class="detail-col">npm</td>
+            <td data-label="LOC" class="detail-col">194,000</td>
+            <td data-label="License" class="detail-col">MIT</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">mkdir-based cross-process locking (atomic, stale detection); Model tier routing: Haiku for critic, Opus for deep reasoning</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/oh-my-codex" target="_blank">oh-my-codex</a></td>
@@ -205,6 +293,12 @@
             <td data-label="Sandbox">git worktree</td>
             <td data-label="Extensions">MCP + hook plugin SDK</td>
             <td data-label="Key Finding" class="key-finding-cell">30 agents, git worktree isolation, autoresearch loop</td>
+            <td data-label="Category" class="detail-col">dev-tool</td>
+            <td data-label="Maturity" class="detail-col">beta</td>
+            <td data-label="Deployment" class="detail-col">npm</td>
+            <td data-label="LOC" class="detail-col">124,000</td>
+            <td data-label="License" class="detail-col">--</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">Plugin hook SDK with process isolation (1.5s timeout escalation); Heuristic task-to-worker allocation via file-path overlap; Autoresearch loops with score-based keep/discard</td>
           </tr>
           <tr>
             <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/guardrails-ai" target="_blank">Guardrails AI</a></td>
@@ -216,6 +310,12 @@
             <td data-label="Sandbox">--</td>
             <td data-label="Extensions">Validator Hub (npm for constraints)</td>
             <td data-label="Key Finding" class="key-finding-cell">Validator Hub, reask self-correction loop, 8 OnFailAction variants</td>
+            <td data-label="Category" class="detail-col">security-framework</td>
+            <td data-label="Maturity" class="detail-col">production</td>
+            <td data-label="Deployment" class="detail-col">pip</td>
+            <td data-label="LOC" class="detail-col">18,079</td>
+            <td data-label="License" class="detail-col">Apache-2.0</td>
+            <td data-label="Worth Stealing" class="detail-col worth-stealing-cell">OnFailAction pattern: 8 variants covering full error-handling tree; Streaming chunk accumulation at sentence boundary; Reask loop with budget ceiling</td>
           </tr>
         </tbody>
       </table>
@@ -483,6 +583,26 @@
 
     // Init
     render();
+  })();
+
+  // Detail columns toggle
+  (function() {
+    var btn = document.getElementById('toggle-details');
+    var detailCols = document.querySelectorAll('.detail-col');
+    var showing = false;
+
+    btn.addEventListener('click', function() {
+      showing = !showing;
+      for (var i = 0; i < detailCols.length; i++) {
+        if (showing) {
+          detailCols[i].classList.add('visible');
+        } else {
+          detailCols[i].classList.remove('visible');
+        }
+      }
+      btn.textContent = showing ? 'Hide Details' : 'Show Details';
+      btn.classList.toggle('active', showing);
+    });
   })();
   </script>
 </body>

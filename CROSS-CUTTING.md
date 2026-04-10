@@ -9,7 +9,7 @@
 - [1. Architecture Patterns](#1-architecture-patterns)
 - [2. Context Management Strategies](#2-context-management-strategies)
 - [3. Tool System Design](#3-tool-system-design)
-- [4. Security Rating](#4-security-rating)
+- [4. Security Posture](#4-security-posture)
 - [5. Technology Choices](#5-technology-choices)
 - [6. Anti-Pattern Catalog](#6-anti-pattern-catalog)
 - [7. If You Were Building an AI Agent from Scratch Today](#7-if-you-were-building-an-ai-agent-from-scratch-today)
@@ -79,15 +79,15 @@ Context window management is the single most important engineering challenge in 
 
 ### Context Management Maturity Ranking
 
-| Rank | Project | Rating | Evidence |
-|------|---------|--------|----------|
-| 1 | **Claude Code** | ★★★★★ | 4-layer cascade: HISTORY_SNIP → Microcompact → CONTEXT_COLLAPSE → Autocompact. Lossless before lossy. |
-| 2 | **Hermes Agent** | ★★★★☆ | 5-step pipeline with structured summaries. Head/tail protection + iterative refinement. |
-| 3 | **Goose** | ★★★★☆ | Proactive 80% threshold + concurrent tool-pair summarization. Recovery path for overflow errors. |
-| 4 | **Pi Mono** | ★★★☆☆ | Auto-compaction with overflow recovery. Extension-overridable — the only project that lets plugins customize compaction. |
-| 5 | **DeerFlow** | ★★☆☆☆ | Single summarization middleware. No progressive degradation. |
-| 6 | **Dify** | ★★☆☆☆ | Execution limits prevent runaway, but no conversation-level context management. |
-| 7 | **oh-my-claudecode** | ★★☆☆☆ | Inherits from Claude Code but adds nothing. |
+| Rank | Project | Sophistication | Evidence |
+|------|---------|----------------|----------|
+| 1 | **Claude Code** | Most sophisticated | 4-layer cascade: HISTORY_SNIP, Microcompact, CONTEXT_COLLAPSE, Autocompact. Lossless before lossy. |
+| 2 | **Hermes Agent** | Very strong | 5-step pipeline with structured summaries. Head/tail protection + iterative refinement. |
+| 3 | **Goose** | Very strong | Proactive 80% threshold + concurrent tool-pair summarization. Recovery path for overflow errors. |
+| 4 | **Pi Mono** | Moderate | Auto-compaction with overflow recovery. Extension-overridable -- the only project that lets plugins customize compaction. |
+| 5 | **DeerFlow** | Basic | Single summarization middleware. No progressive degradation. |
+| 6 | **Dify** | Basic | Execution limits prevent runaway, but no conversation-level context management. |
+| 7 | **oh-my-claudecode** | Basic | Inherits from Claude Code but adds nothing. |
 | 8-10 | **MiroFish, Guardrails, Lightpanda** | N/A | Not applicable to their problem domains. |
 
 ### Key Insight
@@ -137,7 +137,7 @@ How tools are defined, registered, discovered, and executed varies dramatically 
 
 ---
 
-## 4. Security Rating
+## 4. Security Posture
 
 Security posture varies wildly. Some projects treat security as a core concern; others treat it as an afterthought.
 
@@ -145,14 +145,14 @@ Security posture varies wildly. Some projects treat security as a core concern; 
 
 | Dimension | Claude Code | Dify | DeerFlow | MiroFish | Goose | Guardrails AI | OMC | Pi Mono | Hermes | Lightpanda |
 |-----------|------------|------|----------|----------|-------|--------------|-----|---------|--------|------------|
-| **Input Validation** | B | B | D | D | A | A | C | C | B | B |
-| **Sandbox / Isolation** | A | A | C | D | B | C | B | A | B | A |
-| **Auth / RBAC** | B | A | F | D | C | B | C | C | C | N/A |
-| **Prompt Injection Defense** | C | C | F | F | A | C | C | C | B | N/A |
-| **Data Exfiltration Prevention** | B | A | D | D | A | C | C | C | B | N/A |
-| **Tool Execution Safety** | A | B | C | D | A | B | B | C | B | N/A |
-| **Memory/State Protection** | C | B | D | D | C | N/A | C | C | B | A |
-| **Overall Grade** | **B+** | **B+** | **D** | **D-** | **A-** | **B** | **C+** | **C** | **B** | **B+** |
+| **Input Validation** | Present (tool allowlist) | Present (SSRF proxy) | Absent | Absent | Thorough (5 inspectors) | Thorough (schema validation) | Basic (inherited) | Basic (hooks) | Present (memory scanning) | Present (CDP validation) |
+| **Sandbox / Isolation** | Strong (seatbelt on macOS) | Strong (Docker + Go sandbox) | Basic (Docker optional) | Absent | Present (process isolation) | Basic (library mode) | Present (inherited sandbox) | Strong (arena-based) | Present (Docker) | Strong (arena memory) |
+| **Auth / RBAC** | Present (permission model) | Thorough (multi-tenant workspaces) | Absent | Absent | Basic (permission inspector) | Present (API-level) | Basic (inherited) | Basic | Basic | N/A |
+| **Prompt Injection Defense** | Basic (no dedicated scanning) | Basic (no dedicated scanning) | Absent | Absent | Thorough (AdversaryInspector) | Basic | Basic | Basic | Present (memory threat detection) | N/A |
+| **Data Exfiltration Prevention** | Present (tool scoping) | Thorough (SSRF proxy + sandbox) | Absent | Absent | Thorough (EgressInspector) | Basic | Basic | Basic | Present | N/A |
+| **Tool Execution Safety** | Thorough (per-tool permission + RWLock) | Present (sandbox + plugin verification) | Basic (advisory only) | Absent | Thorough (5-inspector pipeline) | Present (reask budget cap) | Present (inherited) | Basic | Present (subagent restrictions) | N/A |
+| **Memory/State Protection** | Basic (unauditable compression) | Present (database-backed) | Absent | Absent | Basic | N/A | Basic | Basic | Present (threat scanning) | Thorough (arena lifetime) |
+| **Overall** | **Solid defense with gaps in injection scanning** | **Solid infrastructure-level isolation** | **No security layer; advisory only** | **No security measures identified** | **Most thorough defense-in-depth** | **Focused on output validation, not agent security** | **Dependent on Claude Code host** | **Minimal independent security** | **Selective protection (memory-focused)** | **Strong memory safety, no process isolation** |
 
 ### Detailed Evidence
 
@@ -209,30 +209,30 @@ DeerFlow has no authentication, no RBAC, no rate limiting at the API level. The 
 
 | Project | Min Containers | Env Vars | Setup Difficulty | Target User |
 |---------|---------------|----------|-----------------|-------------|
-| **Dify** | 7+ (API, Worker, Beat, Web, Redis, PG, Nginx, Sandbox, Plugin Daemon) | 400+ | 🔴 High | Enterprise teams |
-| **DeerFlow** | 2 (LangGraph Server, Gateway API) | ~50 | 🟡 Medium | Developers |
-| **MiroFish** | 1 (Flask) + external APIs (Zep, OASIS) | ~20 | 🟡 Medium | Researchers |
-| **Goose** | 1 binary | ~10 | 🟢 Low | Individual developers |
-| **Claude Code** | 1 binary (Bun) | ~5 | 🟢 Low | Individual developers |
-| **Guardrails AI** | 0 (pip install) | ~3 | 🟢 Low | Any Python developer |
-| **oh-my-claudecode** | 0 (plugin install) | ~5 | 🟢 Low | Claude Code users |
-| **Pi Mono** | 1 binary (npx) | ~5 | 🟢 Low | Individual developers |
-| **Hermes Agent** | 1 process | ~10 | 🟢 Low | Individual developers |
-| **Lightpanda** | 1 binary | ~3 | 🟢 Low | Automation engineers |
+| **Dify** | 7+ (API, Worker, Beat, Web, Redis, PG, Nginx, Sandbox, Plugin Daemon) | 400+ | High | Enterprise teams |
+| **DeerFlow** | 2 (LangGraph Server, Gateway API) | ~50 | Medium | Developers |
+| **MiroFish** | 1 (Flask) + external APIs (Zep, OASIS) | ~20 | Medium | Researchers |
+| **Goose** | 1 binary | ~10 | Low | Individual developers |
+| **Claude Code** | 1 binary (Bun) | ~5 | Low | Individual developers |
+| **Guardrails AI** | 0 (pip install) | ~3 | Low | Any Python developer |
+| **oh-my-claudecode** | 0 (plugin install) | ~5 | Low | Claude Code users |
+| **Pi Mono** | 1 binary (npx) | ~5 | Low | Individual developers |
+| **Hermes Agent** | 1 process | ~10 | Low | Individual developers |
+| **Lightpanda** | 1 binary | ~3 | Low | Automation engineers |
 
 ### Provider Lock-in
 
 | Project | Provider Lock-in | Evidence |
 |---------|-----------------|----------|
-| **Claude Code** | 🔴 **Anthropic only** | Hard dependency on Claude API; no provider abstraction |
-| **Dify** | 🟢 **None** | Plugin marketplace for providers; 30+ vector DBs |
-| **DeerFlow** | 🟡 **Partial** | LangGraph supports multi-model but config-based |
-| **MiroFish** | 🟡 **Partial** | OpenAI-compatible API required; Zep Cloud dependency |
-| **Goose** | 🟢 **None** | 30+ providers; declarative JSON for new OpenAI-compatible providers |
-| **Guardrails AI** | 🟢 **None** | LiteLLM for model calls; any provider |
-| **oh-my-claudecode** | 🟡 **Partial** | Primary: Anthropic; secondary: Codex, Gemini |
-| **Pi Mono** | 🟢 **None** | 10+ native provider implementations; lazy-loading |
-| **Hermes Agent** | 🟢 **None** | Multi-provider support via configuration |
+| **Claude Code** | **Anthropic only** | Hard dependency on Claude API; no provider abstraction |
+| **Dify** | **None** | Plugin marketplace for providers; 30+ vector DBs |
+| **DeerFlow** | **Partial** | LangGraph supports multi-model but config-based |
+| **MiroFish** | **Partial** | OpenAI-compatible API required; Zep Cloud dependency |
+| **Goose** | **None** | 30+ providers; declarative JSON for new OpenAI-compatible providers |
+| **Guardrails AI** | **None** | LiteLLM for model calls; any provider |
+| **oh-my-claudecode** | **Partial** | Primary: Anthropic; secondary: Codex, Gemini |
+| **Pi Mono** | **None** | 10+ native provider implementations; lazy-loading |
+| **Hermes Agent** | **None** | Multi-provider support via configuration |
 | **Lightpanda** | N/A | Browser, not LLM-dependent |
 
 ---
@@ -260,11 +260,11 @@ Patterns observed multiple times across these 10 projects that represent avoidab
 
 | Project | Has Cost Tracking | Has Cost Limits | Risk |
 |---------|-------------------|-----------------|------|
-| **DeerFlow** | ✅ (TokenUsageMiddleware) | ❌ | Agent can run for hours uncapped |
-| **Hermes Agent** | Partial (memory tracking) | ❌ | Modal/Daytona integration without stop-at-$X = cloud bill surprise |
-| **MiroFish** | ❌ | ❌ | Each agent per round = 1 LLM call × N agents × M rounds |
-| **oh-my-claudecode** | ❌ | ❌ | 19 agents × 3 model tiers = cost multiplier |
-| **Goose** | ✅ (ProviderUsage per stream) | ❌ | 1000-turn max but no dollar ceiling |
+| **DeerFlow** | Yes (TokenUsageMiddleware) | No | Agent can run for hours uncapped |
+| **Hermes Agent** | Partial (memory tracking) | No | Modal/Daytona integration without stop-at-$X = cloud bill surprise |
+| **MiroFish** | No | No | Each agent per round = 1 LLM call x N agents x M rounds |
+| **oh-my-claudecode** | No | No | 19 agents x 3 model tiers = cost multiplier |
+| **Goose** | Yes (ProviderUsage per stream) | No | 1000-turn max but no dollar ceiling |
 
 **Only Dify has execution limits** (500 steps, 1200 seconds) set at the infrastructure level. Every other project trusts the model to self-terminate, which is precisely the thing models are bad at.
 
@@ -313,10 +313,10 @@ These constraints exist as comments, not as code-enforced rules. At 14+ middlewa
 
 | Project | Max Concurrent | Depth Limit | Can Children Write Memory? | Can Children Spawn Children? |
 |---------|---------------|-------------|---------------------------|----------------------------|
-| **Claude Code** | Configurable | 1 (flat) | N/A | ❌ |
-| **DeerFlow** | 3 (ThreadPool) | 1 | Yes (shared thread state) | ❌ |
-| **Hermes Agent** | 3 | 1 (blocked by tool restriction) | ❌ (blocked) | ❌ (blocked) |
-| **oh-my-claudecode** | Configurable per team | 1 (workers) | Via file IPC | ❌ |
+| **Claude Code** | Configurable | 1 (flat) | N/A | No |
+| **DeerFlow** | 3 (ThreadPool) | 1 | Yes (shared thread state) | No |
+| **Hermes Agent** | 3 | 1 (blocked by tool restriction) | No (blocked) | No (blocked) |
+| **oh-my-claudecode** | Configurable per team | 1 (workers) | Via file IPC | No |
 | **Goose** | Configurable | Configurable | Not documented | Not documented |
 | **Dify** | Via graph engine | 5 (`WORKFLOW_CALL_MAX_DEPTH`) | Via child variable pool | Yes (child engines) |
 
@@ -328,7 +328,7 @@ These constraints exist as comments, not as code-enforced rules. At 14+ middlewa
 
 Based on evidence from these 10 teardowns, here's what to do and what to avoid.
 
-### ✅ Do This
+### Do This
 
 | Recommendation | Evidence | Steal From |
 |----------------|----------|------------|
@@ -344,7 +344,7 @@ Based on evidence from these 10 teardowns, here's what to do and what to avoid.
 | **Use declarative provider configs** | Goose's JSON-file-per-provider pattern lets you add OpenAI-compatible providers without writing code. 10-line JSON file vs. 300-line adapter class. | **Goose** |
 | **Block dangerous env vars for extensions** | Goose's 31-key blocklist prevents DLL injection and library preloading. Simple, effective, and nobody else does it. | **Goose** |
 
-### ❌ Avoid This
+### Avoid This
 
 | Anti-Pattern | Evidence | Worst Offender |
 |--------------|----------|---------------|

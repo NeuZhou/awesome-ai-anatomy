@@ -90,6 +90,8 @@ Projects sorted by GitHub stars (descending).
 
 ## Cross-Project Comparison
 
+**[Interactive Comparison Tool](https://neuzhou.github.io/awesome-ai-anatomy/comparison.html)** -- filter, search, and compare projects side by side.
+
 We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 15 projects:
 
 - Quick Reference (creator, stars, language, type, license)
@@ -97,12 +99,12 @@ We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side anal
 - Multi-agent & orchestration approaches
 - Memory & persistence strategies
 
-We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal analysis covering:
+We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** -- a deep horizontal analysis covering:
 
 - Architecture pattern taxonomy across all projects
 - Context management strategies compared
 - Tool system design patterns
-- Security ratings (A-F grading)
+- Security posture evaluation
 - Anti-pattern catalog with evidence
 - "Build from scratch" recommendations
 - Safety & security postures
@@ -126,9 +128,9 @@ We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal an
 
 ## Each Teardown Includes
 
-- **Architecture diagrams** — d2-rendered PNG with component relationships
-- **Overall rating** — A-F scale across security, architecture, code quality, and more
-- **Core innovation analysis** — what the project does that nobody else does
+- **Architecture diagrams** -- d2-rendered PNG with component relationships
+- **Detailed evaluation** -- security, architecture, code quality, and more
+- **Core innovation analysis** -- what the project does that nobody else does
 - **Code-level references** — file paths + line numbers for every claim
 - **Cross-project comparison table** — how it stacks up against alternatives
 - **"Stuff Worth Stealing"** — patterns other projects should adopt
