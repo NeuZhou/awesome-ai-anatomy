@@ -1,0 +1,36 @@
+name: MemPalace
+repo: milla-jovovich/mempalace
+stars: 30078
+forks: 3820
+language:
+  - Python
+loc: 15534
+license: MIT
+created: "2026-04-05"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: B+
+  code_quality: B
+  security: C+
+  documentation: A-
+  overall: B
+
+features:
+  sandbox: none
+  context_management: 4_layer_stack
+  stuck_detection: false
+  multi_agent: false
+  mcp_support: true
+  security_layers: 0
+  provider_count: 0
+  plugin_system: false
+
+key_finding: "4-layer memory stack, ChromaDB palace metaphor, +34% retrieval"
+
+tags:
+  - memory-system
+  - chromadb
+  - mcp-support
+  - knowledge-graph
+  - sqlite

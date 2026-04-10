@@ -1,0 +1,36 @@
+name: oh-my-codex
+repo: yeagerai/oh-my-codex
+stars: 19571
+forks: 1790
+language:
+  - TypeScript
+loc: 124000
+license: None
+created: "2025-06"
+data_as_of: "2026-04"
+
+ratings:
+  architecture: A-
+  code_quality: A-
+  security: B
+  documentation: B+
+  overall: A-
+
+features:
+  sandbox: git_worktree
+  context_management: none
+  stuck_detection: true
+  multi_agent: true
+  mcp_support: true
+  security_layers: 1
+  provider_count: 1
+  plugin_system: true
+
+key_finding: "30 agents, git worktree isolation, autoresearch loop"
+
+tags:
+  - multi-agent
+  - codex-plugin
+  - git-worktree
+  - hook-system
+  - autoresearch
