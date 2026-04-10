@@ -97,20 +97,6 @@ for (const proj of PROJECTS) {
 // Sort by stars descending
 projects.sort((a, b) => (b.stars || 0) - (a.stars || 0));
 
-// Rating to numeric for sorting/display
-function ratingToNum(r) {
-  const map = { 'A': 4.0, 'A-': 3.7, 'B+': 3.3, 'B': 3.0, 'B-': 2.7, 'C+': 2.3, 'C': 2.0, 'C-': 1.7, 'D': 1.0, 'F': 0 };
-  return map[r] || 0;
-}
-
-function ratingColor(r) {
-  const n = ratingToNum(r);
-  if (n >= 3.7) return '#3fb950';
-  if (n >= 3.0) return '#58a6ff';
-  if (n >= 2.3) return '#d29922';
-  return '#f85149';
-}
-
 // Collect all tags and languages
 const allTags = new Set();
 const allLangs = new Set();
@@ -131,9 +117,56 @@ function formatStars(n) {
   return String(n);
 }
 
+// Architecture pattern description from meta data
+function archPattern(p) {
+  const f = p.features || {};
+  const loop = f.agent_loop || 'custom';
+  // Map known patterns to descriptive strings
+  const archMap = {
+    'workflow-dag': 'workflow-DAG',
+    'custom': 'custom loop',
+    'event-driven': 'event-driven',
+    'react': 'ReACT loop',
+    'plan-execute': 'plan-execute',
+  };
+  return archMap[loop] || loop;
+}
+
+// Security approach description
+function securityApproach(p) {
+  const f = p.features || {};
+  const sec = f.security || {};
+  const layers = sec.layers || 0;
+  const types = sec.types || [];
+  if (layers === 0 && types.length === 0) return 'none';
+  return types.join(' + ') + ' (' + layers + ' layer' + (layers !== 1 ? 's' : '') + ')';
+}
+
+// Context strategy description
+function contextStrategy(p) {
+  const f = p.features || {};
+  const cm = f.context_management;
+  if (!cm || cm === 'none') return 'none';
+  return String(cm).replace(/_/g, ' ');
+}
+
+// Sandbox description
+function sandboxDesc(p) {
+  const f = p.features || {};
+  return String(f.sandbox || 'none');
+}
+
+// Extensions description
+function extensionsDesc(p) {
+  const f = p.features || {};
+  const parts = [];
+  if (f.mcp_support) parts.push('MCP');
+  if (f.plugin_system) parts.push('plugins');
+  return parts.length > 0 ? parts.join(' + ') : 'none';
+}
+
 function generateProjectCard(p) {
   const langs = Array.isArray(p.language) ? p.language : [p.language || 'Unknown'];
-  const overall = p.ratings?.overall || 'N/A';
   const tagsHtml = (p.tags || []).map(t =>
     `<span class="tag" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</span>`
   ).join('');
@@ -142,19 +175,17 @@ function generateProjectCard(p) {
     <a href="${REPO_URL}/tree/main/${p._slug}" target="_blank" class="card" 
        data-tags="${(p.tags || []).join(',')}" 
        data-lang="${langs.join(',')}" 
-       data-rating="${overall}"
        data-stars="${p.stars || 0}"
        data-name="${escapeHtml((p.name || p._slug).toLowerCase())}">
       <div class="card-img">
-        <img src="../${p._slug}/architecture.png" alt="${escapeHtml(p.name)} architecture" loading="lazy">
+        <img src="https://raw.githubusercontent.com/NeuZhou/awesome-ai-anatomy/main/${p._slug}/architecture.png" alt="${escapeHtml(p.name)} architecture" loading="lazy">
       </div>
       <div class="card-body">
         <div class="card-header">
           <h3>${escapeHtml(p.name)}</h3>
-          <span class="rating" style="background:${ratingColor(overall)}">${overall}</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> ${formatStars(p.stars || 0)}</span>
+          <span class="stars">${formatStars(p.stars || 0)}</span>
           <span class="lang">${langs.map(l => `<span class="lang-badge">${escapeHtml(l)}</span>`).join(' ')}</span>
         </div>
         <p class="key-finding">${escapeHtml(p.key_finding || '')}</p>
@@ -169,10 +200,10 @@ const indexHtml = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Awesome AI Anatomy — Source-Level Teardowns of AI Agent Projects</title>
-  <meta name="description" content="15 AI agent projects dissected — architecture diagrams, design patterns, and the engineering decisions nobody documents. Claude Code, Dify, OpenHands, and more.">
+  <title>Awesome AI Anatomy -- Source-Level Teardowns of AI Agent Projects</title>
+  <meta name="description" content="${projects.length} AI agent projects dissected -- architecture, patterns, and the decisions nobody bothers to document. Claude Code, Dify, OpenHands, and more.">
   <meta property="og:title" content="Awesome AI Anatomy">
-  <meta property="og:description" content="Source-level teardowns of how production AI systems actually work. 15 projects dissected.">
+  <meta property="og:description" content="Source-level teardowns of how production AI systems actually work. ${projects.length} projects dissected.">
   <meta property="og:image" content="${REPO_URL}/raw/main/assets/social-preview.png">
   <meta property="og:url" content="https://neuzhou.github.io/awesome-ai-anatomy/">
   <meta property="og:type" content="website">
@@ -186,12 +217,12 @@ const indexHtml = `<!DOCTYPE html>
 <body>
   <header class="hero">
     <div class="hero-content">
-      <h1> Awesome AI Anatomy</h1>
+      <h1>Awesome AI Anatomy</h1>
       <p class="hero-subtitle">We read the source code. All of it. Here's what we found.</p>
-      <p class="hero-desc">${projects.length} AI agent projects dissected — architecture diagrams, design patterns, and the engineering decisions nobody documents.</p>
+      <p class="hero-desc">${projects.length} AI agent projects dissected -- architecture, patterns, and the decisions nobody bothers to document.</p>
       <div class="hero-links">
-        <a href="${REPO_URL}" class="btn btn-primary" target="_blank"> Star on GitHub</a>
-        <a href="comparison.html" class="btn btn-secondary"> Compare All</a>
+        <a href="${REPO_URL}" class="btn btn-primary" target="_blank">Star on GitHub</a>
+        <a href="comparison.html" class="btn btn-secondary">Compare All</a>
       </div>
     </div>
   </header>
@@ -210,26 +241,14 @@ const indexHtml = `<!DOCTYPE html>
           </select>
         </div>
         <div class="filter-group">
-          <label>Min Rating</label>
-          <select id="filter-rating">
-            <option value="">Any Rating</option>
-            <option value="A">A and above</option>
-            <option value="A-">A- and above</option>
-            <option value="B+">B+ and above</option>
-            <option value="B">B and above</option>
-            <option value="B-">B- and above</option>
-            <option value="C+">C+ and above</option>
-          </select>
-        </div>
-        <div class="filter-group">
           <label>Sort By</label>
           <select id="sort-by">
-            <option value="stars">Stars ↓</option>
-            <option value="rating">Rating ↓</option>
+            <option value="stars">Stars</option>
             <option value="name">Name A-Z</option>
           </select>
         </div>
       </div>
+      <div class="filter-presets" id="filter-presets"></div>
       <div class="active-tags" id="active-tags"></div>
     </section>
 
@@ -243,8 +262,8 @@ const indexHtml = `<!DOCTYPE html>
   </main>
 
   <footer>
-    <p>Built with  by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> · 
-    <a href="${REPO_URL}" target="_blank">GitHub</a> · 
+    <p>Built by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> | 
+    <a href="${REPO_URL}" target="_blank">GitHub</a> | 
     <a href="${REPO_URL}/blob/main/CONTRIBUTING.md" target="_blank">Contribute</a></p>
   </footer>
 
@@ -253,35 +272,21 @@ const indexHtml = `<!DOCTYPE html>
 </html>`;
 
 // Generate comparison.html
-function generateComparisonTable() {
-  const sorted = [...projects].sort((a, b) => (b.stars || 0) - (a.stars || 0));
+function generateComparisonRow(p) {
+  const langs = Array.isArray(p.language) ? p.language.join(', ') : (p.language || '');
+  const f = p.features || {};
 
-  const rows = sorted.map(p => {
-    const langs = Array.isArray(p.language) ? p.language.join(', ') : (p.language || '');
-    const overall = p.ratings?.overall || 'N/A';
-    const arch = p.ratings?.architecture || 'N/A';
-    const code = p.ratings?.code_quality || 'N/A';
-    const sec = p.ratings?.security || 'N/A';
-    const f = p.features || {};
-
-    return `<tr>
-      <td><a href="${REPO_URL}/tree/main/${p._slug}" target="_blank">${escapeHtml(p.name)}</a></td>
-      <td>${formatStars(p.stars || 0)}</td>
-      <td>${escapeHtml(langs)}</td>
-      <td><span class="rating-cell" style="color:${ratingColor(overall)}">${overall}</span></td>
-      <td><span class="rating-cell" style="color:${ratingColor(arch)}">${arch}</span></td>
-      <td><span class="rating-cell" style="color:${ratingColor(code)}">${code}</span></td>
-      <td><span class="rating-cell" style="color:${ratingColor(sec)}">${sec}</span></td>
-      <td>${escapeHtml(String(f.sandbox || 'none'))}</td>
-      <td>${f.multi_agent ? '' : ''}</td>
-      <td>${f.mcp_support ? '' : ''}</td>
-      <td>${f.plugin_system ? '' : ''}</td>
-      <td>${escapeHtml(String(f.security_layers || 0))}</td>
-      <td class="key-finding-cell">${escapeHtml(p.key_finding || '')}</td>
-    </tr>`;
-  }).join('\n');
-
-  return rows;
+  return `          <tr>
+            <td data-label="Project"><a href="${REPO_URL}/tree/main/${p._slug}" target="_blank">${escapeHtml(p.name)}</a></td>
+            <td data-label="Stars">${formatStars(p.stars || 0)}</td>
+            <td data-label="Language">${escapeHtml(langs)}</td>
+            <td data-label="Architecture">${escapeHtml(archPattern(p))}</td>
+            <td data-label="Security">${escapeHtml(securityApproach(p))}</td>
+            <td data-label="Context">${escapeHtml(contextStrategy(p))}</td>
+            <td data-label="Sandbox">${escapeHtml(sandboxDesc(p))}</td>
+            <td data-label="Extensions">${escapeHtml(extensionsDesc(p))}</td>
+            <td data-label="Key Finding" class="key-finding-cell">${escapeHtml(p.key_finding || '')}</td>
+          </tr>`;
 }
 
 const comparisonHtml = `<!DOCTYPE html>
@@ -289,23 +294,23 @@ const comparisonHtml = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Comparison — Awesome AI Anatomy</title>
-  <meta name="description" content="Side-by-side comparison of 15 AI agent projects: ratings, features, architecture, and security.">
-  <meta property="og:title" content="AI Agent Comparison — Awesome AI Anatomy">
-  <meta property="og:description" content="Side-by-side comparison of 15 AI agent projects.">
+  <title>Project Comparison -- Awesome AI Anatomy</title>
+  <meta name="description" content="${projects.length} AI agent projects compared on architecture, security, context strategy, and extensions -- based on source code, not README claims.">
+  <meta property="og:title" content="AI Agent Comparison -- Awesome AI Anatomy">
+  <meta property="og:description" content="${projects.length} AI agent projects compared side-by-side on real engineering decisions.">
   <meta property="og:image" content="${REPO_URL}/raw/main/assets/social-preview.png">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'></text></svg>">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <nav class="top-nav">
-    <a href="index.html" class="nav-back">← Back to Projects</a>
+    <a href="index.html" class="nav-back">Back to Projects</a>
     <a href="${REPO_URL}" class="nav-github" target="_blank">GitHub</a>
   </nav>
 
   <main class="comparison-page">
-    <h1> Project Comparison</h1>
-    <p class="comparison-desc">${projects.length} projects compared across ratings, features, and architecture decisions.</p>
+    <h1>Project Comparison</h1>
+    <p class="comparison-desc">Every AI agent README says it's fast, extensible, and secure. This table cuts through that. We compared each project on architecture patterns, security approach, and context strategy based on what's actually in the source -- not what the landing page claims.</p>
 
     <div class="table-wrapper">
       <table class="comparison-table">
@@ -314,40 +319,19 @@ const comparisonHtml = `<!DOCTYPE html>
             <th>Project</th>
             <th>Stars</th>
             <th>Language</th>
-            <th>Overall</th>
-            <th>Arch</th>
-            <th>Code</th>
-            <th>Security</th>
+            <th>Architecture Pattern</th>
+            <th>Security Approach</th>
+            <th>Context Strategy</th>
             <th>Sandbox</th>
-            <th>Multi-Agent</th>
-            <th>MCP</th>
-            <th>Plugins</th>
-            <th>Sec Layers</th>
+            <th>Extensions</th>
             <th>Key Finding</th>
           </tr>
         </thead>
         <tbody>
-          ${generateComparisonTable()}
+${projects.map(generateComparisonRow).join('\n')}
         </tbody>
       </table>
     </div>
-
-    <section class="comparison-charts">
-      <h2>Rating Distribution</h2>
-      <div class="chart-grid">
-        ${projects.map(p => {
-          const overall = p.ratings?.overall || 'N/A';
-          const pct = (ratingToNum(overall) / 4.0 * 100).toFixed(0);
-          return `<div class="bar-item">
-            <span class="bar-label">${escapeHtml(p.name)}</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:${pct}%; background:${ratingColor(overall)}"></div>
-            </div>
-            <span class="bar-value" style="color:${ratingColor(overall)}">${overall}</span>
-          </div>`;
-        }).join('\n        ')}
-      </div>
-    </section>
 
     <section class="comparison-charts">
       <h2>Feature Matrix</h2>
@@ -368,9 +352,9 @@ const comparisonHtml = `<!DOCTYPE html>
               const f = p.features || {};
               return `<tr>
                 <td>${escapeHtml(p.name)}</td>
-                <td>${escapeHtml(String(f.context_management || 'none'))}</td>
-                <td>${f.stuck_detection ? '' : ''}</td>
-                <td>${f.provider_count || 0}</td>
+                <td>${escapeHtml(String(f.context_management || 'none').replace(/_/g, ' '))}</td>
+                <td>${f.stuck_detection ? 'yes' : '--'}</td>
+                <td>${f.providers?.count || f.provider_count || 0}</td>
                 <td>${escapeHtml(p.license || 'N/A')}</td>
                 <td>${(p.loc || 0).toLocaleString()}</td>
               </tr>`;
@@ -382,7 +366,7 @@ const comparisonHtml = `<!DOCTYPE html>
   </main>
 
   <footer>
-    <p>Built with  by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> · 
+    <p>Built by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> | 
     <a href="${REPO_URL}" target="_blank">GitHub</a></p>
   </footer>
 </body>

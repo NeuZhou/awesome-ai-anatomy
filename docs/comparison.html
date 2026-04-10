@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Comparison — Awesome AI Anatomy</title>
-  <meta name="description" content="15 AI agent projects scored on architecture, code quality, and security — based on source code, not README claims.">
-  <meta property="og:title" content="AI Agent Comparison — Awesome AI Anatomy">
-  <meta property="og:description" content="15 AI agent projects scored on architecture, code quality, and security — from the source.">
+  <title>Project Comparison -- Awesome AI Anatomy</title>
+  <meta name="description" content="15 AI agent projects compared on architecture, security, context strategy, and extensions -- based on source code, not README claims.">
+  <meta property="og:title" content="AI Agent Comparison -- Awesome AI Anatomy">
+  <meta property="og:description" content="15 AI agent projects compared side-by-side on real engineering decisions.">
   <meta property="og:image" content="https://github.com/NeuZhou/awesome-ai-anatomy/raw/main/assets/social-preview.png">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'></text></svg>">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <nav class="top-nav">
-    <a href="index.html" class="nav-back">← Back to Projects</a>
+    <a href="index.html" class="nav-back">Back to Projects</a>
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy" class="nav-github" target="_blank">GitHub</a>
   </nav>
 
   <main class="comparison-page">
-    <h1> Project Comparison</h1>
-    <p class="comparison-desc">Every AI agent README says it's fast, extensible, and secure. This table cuts through that. We scored each project on architecture, code quality, and security based on what's actually in the source — not what the landing page claims. Use it to pick the right tool, or to steal ideas from the best ones.</p>
+    <h1>Project Comparison</h1>
+    <p class="comparison-desc">Every AI agent README says it's fast, extensible, and secure. This table cuts through that. We compared each project on architecture patterns, security approach, and context strategy based on what's actually in the source -- not what the landing page claims.</p>
 
     <div class="table-wrapper">
       <table class="comparison-table">
@@ -28,358 +28,183 @@
             <th>Project</th>
             <th>Stars</th>
             <th>Language</th>
-            <th>Overall</th>
-            <th>Arch</th>
-            <th>Code</th>
-            <th>Security</th>
+            <th>Architecture Pattern</th>
+            <th>Security Approach</th>
+            <th>Context Strategy</th>
             <th>Sandbox</th>
-            <th>Multi-Agent</th>
-            <th>MCP</th>
-            <th>Plugins</th>
-            <th>Sec Layers</th>
+            <th>Extensions</th>
             <th>Key Finding</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/dify" target="_blank">Dify</a></td>
-      <td>136.3k</td>
-      <td>Python, TypeScript</td>
-      <td><span class="rating-cell" style="color:#58a6ff">B+</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B+</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td><span class="rating-cell" style="color:#d29922">B-</span></td>
-      <td>docker</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>2</td>
-      <td class="key-finding-cell">graphon engine, 7+ containers, 30+ vector DBs</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/claude-code" target="_blank">Claude Code</a></td>
-      <td>109.6k</td>
-      <td>TypeScript</td>
-      <td><span class="rating-cell" style="color:#3fb950">A-</span></td>
-      <td><span class="rating-cell" style="color:#3fb950">A</span></td>
-      <td><span class="rating-cell" style="color:#3fb950">A-</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B+</span></td>
-      <td>seatbelt</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>1</td>
-      <td class="key-finding-cell">4-layer context, hidden pet system (18 species)</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/openhands" target="_blank">OpenHands</a></td>
-      <td>70.9k</td>
-      <td>Python, TypeScript</td>
-      <td><span class="rating-cell" style="color:#58a6ff">B+</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B+</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td><span class="rating-cell" style="color:#3fb950">A-</span></td>
-      <td>docker</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>3</td>
-      <td class="key-finding-cell">10 condensers, 3-layer security, 487-line stuck detector, V0/V1 mid-migration</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/cline" target="_blank">Cline</a></td>
-      <td>60k</td>
-      <td>TypeScript</td>
-      <td><span class="rating-cell" style="color:#d29922">B-</span></td>
-      <td><span class="rating-cell" style="color:#d29922">C+</span></td>
-      <td><span class="rating-cell" style="color:#d29922">B-</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td>none</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>1</td>
-      <td class="key-finding-cell">3,756-line God Object, 40+ providers, YOLO mode, hooks system</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/deer-flow" target="_blank">DeerFlow</a></td>
-      <td>58.1k</td>
-      <td>Python, TypeScript</td>
-      <td><span class="rating-cell" style="color:#d29922">B-</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td><span class="rating-cell" style="color:#d29922">B-</span></td>
-      <td><span class="rating-cell" style="color:#d29922">C+</span></td>
-      <td>docker</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>0</td>
-      <td class="key-finding-cell">14-layer middleware, hash loop kill@5, no RBAC</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/mirofish" target="_blank">MiroFish</a></td>
-      <td>50.2k</td>
-      <td>Python, Vue</td>
-      <td><span class="rating-cell" style="color:#f85149">C</span></td>
-      <td><span class="rating-cell" style="color:#d29922">C+</span></td>
-      <td><span class="rating-cell" style="color:#f85149">C</span></td>
-      <td><span class="rating-cell" style="color:#f85149">D</span></td>
-      <td>none</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>0</td>
-      <td class="key-finding-cell">LLM social sim as 'collective intelligence'</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/goose" target="_blank">Goose</a></td>
-      <td>37.3k</td>
-      <td>Rust, TypeScript</td>
-      <td><span class="rating-cell" style="color:#3fb950">A-</span></td>
-      <td><span class="rating-cell" style="color:#3fb950">A-</span></td>
-      <td><span class="rating-cell" style="color:#3fb950">A</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B+</span></td>
-      <td>process_isolation</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>5</td>
-      <td class="key-finding-cell">MCP-first bus, 5-inspector pipeline, 30+ LLMs</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/pi-mono" target="_blank">Pi Mono</a></td>
-      <td>32k</td>
-      <td>TypeScript</td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B+</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td><span class="rating-cell" style="color:#f85149">C</span></td>
-      <td>none</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>0</td>
-      <td class="key-finding-cell">Game-engine arch, stealth mode as Claude Code</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/mempalace" target="_blank">MemPalace</a></td>
-      <td>30.1k</td>
-      <td>Python</td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B+</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td><span class="rating-cell" style="color:#d29922">C+</span></td>
-      <td>none</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>0</td>
-      <td class="key-finding-cell">4-layer memory stack, ChromaDB palace metaphor, +34% retrieval</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/lightpanda-browser" target="_blank">Lightpanda</a></td>
-      <td>27.3k</td>
-      <td>Zig, Rust</td>
-      <td><span class="rating-cell" style="color:#3fb950">A-</span></td>
-      <td><span class="rating-cell" style="color:#3fb950">A</span></td>
-      <td><span class="rating-cell" style="color:#3fb950">A</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td>none</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>0</td>
-      <td class="key-finding-cell">From-scratch browser for AI agents, 9x Chrome</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/codex-cli" target="_blank">OpenAI Codex CLI</a></td>
-      <td>27k</td>
-      <td>Rust</td>
-      <td><span class="rating-cell" style="color:#3fb950">A</span></td>
-      <td><span class="rating-cell" style="color:#3fb950">A</span></td>
-      <td><span class="rating-cell" style="color:#3fb950">A</span></td>
-      <td><span class="rating-cell" style="color:#3fb950">A</span></td>
-      <td>seatbelt_landlock_restricted_token</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>3</td>
-      <td class="key-finding-cell">Queue-pair arch, Guardian AI approval, 3-OS sandbox</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/hermes-agent" target="_blank">Hermes Agent</a></td>
-      <td>26.1k</td>
-      <td>Python</td>
-      <td><span class="rating-cell" style="color:#d29922">B-</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td><span class="rating-cell" style="color:#d29922">B-</span></td>
-      <td><span class="rating-cell" style="color:#f85149">C</span></td>
-      <td>docker</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>0</td>
-      <td class="key-finding-cell">Self-improving skills, FTS5 search, frozen mem</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/oh-my-claudecode" target="_blank">oh-my-claudecode</a></td>
-      <td>24.4k</td>
-      <td>TypeScript</td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B+</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td><span class="rating-cell" style="color:#d29922">B-</span></td>
-      <td>none</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>0</td>
-      <td class="key-finding-cell">19-agent team via file IPC, Haiku→Opus routing</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/oh-my-codex" target="_blank">oh-my-codex</a></td>
-      <td>19.6k</td>
-      <td>TypeScript</td>
-      <td><span class="rating-cell" style="color:#3fb950">A-</span></td>
-      <td><span class="rating-cell" style="color:#3fb950">A-</span></td>
-      <td><span class="rating-cell" style="color:#3fb950">A-</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td>git_worktree</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>1</td>
-      <td class="key-finding-cell">30 agents, git worktree isolation, autoresearch loop</td>
-    </tr>
-<tr>
-      <td><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/guardrails-ai" target="_blank">Guardrails AI</a></td>
-      <td>6.6k</td>
-      <td>Python</td>
-      <td><span class="rating-cell" style="color:#58a6ff">B+</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B+</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B+</span></td>
-      <td><span class="rating-cell" style="color:#58a6ff">B</span></td>
-      <td>none</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>0</td>
-      <td class="key-finding-cell">Validator Hub, reask self-correction loop</td>
-    </tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/dify" target="_blank">Dify</a></td>
+            <td data-label="Stars">136.3k</td>
+            <td data-label="Language">Python, TypeScript</td>
+            <td data-label="Architecture">workflow-DAG (graphon engine)</td>
+            <td data-label="Security">SSRF proxy + code sandbox (2 layers)</td>
+            <td data-label="Context">none</td>
+            <td data-label="Sandbox">Docker (7+ containers)</td>
+            <td data-label="Extensions">plugins + workflow nodes</td>
+            <td data-label="Key Finding" class="key-finding-cell">graphon engine, 7+ containers, 30+ vector DBs, plugin daemon</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/claude-code" target="_blank">Claude Code</a></td>
+            <td data-label="Stars">109.6k</td>
+            <td data-label="Language">TypeScript</td>
+            <td data-label="Architecture">streaming tool pipeline</td>
+            <td data-label="Security">per-tool permission + seatbelt sandbox</td>
+            <td data-label="Context">4-layer cascade (lossless before lossy)</td>
+            <td data-label="Sandbox">seatbelt (macOS)</td>
+            <td data-label="Extensions">MCP</td>
+            <td data-label="Key Finding" class="key-finding-cell">4-layer context cascade, hidden pet system (18 species)</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/openhands" target="_blank">OpenHands</a></td>
+            <td data-label="Stars">70.9k</td>
+            <td data-label="Language">Python, TypeScript</td>
+            <td data-label="Architecture">event-driven (observation/action)</td>
+            <td data-label="Security">GraySwan + Invariant + LLM-analyzer (3 layers)</td>
+            <td data-label="Context">10-condenser pipeline</td>
+            <td data-label="Sandbox">Docker</td>
+            <td data-label="Extensions">none</td>
+            <td data-label="Key Finding" class="key-finding-cell">10 condensers, 3-layer security, 487-line stuck detector</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/cline" target="_blank">Cline</a></td>
+            <td data-label="Stars">60k</td>
+            <td data-label="Language">TypeScript</td>
+            <td data-label="Architecture">monolithic loop (3,756-line God Object)</td>
+            <td data-label="Security">human-in-the-loop (1 layer)</td>
+            <td data-label="Context">truncate</td>
+            <td data-label="Sandbox">none</td>
+            <td data-label="Extensions">MCP + hooks</td>
+            <td data-label="Key Finding" class="key-finding-cell">3,756-line God Object, 43 providers, YOLO mode, hooks system</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/deer-flow" target="_blank">DeerFlow</a></td>
+            <td data-label="Stars">58.1k</td>
+            <td data-label="Language">Python, TypeScript</td>
+            <td data-label="Architecture">middleware pipeline (14 layers)</td>
+            <td data-label="Security">none</td>
+            <td data-label="Context">summarize (hash loop kill@5)</td>
+            <td data-label="Sandbox">Docker</td>
+            <td data-label="Extensions">none</td>
+            <td data-label="Key Finding" class="key-finding-cell">14-layer middleware, hash-based loop detection, no auth/RBAC</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/mirofish" target="_blank">MiroFish</a></td>
+            <td data-label="Stars">50.2k</td>
+            <td data-label="Language">Python, Vue</td>
+            <td data-label="Architecture">ReACT loop (OASIS/camel-ai)</td>
+            <td data-label="Security">none</td>
+            <td data-label="Context">none</td>
+            <td data-label="Sandbox">none</td>
+            <td data-label="Extensions">none</td>
+            <td data-label="Key Finding" class="key-finding-cell">LLM social sim as 'collective intelligence', core is OASIS</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/goose" target="_blank">Goose</a></td>
+            <td data-label="Stars">37.3k</td>
+            <td data-label="Language">Rust, TypeScript</td>
+            <td data-label="Architecture">MCP-first extension bus</td>
+            <td data-label="Security">5-inspector pipeline (security, egress, adversary, permission, repetition)</td>
+            <td data-label="Context">summarize (tool-pair background)</td>
+            <td data-label="Sandbox">process isolation</td>
+            <td data-label="Extensions">MCP + 6 extension types</td>
+            <td data-label="Key Finding" class="key-finding-cell">MCP-first bus, 5-inspector pipeline, 30+ LLMs</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/pi-mono" target="_blank">Pi Mono</a></td>
+            <td data-label="Stars">32k</td>
+            <td data-label="Language">TypeScript</td>
+            <td data-label="Architecture">game-engine loop (tick-based)</td>
+            <td data-label="Security">none</td>
+            <td data-label="Context">summarize</td>
+            <td data-label="Sandbox">none</td>
+            <td data-label="Extensions">plugins (tool definitions)</td>
+            <td data-label="Key Finding" class="key-finding-cell">Game-engine arch, stealth mode as Claude Code</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/mempalace" target="_blank">MemPalace</a></td>
+            <td data-label="Stars">30.1k</td>
+            <td data-label="Language">Python</td>
+            <td data-label="Architecture">layered recall (4-layer stack)</td>
+            <td data-label="Security">none</td>
+            <td data-label="Context">4-layer cascade (~600 token wake-up)</td>
+            <td data-label="Sandbox">none</td>
+            <td data-label="Extensions">MCP</td>
+            <td data-label="Key Finding" class="key-finding-cell">4-layer memory stack, ChromaDB palace metaphor, +34% retrieval</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/lightpanda-browser" target="_blank">Lightpanda</a></td>
+            <td data-label="Stars">27.3k</td>
+            <td data-label="Language">Zig, Rust</td>
+            <td data-label="Architecture">comptime bridge (Zig-V8 zero-cost FFI)</td>
+            <td data-label="Security">none</td>
+            <td data-label="Context">none (browser, not agent)</td>
+            <td data-label="Sandbox">none</td>
+            <td data-label="Extensions">MCP + CDP</td>
+            <td data-label="Key Finding" class="key-finding-cell">From-scratch browser for AI agents, 9x Chrome, 16x less memory</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/codex-cli" target="_blank">OpenAI Codex CLI</a></td>
+            <td data-label="Stars">27k</td>
+            <td data-label="Language">Rust</td>
+            <td data-label="Architecture">queue-pair (Sender/Receiver decoupled)</td>
+            <td data-label="Security">seatbelt + landlock + restricted-token + Guardian AI (4 layers)</td>
+            <td data-label="Context">summarize (two-phase extraction)</td>
+            <td data-label="Sandbox">seatbelt + landlock + restricted token (3-OS)</td>
+            <td data-label="Extensions">MCP + plugins</td>
+            <td data-label="Key Finding" class="key-finding-cell">Queue-pair arch, Guardian AI approval, 3-OS sandbox (17K LoC)</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/hermes-agent" target="_blank">Hermes Agent</a></td>
+            <td data-label="Stars">26.1k</td>
+            <td data-label="Language">Python</td>
+            <td data-label="Architecture">single-file loop (9,000-line agent)</td>
+            <td data-label="Security">memory threat detection (1 layer)</td>
+            <td data-label="Context">summarize + frozen snapshots</td>
+            <td data-label="Sandbox">Docker</td>
+            <td data-label="Extensions">self-improving skills</td>
+            <td data-label="Key Finding" class="key-finding-cell">Self-improving skills, FTS5 search, frozen memory snapshots</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/oh-my-claudecode" target="_blank">oh-my-claudecode</a></td>
+            <td data-label="Stars">24.4k</td>
+            <td data-label="Language">TypeScript</td>
+            <td data-label="Architecture">plan-execute (file IPC, mkdir locking)</td>
+            <td data-label="Security">none</td>
+            <td data-label="Context">none</td>
+            <td data-label="Sandbox">none</td>
+            <td data-label="Extensions">none (Claude Code plugin)</td>
+            <td data-label="Key Finding" class="key-finding-cell">19-agent team via file IPC, Haiku-to-Opus model routing</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/oh-my-codex" target="_blank">oh-my-codex</a></td>
+            <td data-label="Stars">19.6k</td>
+            <td data-label="Language">TypeScript</td>
+            <td data-label="Architecture">plan-execute (git worktree isolation)</td>
+            <td data-label="Security">plugin process isolation (1 layer)</td>
+            <td data-label="Context">none</td>
+            <td data-label="Sandbox">git worktree</td>
+            <td data-label="Extensions">MCP + hook plugin SDK</td>
+            <td data-label="Key Finding" class="key-finding-cell">30 agents, git worktree isolation, autoresearch loop</td>
+          </tr>
+          <tr>
+            <td data-label="Project"><a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/guardrails-ai" target="_blank">Guardrails AI</a></td>
+            <td data-label="Stars">6.6k</td>
+            <td data-label="Language">Python</td>
+            <td data-label="Architecture">validator pipeline (reask loop)</td>
+            <td data-label="Security">none (it IS the security layer)</td>
+            <td data-label="Context">none</td>
+            <td data-label="Sandbox">none</td>
+            <td data-label="Extensions">Validator Hub (npm for constraints)</td>
+            <td data-label="Key Finding" class="key-finding-cell">Validator Hub, reask self-correction loop, 8 OnFailAction variants</td>
+          </tr>
         </tbody>
       </table>
     </div>
-
-    <section class="comparison-charts">
-      <h2>Rating Distribution</h2>
-      <div class="chart-grid">
-        <div class="bar-item">
-            <span class="bar-label">Dify</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:83%; background:#58a6ff"></div>
-            </div>
-            <span class="bar-value" style="color:#58a6ff">B+</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">Claude Code</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:93%; background:#3fb950"></div>
-            </div>
-            <span class="bar-value" style="color:#3fb950">A-</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">OpenHands</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:83%; background:#58a6ff"></div>
-            </div>
-            <span class="bar-value" style="color:#58a6ff">B+</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">Cline</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:68%; background:#d29922"></div>
-            </div>
-            <span class="bar-value" style="color:#d29922">B-</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">DeerFlow</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:68%; background:#d29922"></div>
-            </div>
-            <span class="bar-value" style="color:#d29922">B-</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">MiroFish</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:50%; background:#f85149"></div>
-            </div>
-            <span class="bar-value" style="color:#f85149">C</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">Goose</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:93%; background:#3fb950"></div>
-            </div>
-            <span class="bar-value" style="color:#3fb950">A-</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">Pi Mono</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:75%; background:#58a6ff"></div>
-            </div>
-            <span class="bar-value" style="color:#58a6ff">B</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">MemPalace</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:75%; background:#58a6ff"></div>
-            </div>
-            <span class="bar-value" style="color:#58a6ff">B</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">Lightpanda</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:93%; background:#3fb950"></div>
-            </div>
-            <span class="bar-value" style="color:#3fb950">A-</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">OpenAI Codex CLI</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:100%; background:#3fb950"></div>
-            </div>
-            <span class="bar-value" style="color:#3fb950">A</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">Hermes Agent</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:68%; background:#d29922"></div>
-            </div>
-            <span class="bar-value" style="color:#d29922">B-</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">oh-my-claudecode</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:75%; background:#58a6ff"></div>
-            </div>
-            <span class="bar-value" style="color:#58a6ff">B</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">oh-my-codex</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:93%; background:#3fb950"></div>
-            </div>
-            <span class="bar-value" style="color:#3fb950">A-</span>
-          </div>
-        <div class="bar-item">
-            <span class="bar-label">Guardrails AI</span>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:83%; background:#58a6ff"></div>
-            </div>
-            <span class="bar-value" style="color:#58a6ff">B+</span>
-          </div>
-      </div>
-    </section>
 
     <section class="comparison-charts">
       <h2>Feature Matrix</h2>
@@ -397,125 +222,125 @@
           </thead>
           <tbody>
             <tr>
-                <td>Dify</td>
-                <td>none</td>
-                <td></td>
-                <td>30</td>
-                <td>Modified Apache 2.0</td>
-                <td>1,283,000</td>
-              </tr>
-<tr>
-                <td>Claude Code</td>
-                <td>4_layer_cascade</td>
-                <td></td>
-                <td>1</td>
-                <td>Proprietary</td>
-                <td>510,000</td>
-              </tr>
-<tr>
-                <td>OpenHands</td>
-                <td>condenser_pipeline</td>
-                <td></td>
-                <td>1</td>
-                <td>MIT</td>
-                <td>400,000</td>
-              </tr>
-<tr>
-                <td>Cline</td>
-                <td>truncate</td>
-                <td></td>
-                <td>43</td>
-                <td>Apache-2.0</td>
-                <td>560,000</td>
-              </tr>
-<tr>
-                <td>DeerFlow</td>
-                <td>summarize</td>
-                <td></td>
-                <td>1</td>
-                <td>MIT</td>
-                <td>0</td>
-              </tr>
-<tr>
-                <td>MiroFish</td>
-                <td>none</td>
-                <td></td>
-                <td>1</td>
-                <td>AGPL-3.0</td>
-                <td>38,800</td>
-              </tr>
-<tr>
-                <td>Goose</td>
-                <td>summarize</td>
-                <td></td>
-                <td>30</td>
-                <td>Apache-2.0</td>
-                <td>198,000</td>
-              </tr>
-<tr>
-                <td>Pi Mono</td>
-                <td>summarize</td>
-                <td></td>
-                <td>10</td>
-                <td>MIT</td>
-                <td>147,444</td>
-              </tr>
-<tr>
-                <td>MemPalace</td>
-                <td>4_layer_stack</td>
-                <td></td>
-                <td>0</td>
-                <td>MIT</td>
-                <td>15,534</td>
-              </tr>
-<tr>
-                <td>Lightpanda</td>
-                <td>none</td>
-                <td></td>
-                <td>0</td>
-                <td>AGPL-3.0</td>
-                <td>91,000</td>
-              </tr>
-<tr>
-                <td>OpenAI Codex CLI</td>
-                <td>summarize</td>
-                <td></td>
-                <td>1</td>
-                <td>Apache-2.0</td>
-                <td>549,000</td>
-              </tr>
-<tr>
-                <td>Hermes Agent</td>
-                <td>summarize</td>
-                <td></td>
-                <td>1</td>
-                <td>MIT</td>
-                <td>260,000</td>
-              </tr>
-<tr>
-                <td>oh-my-claudecode</td>
-                <td>none</td>
-                <td></td>
-                <td>3</td>
-                <td>MIT</td>
-                <td>194,000</td>
-              </tr>
-<tr>
-                <td>oh-my-codex</td>
-                <td>none</td>
-                <td></td>
-                <td>1</td>
-                <td>None</td>
-                <td>124,000</td>
-              </tr>
-<tr>
-                <td>Guardrails AI</td>
-                <td>none</td>
-                <td></td>
-                <td>1</td>
-                <td>Apache-2.0</td>
-                <td>18,079</td>
-              </tr>
+              <td>Dify</td>
+              <td>none</td>
+              <td>--</td>
+              <td>30</td>
+              <td>Modified Apache 2.0</td>
+              <td>1,283,000</td>
+            </tr>
+            <tr>
+              <td>Claude Code</td>
+              <td>4-layer cascade</td>
+              <td>--</td>
+              <td>1</td>
+              <td>Proprietary</td>
+              <td>510,000</td>
+            </tr>
+            <tr>
+              <td>OpenHands</td>
+              <td>condenser pipeline (10)</td>
+              <td>yes (487-line detector)</td>
+              <td>1 (LiteLLM)</td>
+              <td>MIT</td>
+              <td>400,000</td>
+            </tr>
+            <tr>
+              <td>Cline</td>
+              <td>truncate</td>
+              <td>yes</td>
+              <td>43</td>
+              <td>Apache-2.0</td>
+              <td>560,000</td>
+            </tr>
+            <tr>
+              <td>DeerFlow</td>
+              <td>summarize</td>
+              <td>yes (hash@3, kill@5)</td>
+              <td>1 (LangGraph)</td>
+              <td>MIT</td>
+              <td>--</td>
+            </tr>
+            <tr>
+              <td>MiroFish</td>
+              <td>none</td>
+              <td>--</td>
+              <td>1 (OASIS)</td>
+              <td>AGPL-3.0</td>
+              <td>38,800</td>
+            </tr>
+            <tr>
+              <td>Goose</td>
+              <td>summarize (tool-pair)</td>
+              <td>yes</td>
+              <td>30+</td>
+              <td>Apache-2.0</td>
+              <td>198,000</td>
+            </tr>
+            <tr>
+              <td>Pi Mono</td>
+              <td>summarize</td>
+              <td>--</td>
+              <td>10</td>
+              <td>MIT</td>
+              <td>147,444</td>
+            </tr>
+            <tr>
+              <td>MemPalace</td>
+              <td>4-layer stack</td>
+              <td>--</td>
+              <td>0 (memory only)</td>
+              <td>MIT</td>
+              <td>15,534</td>
+            </tr>
+            <tr>
+              <td>Lightpanda</td>
+              <td>none (browser)</td>
+              <td>--</td>
+              <td>0 (browser)</td>
+              <td>AGPL-3.0</td>
+              <td>91,000</td>
+            </tr>
+            <tr>
+              <td>OpenAI Codex CLI</td>
+              <td>summarize (two-phase)</td>
+              <td>--</td>
+              <td>1</td>
+              <td>Apache-2.0</td>
+              <td>549,000</td>
+            </tr>
+            <tr>
+              <td>Hermes Agent</td>
+              <td>summarize + frozen</td>
+              <td>--</td>
+              <td>1 (Gemini Flash)</td>
+              <td>MIT</td>
+              <td>260,000</td>
+            </tr>
+            <tr>
+              <td>oh-my-claudecode</td>
+              <td>none</td>
+              <td>--</td>
+              <td>3</td>
+              <td>MIT</td>
+              <td>194,000</td>
+            </tr>
+            <tr>
+              <td>oh-my-codex</td>
+              <td>none</td>
+              <td>yes</td>
+              <td>1</td>
+              <td>None</td>
+              <td>124,000</td>
+            </tr>
+            <tr>
+              <td>Guardrails AI</td>
+              <td>none</td>
+              <td>--</td>
+              <td>1 (LiteLLM)</td>
+              <td>Apache-2.0</td>
+              <td>18,079</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -523,7 +348,7 @@
   </main>
 
   <footer>
-    <p>Built with  by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> · 
+    <p>Built by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> | 
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy" target="_blank">GitHub</a></p>
   </footer>
 </body>

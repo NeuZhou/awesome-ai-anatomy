@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Awesome AI Anatomy — Source-Level Teardowns of AI Agent Projects</title>
-  <meta name="description" content="15 AI agent projects dissected — architecture, patterns, and the decisions nobody bothers to document. Claude Code, Dify, OpenHands, and more.">
+  <title>Awesome AI Anatomy -- Source-Level Teardowns of AI Agent Projects</title>
+  <meta name="description" content="15 AI agent projects dissected -- architecture, patterns, and the decisions nobody bothers to document. Claude Code, Dify, OpenHands, and more.">
   <meta property="og:title" content="Awesome AI Anatomy">
   <meta property="og:description" content="Source-level teardowns of how production AI systems actually work. 15 projects dissected.">
   <meta property="og:image" content="https://github.com/NeuZhou/awesome-ai-anatomy/raw/main/assets/social-preview.png">
@@ -20,12 +20,12 @@
 <body>
   <header class="hero">
     <div class="hero-content">
-      <h1> Awesome AI Anatomy</h1>
+      <h1>Awesome AI Anatomy</h1>
       <p class="hero-subtitle">We read the source code. All of it. Here's what we found.</p>
-      <p class="hero-desc">15 AI agent projects dissected — architecture, patterns, and the decisions nobody bothers to document.</p>
+      <p class="hero-desc">15 AI agent projects dissected -- architecture, patterns, and the decisions nobody bothers to document.</p>
       <div class="hero-links">
-        <a href="https://github.com/NeuZhou/awesome-ai-anatomy" class="btn btn-primary" target="_blank"> Star on GitHub</a>
-        <a href="comparison.html" class="btn btn-secondary"> Compare All</a>
+        <a href="https://github.com/NeuZhou/awesome-ai-anatomy" class="btn btn-primary" target="_blank">Star on GitHub</a>
+        <a href="comparison.html" class="btn btn-secondary">Compare All</a>
       </div>
     </div>
   </header>
@@ -48,23 +48,9 @@
           </select>
         </div>
         <div class="filter-group">
-          <label>Min Rating</label>
-          <select id="filter-rating">
-            <option value="">Any Rating</option>
-            <option value="A">A and above</option>
-            <option value="A-">A- and above</option>
-            <option value="B+">B+ and above</option>
-            <option value="B">B and above</option>
-            <option value="B-">B- and above</option>
-            <option value="C+">C+ and above</option>
-          </select>
-        </div>
-        <div class="filter-group">
           <label>Sort By</label>
           <select id="sort-by">
-            <option value="editorial">Editorial Score ↓</option>
-            <option value="stars">Stars ↓</option>
-            <option value="rating">Rating ↓</option>
+            <option value="stars">Stars</option>
             <option value="name">Name A-Z</option>
           </select>
         </div>
@@ -78,7 +64,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/dify" target="_blank" class="card" 
        data-tags="workflow-engine,web-ui,docker-sandbox,rag-platform,plugin-system,low-code" 
        data-lang="Python,TypeScript" 
-       data-rating="B+"
        data-stars="136306"
        data-name="dify">
       <div class="card-img">
@@ -87,10 +72,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>Dify</h3>
-          <span class="rating" style="background:#58a6ff">B+</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 136.3k</span>
+          <span class="stars">136.3k</span>
           <span class="lang"><span class="lang-badge">Python</span> <span class="lang-badge">TypeScript</span></span>
         </div>
         <p class="key-finding">graphon engine, 7+ containers, 30+ vector DBs</p>
@@ -101,7 +85,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/claude-code" target="_blank" class="card" 
        data-tags="coding-agent,cli,context-management,streaming-tools" 
        data-lang="TypeScript" 
-       data-rating="A-"
        data-stars="109558"
        data-name="claude code">
       <div class="card-img">
@@ -110,10 +93,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>Claude Code</h3>
-          <span class="rating" style="background:#3fb950">A-</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 109.6k</span>
+          <span class="stars">109.6k</span>
           <span class="lang"><span class="lang-badge">TypeScript</span></span>
         </div>
         <p class="key-finding">4-layer context, hidden pet system (18 species)</p>
@@ -124,7 +106,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/openhands" target="_blank" class="card" 
        data-tags="coding-agent,web-ui,docker-sandbox,multi-agent,context-management" 
        data-lang="Python,TypeScript" 
-       data-rating="B+"
        data-stars="70860"
        data-name="openhands">
       <div class="card-img">
@@ -133,10 +114,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>OpenHands</h3>
-          <span class="rating" style="background:#58a6ff">B+</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 70.9k</span>
+          <span class="stars">70.9k</span>
           <span class="lang"><span class="lang-badge">Python</span> <span class="lang-badge">TypeScript</span></span>
         </div>
         <p class="key-finding">10 condensers, 3-layer security, 487-line stuck detector, V0/V1 mid-migration</p>
@@ -147,7 +127,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/cline" target="_blank" class="card" 
        data-tags="coding-agent,vscode-extension,multi-provider,mcp-support,hooks-system" 
        data-lang="TypeScript" 
-       data-rating="B-"
        data-stars="60000"
        data-name="cline">
       <div class="card-img">
@@ -156,10 +135,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>Cline</h3>
-          <span class="rating" style="background:#d29922">B-</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 60k</span>
+          <span class="stars">60k</span>
           <span class="lang"><span class="lang-badge">TypeScript</span></span>
         </div>
         <p class="key-finding">3,756-line God Object, 40+ providers, YOLO mode, hooks system</p>
@@ -170,7 +148,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/deer-flow" target="_blank" class="card" 
        data-tags="agent-framework,middleware-chain,multi-agent,langgraph" 
        data-lang="Python,TypeScript" 
-       data-rating="B-"
        data-stars="58080"
        data-name="deerflow">
       <div class="card-img">
@@ -179,10 +156,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>DeerFlow</h3>
-          <span class="rating" style="background:#d29922">B-</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 58.1k</span>
+          <span class="stars">58.1k</span>
           <span class="lang"><span class="lang-badge">Python</span> <span class="lang-badge">TypeScript</span></span>
         </div>
         <p class="key-finding">14-layer middleware, hash loop kill@5, no RBAC</p>
@@ -193,7 +169,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/mirofish" target="_blank" class="card" 
        data-tags="social-simulation,multi-agent,prediction,flask-wrapper" 
        data-lang="Python,Vue" 
-       data-rating="C"
        data-stars="50223"
        data-name="mirofish">
       <div class="card-img">
@@ -202,10 +177,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>MiroFish</h3>
-          <span class="rating" style="background:#f85149">C</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 50.2k</span>
+          <span class="stars">50.2k</span>
           <span class="lang"><span class="lang-badge">Python</span> <span class="lang-badge">Vue</span></span>
         </div>
         <p class="key-finding">LLM social sim as 'collective intelligence'</p>
@@ -216,7 +190,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/goose" target="_blank" class="card" 
        data-tags="coding-agent,cli,mcp-first,rust,multi-provider,extension-system" 
        data-lang="Rust,TypeScript" 
-       data-rating="A-"
        data-stars="37343"
        data-name="goose">
       <div class="card-img">
@@ -225,10 +198,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>Goose</h3>
-          <span class="rating" style="background:#3fb950">A-</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 37.3k</span>
+          <span class="stars">37.3k</span>
           <span class="lang"><span class="lang-badge">Rust</span> <span class="lang-badge">TypeScript</span></span>
         </div>
         <p class="key-finding">MCP-first bus, 5-inspector pipeline, 30+ LLMs</p>
@@ -239,7 +211,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/pi-mono" target="_blank" class="card" 
        data-tags="coding-agent,cli,game-engine-arch,multi-provider,monorepo" 
        data-lang="TypeScript" 
-       data-rating="B"
        data-stars="32049"
        data-name="pi mono">
       <div class="card-img">
@@ -248,10 +219,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>Pi Mono</h3>
-          <span class="rating" style="background:#58a6ff">B</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 32k</span>
+          <span class="stars">32k</span>
           <span class="lang"><span class="lang-badge">TypeScript</span></span>
         </div>
         <p class="key-finding">Game-engine arch, stealth mode as Claude Code</p>
@@ -262,7 +232,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/mempalace" target="_blank" class="card" 
        data-tags="memory-system,chromadb,mcp-support,knowledge-graph,sqlite" 
        data-lang="Python" 
-       data-rating="B"
        data-stars="30078"
        data-name="mempalace">
       <div class="card-img">
@@ -271,10 +240,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>MemPalace</h3>
-          <span class="rating" style="background:#58a6ff">B</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 30.1k</span>
+          <span class="stars">30.1k</span>
           <span class="lang"><span class="lang-badge">Python</span></span>
         </div>
         <p class="key-finding">4-layer memory stack, ChromaDB palace metaphor, +34% retrieval</p>
@@ -285,7 +253,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/lightpanda-browser" target="_blank" class="card" 
        data-tags="browser,headless,zig,cdp,performance" 
        data-lang="Zig,Rust" 
-       data-rating="A-"
        data-stars="27287"
        data-name="lightpanda">
       <div class="card-img">
@@ -294,10 +261,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>Lightpanda</h3>
-          <span class="rating" style="background:#3fb950">A-</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 27.3k</span>
+          <span class="stars">27.3k</span>
           <span class="lang"><span class="lang-badge">Zig</span> <span class="lang-badge">Rust</span></span>
         </div>
         <p class="key-finding">From-scratch browser for AI agents, 9x Chrome</p>
@@ -308,7 +274,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/codex-cli" target="_blank" class="card" 
        data-tags="coding-agent,cli,rust,sandbox,guardian-ai,multi-platform" 
        data-lang="Rust" 
-       data-rating="A"
        data-stars="27000"
        data-name="openai codex cli">
       <div class="card-img">
@@ -317,10 +282,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>OpenAI Codex CLI</h3>
-          <span class="rating" style="background:#3fb950">A</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 27k</span>
+          <span class="stars">27k</span>
           <span class="lang"><span class="lang-badge">Rust</span></span>
         </div>
         <p class="key-finding">Queue-pair arch, Guardian AI approval, 3-OS sandbox</p>
@@ -331,7 +295,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/hermes-agent" target="_blank" class="card" 
        data-tags="coding-agent,cli,self-improving,session-search,openclaw-clone" 
        data-lang="Python" 
-       data-rating="B-"
        data-stars="26130"
        data-name="hermes agent">
       <div class="card-img">
@@ -340,10 +303,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>Hermes Agent</h3>
-          <span class="rating" style="background:#d29922">B-</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 26.1k</span>
+          <span class="stars">26.1k</span>
           <span class="lang"><span class="lang-badge">Python</span></span>
         </div>
         <p class="key-finding">Self-improving skills, FTS5 search, frozen mem</p>
@@ -354,7 +316,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/oh-my-claudecode" target="_blank" class="card" 
        data-tags="multi-agent,claude-code-plugin,file-ipc,model-routing,team-orchestration" 
        data-lang="TypeScript" 
-       data-rating="B"
        data-stars="24423"
        data-name="oh-my-claudecode">
       <div class="card-img">
@@ -363,13 +324,12 @@
       <div class="card-body">
         <div class="card-header">
           <h3>oh-my-claudecode</h3>
-          <span class="rating" style="background:#58a6ff">B</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 24.4k</span>
+          <span class="stars">24.4k</span>
           <span class="lang"><span class="lang-badge">TypeScript</span></span>
         </div>
-        <p class="key-finding">19-agent team via file IPC, Haiku→Opus routing</p>
+        <p class="key-finding">19-agent team via file IPC, Haiku-to-Opus routing</p>
         <div class="card-tags"><span class="tag" data-tag="multi-agent">multi-agent</span><span class="tag" data-tag="claude-code-plugin">claude-code-plugin</span><span class="tag" data-tag="file-ipc">file-ipc</span><span class="tag" data-tag="model-routing">model-routing</span><span class="tag" data-tag="team-orchestration">team-orchestration</span></div>
       </div>
     </a>
@@ -377,7 +337,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/oh-my-codex" target="_blank" class="card" 
        data-tags="multi-agent,codex-plugin,git-worktree,hook-system,autoresearch" 
        data-lang="TypeScript" 
-       data-rating="A-"
        data-stars="19571"
        data-name="oh-my-codex">
       <div class="card-img">
@@ -386,10 +345,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>oh-my-codex</h3>
-          <span class="rating" style="background:#3fb950">A-</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 19.6k</span>
+          <span class="stars">19.6k</span>
           <span class="lang"><span class="lang-badge">TypeScript</span></span>
         </div>
         <p class="key-finding">30 agents, git worktree isolation, autoresearch loop</p>
@@ -400,7 +358,6 @@
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/tree/main/guardrails-ai" target="_blank" class="card" 
        data-tags="security-tool,validation,llm-output-guard,validator-hub,reask-loop" 
        data-lang="Python" 
-       data-rating="B+"
        data-stars="6635"
        data-name="guardrails ai">
       <div class="card-img">
@@ -409,10 +366,9 @@
       <div class="card-body">
         <div class="card-header">
           <h3>Guardrails AI</h3>
-          <span class="rating" style="background:#58a6ff">B+</span>
         </div>
         <div class="card-meta">
-          <span class="stars"> 6.6k</span>
+          <span class="stars">6.6k</span>
           <span class="lang"><span class="lang-badge">Python</span></span>
         </div>
         <p class="key-finding">Validator Hub, reask self-correction loop</p>
@@ -427,8 +383,8 @@
   </main>
 
   <footer>
-    <p>Built with  by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> · 
-    <a href="https://github.com/NeuZhou/awesome-ai-anatomy" target="_blank">GitHub</a> · 
+    <p>Built by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> | 
+    <a href="https://github.com/NeuZhou/awesome-ai-anatomy" target="_blank">GitHub</a> | 
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy/blob/main/CONTRIBUTING.md" target="_blank">Contribute</a></p>
   </footer>
 

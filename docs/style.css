@@ -1,4 +1,4 @@
-/* Awesome AI Anatomy — GitHub Dark Theme */
+/* Awesome AI Anatomy -- GitHub Dark Theme */
 :root {
   --bg: #0d1117;
   --bg-secondary: #161b22;
@@ -191,19 +191,12 @@ main { max-width: 1280px; margin: 0 auto; padding: 1.5rem; }
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
+  gap: 0.5rem;
 }
 .card-header h3 {
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--text);
-}
-.rating {
-  padding: 0.15rem 0.55rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #fff;
-  flex-shrink: 0;
 }
 
 .card-meta {
@@ -288,7 +281,6 @@ main { max-width: 1280px; margin: 0 auto; padding: 1.5rem; }
   padding: 0.65rem 0.8rem;
   text-align: left;
   border-bottom: 1px solid var(--border);
-  white-space: nowrap;
 }
 .comparison-table th, .feature-table th {
   background: var(--bg-secondary);
@@ -299,6 +291,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 1.5rem; }
   letter-spacing: 0.03em;
   position: sticky;
   top: 0;
+  z-index: 1;
 }
 .comparison-table td:first-child a {
   font-weight: 600;
@@ -309,43 +302,11 @@ main { max-width: 1280px; margin: 0 auto; padding: 1.5rem; }
   min-width: 200px;
   max-width: 300px;
 }
-.rating-cell { font-weight: 700; }
 
 .comparison-table tbody tr:hover,
 .feature-table tbody tr:hover {
   background: var(--bg-card-hover);
 }
-
-/* Rating bar chart */
-.comparison-charts { margin-bottom: 2.5rem; }
-.comparison-charts h2 { margin-bottom: 1rem; font-size: 1.3rem; }
-.chart-grid { display: flex; flex-direction: column; gap: 0.5rem; }
-.bar-item {
-  display: grid;
-  grid-template-columns: 160px 1fr 40px;
-  align-items: center;
-  gap: 0.75rem;
-}
-.bar-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: right;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.bar-track {
-  height: 24px;
-  background: var(--bg-secondary);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.6s cubic-bezier(.4, 0, .2, 1);
-}
-.bar-value { font-size: 0.85rem; font-weight: 700; }
 
 /* Staff Pick Badge */
 .staff-pick-badge {
@@ -412,9 +373,45 @@ footer a:hover { color: var(--accent); }
   .hero-subtitle { font-size: 1rem; }
   .grid { grid-template-columns: 1fr; }
   .filter-row { flex-direction: column; }
-  .bar-item { grid-template-columns: 100px 1fr 35px; }
-  .bar-label { font-size: 0.75rem; }
   .comparison-page { padding: 1.5rem 1rem; }
+
+  /* Comparison table: wrap into card-style blocks on mobile */
+  .comparison-table thead { display: none; }
+  .comparison-table tbody tr {
+    display: block;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+  }
+  .comparison-table tbody tr:hover {
+    background: var(--bg-card-hover);
+  }
+  .comparison-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+    white-space: normal;
+  }
+  .comparison-table tbody td:last-child {
+    border-bottom: none;
+  }
+  .comparison-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+    margin-right: 0.75rem;
+  }
+  .key-finding-cell {
+    min-width: unset;
+    max-width: unset;
+  }
 }
 
 @media (max-width: 480px) {
