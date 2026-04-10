@@ -419,3 +419,52 @@ footer a:hover { color: var(--accent); }
   .card-img { height: 140px; }
   main { padding: 1rem; }
 }
+
+/* Comparison filter bar */
+.filter-bar {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+}
+.filter-label {
+  display: block;
+  color: #8b949e;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+.filter-btn {
+  background: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+.filter-btn:hover { border-color: #58a6ff; }
+.filter-btn.active { background: #1f6feb; color: #fff; border-color: #1f6feb; }
+.project-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.project-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  padding: 3px 10px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  color: #c9d1d9;
+  cursor: pointer;
+  user-select: none;
+}
+.project-chip:hover { border-color: #58a6ff; }
+.project-chip input { accent-color: #58a6ff; }

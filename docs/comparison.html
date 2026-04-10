@@ -21,6 +21,13 @@
     <h1>Project Comparison</h1>
     <p class="comparison-desc">Every AI agent README says it's fast, extensible, and secure. This table cuts through that. We compared each project on architecture patterns, security approach, and context strategy based on what's actually in the source -- not what the landing page claims.</p>
 
+    <div class="filter-bar">
+      <span class="filter-label">Select projects to compare:</span>
+      <button id="select-all" class="filter-btn active">All</button>
+      <button id="select-none" class="filter-btn">Clear</button>
+      <div class="project-checkboxes" id="project-checkboxes"></div>
+    </div>
+
     <div class="table-wrapper">
       <table class="comparison-table">
         <thead>
@@ -351,5 +358,50 @@
     <p>Built by <a href="https://github.com/NeuZhou" target="_blank">NeuZhou</a> | 
     <a href="https://github.com/NeuZhou/awesome-ai-anatomy" target="_blank">GitHub</a></p>
   </footer>
+
+  <script>
+  (function() {
+    const table = document.querySelector('.comparison-table');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const container = document.getElementById('project-checkboxes');
+    const selectAll = document.getElementById('select-all');
+    const selectNone = document.getElementById('select-none');
+
+    // Build checkboxes from table rows
+    rows.forEach((row, i) => {
+      const name = row.querySelector('td a')?.textContent || row.querySelector('td')?.textContent || '';
+      const label = document.createElement('label');
+      label.className = 'project-chip';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = true;
+      cb.dataset.index = i;
+      cb.addEventListener('change', filterRows);
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(' ' + name.trim()));
+      container.appendChild(label);
+    });
+
+    function filterRows() {
+      const checks = container.querySelectorAll('input[type="checkbox"]');
+      const anyUnchecked = Array.from(checks).some(c => !c.checked);
+      selectAll.classList.toggle('active', !anyUnchecked);
+      checks.forEach(cb => {
+        rows[cb.dataset.index].style.display = cb.checked ? '' : 'none';
+      });
+    }
+
+    selectAll.addEventListener('click', () => {
+      container.querySelectorAll('input').forEach(c => c.checked = true);
+      filterRows();
+    });
+
+    selectNone.addEventListener('click', () => {
+      container.querySelectorAll('input').forEach(c => c.checked = false);
+      filterRows();
+    });
+  })();
+  </script>
 </body>
 </html>
