@@ -15,6 +15,8 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 > This analysis tracks Claude Code's evolution. **Star to get updates** as new versions are analyzed.
+>
+> 📬 **[Read the newsletter version on Substack](https://neuzhou.substack.com/p/i-read-510000-lines-of-claude-codes)** — shorter, opinionated, delivered to your inbox.
 
 ## At a Glance
 

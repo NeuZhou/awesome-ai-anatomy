@@ -10,6 +10,7 @@
  <a href="https://github.com/NeuZhou/awesome-ai-anatomy/stargazers"><img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=social" alt="Stars"></a>
  <a href="https://github.com/NeuZhou/awesome-ai-anatomy/network/members"><img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks"></a>
  <a href="https://twitter.com/Neuzhou_"><img src="https://img.shields.io/twitter/follow/Neuzhou_?style=social" alt="Twitter"></a>
+ <a href="https://neuzhou.substack.com"><img src="https://img.shields.io/badge/Substack-Newsletter-orange?logo=substack" alt="Substack"></a>
  <img src="https://img.shields.io/badge/teardowns-15-blue" alt="Teardowns">
  <img src="https://img.shields.io/badge/updated-weekly-brightgreen" alt="Updated Weekly">
  <img src="https://img.shields.io/github/last-commit/NeuZhou/awesome-ai-anatomy?label=Last%20Updated" alt="Last Updated">
