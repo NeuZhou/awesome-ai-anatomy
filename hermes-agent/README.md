@@ -4,13 +4,13 @@
 
 ## TL;DR
 
-- **What it is** — OpenClaw rewritten in Python. Same SOUL.md/MEMORY.md/AGENTS.md structure, same skill system, plus self-improving skills, FTS5 session search, and a migration command that imports your OpenClaw config.
-- **Why it matters** — The self-improving skill system is the first production implementation of Voyager-style skill libraries (Wang et al., 2023) I've seen in a general-purpose agent. Skills get created from experience and patched in-place with security scanning.
-- **What you'll learn** — How verbal reinforcement learning works outside academia, why scanning memory writes for prompt injection matters, and what a 9,000-line single-file agent loop looks like in practice.
+- **What it is** - OpenClaw rewritten in Python. Same SOUL.md/MEMORY.md/AGENTS.md structure, same skill system, plus self-improving skills, FTS5 session search, and a migration command that imports your OpenClaw config.
+- **Why it matters** - The self-improving skill system is the first production implementation of Voyager-style skill libraries (Wang et al., 2023) I've seen in a general-purpose agent. Skills get created from experience and patched in-place with security scanning.
+- **What you'll learn** - How verbal reinforcement learning works outside academia, why scanning memory writes for prompt injection matters, and what a 9,000-line single-file agent loop looks like in practice.
 
 ## Why Should You Care?
 
-I ran `wc -l` on `run_agent.py` three times because I thought I miscounted. Nine thousand lines. One file. One class. Every PR touches it, every merge conflict lives here. At 26K stars nobody's had the guts to refactor it, and honestly, I get why — you'd basically be rewriting the product.
+I ran `wc -l` on `run_agent.py` three times because I thought I miscounted. Nine thousand lines. One file. One class. Every PR touches it, every merge conflict lives here. At 26K stars nobody's had the guts to refactor it, and honestly, I get why - you'd basically be rewriting the product.
 
 But that's not the interesting part. The interesting part is what happens when the agent finishes a hard task:
 
@@ -23,9 +23,9 @@ Agent: (internally) "This was complex. I'll create a skill for this."
 
 And then, next time it uses that skill and finds a better approach, it patches the skill *in-place*. The skill evolves.
 
-If you've read the Voyager paper (Wang et al., 2023), this will sound familiar — Voyager's Minecraft agent maintained a skill library of executable code, accumulating capabilities over time without catastrophic forgetting. Hermes takes that idea out of Minecraft and into a real coding agent. And where Voyager's skills were JavaScript functions, Hermes skills are markdown files with instructions and code snippets — closer to how a human would write a runbook.
+If you've read the Voyager paper (Wang et al., 2023), this will sound familiar - Voyager's Minecraft agent maintained a skill library of executable code, accumulating capabilities over time without catastrophic forgetting. Hermes takes that idea out of Minecraft and into a real coding agent. And where Voyager's skills were JavaScript functions, Hermes skills are markdown files with instructions and code snippets - closer to how a human would write a runbook.
 
-The Reflexion paper (Shinn et al., 2023) is the other piece of the puzzle. Reflexion showed that agents could improve through verbal self-reflection without weight updates — just natural language feedback stored in memory. Hermes combines both: Voyager-style skill accumulation + Reflexion-style self-patching. The skill doesn't just exist; it gets *better* each time it fails.
+The Reflexion paper (Shinn et al., 2023) is the other piece of the puzzle. Reflexion showed that agents could improve through verbal self-reflection without weight updates - just natural language feedback stored in memory. Hermes combines both: Voyager-style skill accumulation + Reflexion-style self-patching. The skill doesn't just exist; it gets *better* each time it fails.
 
 ## At a Glance
 
@@ -40,7 +40,7 @@ The Reflexion paper (Shinn et al., 2023) is the other piece of the puzzle. Refle
 | Tagline | "The agent that grows with you" |
 | Data as of | April 2026 |
 
-If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SOUL.md/MEMORY.md/AGENTS.md file structure, same skill system, same gateway architecture, even a `hermes claw migrate` command to import your OpenClaw config. Let's just say it: **Hermes is OpenClaw rewritten in Python.** The file structure is the same, the concepts are the same, the terminology is the same. What's different is the stuff they added on top — and some of it is actually worth paying attention to.
+If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SOUL.md/MEMORY.md/AGENTS.md file structure, same skill system, same gateway architecture, even a `hermes claw migrate` command to import your OpenClaw config. Let's just say it: **Hermes is OpenClaw rewritten in Python.** The file structure is the same, the concepts are the same, the terminology is the same. What's different is the stuff they added on top - and some of it is actually worth paying attention to.
 
 ---
 
@@ -60,9 +60,9 @@ If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SO
 
 ![Architecture](architecture.png)
 
-The entire agent loop lives in one file: `run_agent.py` at 9,000+ lines. I know. Nine thousand lines, one file, one class. This is the kind of file that makes you run `wc -l` three times. Every PR touches it. Every merge conflict lives here. Nobody at 26K stars has refactored it, and at this point it's load-bearing spaghetti — touch it and the whole product might break.
+The entire agent loop lives in one file: `run_agent.py` at 9,000+ lines. I know. Nine thousand lines, one file, one class. This is the kind of file that makes you run `wc -l` three times. Every PR touches it. Every merge conflict lives here. Nobody at 26K stars has refactored it, and at this point it's deeply entrenched — the kind of file where changing one function means understanding 8,999 other lines of context.
 
-(For contrast: DeerFlow's middleware chain is how you actually make an agent loop extensible. But Hermes didn't start with extensibility — it started with getting things working, and 9K lines later, here we are.)
+(For contrast: DeerFlow's middleware chain is how you actually make an agent loop extensible. But Hermes didn't start with extensibility - it started with getting things working, and 9K lines later, here we are.)
 
 ---
 
@@ -76,7 +76,7 @@ The learning loop has three components, and they map surprisingly well to two pa
 
 ### 1. Autonomous Skill Creation (← Voyager's Skill Library)
 
-Voyager (Wang et al., 2023) introduced the idea of a skill library — a growing collection of executable code that the agent accumulates through exploration. The agent discovers how to do something, saves it as a reusable skill, and retrieves it later. The key insight was that skills are *composable*: complex behaviors build on simpler ones, avoiding catastrophic forgetting.
+Voyager (Wang et al., 2023) introduced the idea of a skill library - a growing collection of executable code that the agent accumulates through exploration. The agent discovers how to do something, saves it as a reusable skill, and retrieves it later. The key insight was that skills are *composable*: complex behaviors build on simpler ones, avoiding catastrophic forgetting.
 
 Hermes implements this directly. After completing a complex task, the agent creates a new skill:
 
@@ -84,11 +84,11 @@ Hermes implements this directly. After completing a complex task, the agent crea
 → Creates ~/.hermes/skills/prometheus-grafana-setup/SKILL.md
 ```
 
-The `skill_manager_tool.py` handles creation with six actions: `create`, `edit`, `patch`, `delete`, `write_file`, `remove_file`. Every new skill gets a security scan before activation — the same scanner that vets community hub installs runs on agent-authored skills too. That's a detail Voyager didn't have to worry about in Minecraft.
+The `skill_manager_tool.py` handles creation with six actions: `create`, `edit`, `patch`, `delete`, `write_file`, `remove_file`. Every new skill gets a security scan before activation - the same scanner that vets community hub installs runs on agent-authored skills too. That's a detail Voyager didn't have to worry about in Minecraft.
 
 ### 2. Skills Self-Improve During Use (← Reflexion's Verbal RL)
 
-This is where it gets interesting. Reflexion (Shinn et al., 2023) showed that agents could improve through verbal reinforcement learning — natural language self-reflection stored in memory, used to make better decisions on retry. No weight updates, no fine-tuning. Just words.
+This is where it gets interesting. Reflexion (Shinn et al., 2023) showed that agents could improve through verbal reinforcement learning - natural language self-reflection stored in memory, used to make better decisions on retry. No weight updates, no fine-tuning. Just words.
 
 Hermes applies this to skills. When the agent uses a skill and discovers a better approach, it patches the skill in-place:
 
@@ -100,7 +100,7 @@ def handle_patch(args):
     # Security scan runs AFTER modification
 ```
 
-The `patch` action does targeted find-and-replace rather than full rewrites. This is smart — the agent can fix one section without regenerating the whole skill. And the post-edit security scan catches any injections the LLM might accidentally introduce.
+The `patch` action does targeted find-and-replace rather than full rewrites. This is smart - the agent can fix one section without regenerating the whole skill. And the post-edit security scan catches any injections the LLM might accidentally introduce.
 
 The combination is what makes it work: Voyager-style creation (accumulate skills from experience) + Reflexion-style improvement (verbal feedback → skill patches). Neither paper did both. Hermes does.
 
@@ -143,14 +143,14 @@ MAX_DEPTH = 2  # parent (0) -> child (1) -> grandchild rejected
 
 Key decisions:
 
-1. **No recursive delegation** — children can't spawn grandchildren (`delegate_task` is blocked, so effective depth = 1)
-2. **No memory writes** — children can't corrupt shared MEMORY.md
-3. **No user interaction** — children can't ask clarifying questions
-4. **No code execution** — children "should reason step-by-step, not write scripts"
+1. **No recursive delegation** - children can't spawn grandchildren (`delegate_task` is blocked, so effective depth = 1)
+2. **No memory writes** - children can't corrupt shared MEMORY.md
+3. **No user interaction** - children can't ask clarifying questions
+4. **No code execution** - children "should reason step-by-step, not write scripts"
 
 The no-memory-writes constraint prevents a class of bugs where two children simultaneously try to update MEMORY.md. But it also means children can't benefit from each other's discoveries within a single turn.
 
-The no-code-execution constraint is the one I'm least sure about. The comment says children "should reason step-by-step" — but what about multi-file refactors where the child needs to actually run tests? I suspect this was a safety-first decision that'll get relaxed once someone hits the limitation on a real task.
+The no-code-execution constraint is the one I'm least sure about. The comment says children "should reason step-by-step" - but what about multi-file refactors where the child needs to actually run tests? I suspect this was a safety-first decision that'll get relaxed once someone hits the limitation on a real task.
 
 ---
 
@@ -160,11 +160,11 @@ The no-code-execution constraint is the one I'm least sure about. The comment sa
 
 Five-step algorithm:
 
-1. **Prune old tool results** — cheap pre-pass, no LLM call. Old tool outputs get replaced with `[Old tool output cleared to save context space]`
-2. **Protect the head** — system prompt + first exchange are never summarized
-3. **Protect the tail** — most recent ~20K tokens kept verbatim
-4. **Summarize the middle** — structured template: Goal, Progress, Decisions, Files, Next Steps
-5. **Iterative updates** — subsequent compactions refine the previous summary rather than regenerating
+1. **Prune old tool results** - cheap pre-pass, no LLM call. Old tool outputs get replaced with `[Old tool output cleared to save context space]`
+2. **Protect the head** - system prompt + first exchange are never summarized
+3. **Protect the tail** - most recent ~20K tokens kept verbatim
+4. **Summarize the middle** - structured template: Goal, Progress, Decisions, Files, Next Steps
+5. **Iterative updates** - subsequent compactions refine the previous summary rather than regenerating
 
 ```python
 SUMMARY_PREFIX = (
@@ -174,13 +174,13 @@ SUMMARY_PREFIX = (
 )
 ```
 
-The structured summary template is the key improvement over naive compression. Instead of "summarize everything," it asks the model to specifically track goals, decisions made, and files modified. This connects to MemGPT's (Packer et al., 2023) virtual context management — treating context as managed memory with explicit page-in/page-out policies rather than a dumb buffer.
+The structured summary template is the key improvement over naive compression. Instead of "summarize everything," it asks the model to specifically track goals, decisions made, and files modified. This connects to MemGPT's (Packer et al., 2023) virtual context management - treating context as managed memory with explicit page-in/page-out policies rather than a dumb buffer.
 
 ---
 
 ## Session Search: FTS5 Over Event History
 
-Most agent frameworks treat each session as a clean slate with only MEMORY.md for continuity. I've been annoyed by this for months — the agent forgets what we talked about three days ago unless I manually wrote it down. Hermes stores all sessions in SQLite with FTS5 full-text search:
+Most agent frameworks treat each session as a clean slate with only MEMORY.md for continuity. I've been annoyed by this for months - the agent forgets what we talked about three days ago unless I manually wrote it down. Hermes stores all sessions in SQLite with FTS5 full-text search:
 
 ```python
 # From session_search_tool.py
@@ -194,9 +194,9 @@ Flow:
 """
 ```
 
-When you ask "what did I work on last week?", it doesn't grep MEMORY.md — it searches actual conversation transcripts, finds the most relevant sessions, and uses a cheap model (Gemini Flash) to summarize them. The main model's context stays clean.
+When you ask "what did I work on last week?", it doesn't grep MEMORY.md - it searches actual conversation transcripts, finds the most relevant sessions, and uses a cheap model (Gemini Flash) to summarize them. The main model's context stays clean.
 
-This is the missing piece that the Generative Agents paper implied but didn't fully implement. Park et al. had a memory stream with recency-weighted retrieval. Hermes has full-text search over raw transcripts. The FTS5 approach is less elegant but more practical — you don't need embedding infrastructure, and SQLite is already in every Python installation.
+This is the missing piece that the Generative Agents paper implied but didn't fully implement. Park et al. had a memory stream with recency-weighted retrieval. Hermes has full-text search over raw transcripts. The FTS5 approach is less elegant but more practical - you don't need embedding infrastructure, and SQLite is already in every Python installation.
 
 ---
 
@@ -211,7 +211,7 @@ This is the missing piece that the Generative Agents paper implied but didn't fu
 | Singularity | HPC containers | GPU clusters |
 | Modal | Serverless compute | Pay-per-second |
 
-Daytona and Modal are the interesting ones — serverless persistence. Your agent's environment hibernates when idle and wakes on demand. If your agent runs 2 hours/day, you pay for 2 hours, not 24.
+Daytona and Modal are the interesting ones - serverless persistence. Your agent's environment hibernates when idle and wakes on demand. If your agent runs 2 hours/day, you pay for 2 hours, not 24.
 
 ---
 
@@ -227,13 +227,13 @@ hermes claw migrate --preset user-data  # Only data, no secrets
 
 It imports: SOUL.md, MEMORY.md, USER.md, skills, command allowlists, messaging configs, API keys, TTS assets, and workspace instructions.
 
-The command name says it all. Not `hermes import-config` or `hermes migrate-from`. It's `hermes claw migrate`. They named the subcommand after the project they're migrating from. This is the most honest "we forked the concept" signal I've ever seen in an open-source project — and honestly, if the extras are good enough, that's a legitimate growth strategy.
+The command name says it all. Not `hermes import-config` or `hermes migrate-from`. It's `hermes claw migrate`. They named the subcommand after the project they're migrating from. This is the most honest "we forked the concept" signal I've ever seen in an open-source project - and honestly, if the extras are good enough, that's a legitimate growth strategy.
 
 ---
 
 ## Memory Threat Detection
 
-The memory tool includes inline threat scanning — checking for prompt injections in content before it gets persisted into the system prompt:
+The memory tool includes inline threat scanning - checking for prompt injections in content before it gets persisted into the system prompt:
 
 ```python
 _MEMORY_THREAT_PATTERNS = [
@@ -242,7 +242,7 @@ _MEMORY_THREAT_PATTERNS = [
 ]
 ```
 
-This is the right instinct. Memory is a persistence vector for prompt injection: if an attacker can get malicious text into MEMORY.md (via a poisoned web page the agent reads, for example), it affects every future session. Most frameworks don't scan memory writes at all. The patterns live right next to the memory write path, not in a separate security module — defensive coding where the patterns and the code they protect are in the same file.
+This is the right instinct. Memory is a persistence vector for prompt injection: if an attacker can get malicious text into MEMORY.md (via a poisoned web page the agent reads, for example), it affects every future session. Most frameworks don't scan memory writes at all. The patterns live right next to the memory write path, not in a separate security module - defensive coding where the patterns and the code they protect are in the same file.
 
 ---
 
@@ -250,7 +250,7 @@ This is the right instinct. Memory is a persistence vector for prompt injection:
 
 The learning loop works and is the main reason to care about Hermes. Skills get created from experience, patched in-place with security scanning, and the frozen snapshot trick for memory is worth stealing. Session search with FTS5 + LLM summarization solves a real problem I've been annoyed by personally.
 
-But let's not pretend this is from-scratch innovation. It's OpenClaw in Python, and the 9,000-line single-file agent loop is the kind of thing that happens when a project evolves fast. The subagent restrictions are safety-first, which I respect — but blocking code execution for child agents means multi-file refactors are going to hit a wall. Someone will find that limit soon.
+But let's not pretend this is from-scratch innovation. It's OpenClaw in Python, and the 9,000-line single-file agent loop is the kind of thing that happens when a project evolves fast. The subagent restrictions are safety-first, which I respect - but blocking code execution for child agents means multi-file refactors are going to hit a wall. Someone will find that limit soon.
 
 The one-memory-provider limit is a constraint where the single-provider design keeps architecture simple. In 2026, you probably want at least a file store plus a semantic search layer. Combining both would unlock more value.
 
@@ -260,14 +260,14 @@ No cost budgets. For an agent that advertises Modal and Daytona (serverless, pay
 
 ## The Academic Lineage: What Hermes Actually Implements
 
-It's worth mapping Hermes's features to the papers that proposed them, because Hermes is — possibly accidentally — the most faithful implementation of several research ideas I've seen in a production agent.
+It's worth mapping Hermes's features to the papers that proposed them, because Hermes is - possibly accidentally - the most faithful implementation of several research ideas I've seen in a production agent.
 
 | Hermes Feature | Academic Origin | What Changed |
 |----------------|----------------|-------------|
-| Skill creation from experience | Voyager (Wang et al., 2023) — skill library | JavaScript functions → SKILL.md files |
-| Skill self-improvement | Reflexion (Shinn et al., 2023) — verbal RL | Retry with reflection → in-place skill patching |
-| Frozen memory snapshots | Generative Agents (Park et al., 2023) — observation/reflection separation | Embedding retrieval → markdown files |
-| FTS5 session search | MemGPT (Packer et al., 2023) — virtual context management | Page in/out → FTS5 + Gemini Flash summarization |
+| Skill creation from experience | Voyager (Wang et al., 2023) - skill library | JavaScript functions → SKILL.md files |
+| Skill self-improvement | Reflexion (Shinn et al., 2023) - verbal RL | Retry with reflection → in-place skill patching |
+| Frozen memory snapshots | Generative Agents (Park et al., 2023) - observation/reflection separation | Embedding retrieval → markdown files |
+| FTS5 session search | MemGPT (Packer et al., 2023) - virtual context management | Page in/out → FTS5 + Gemini Flash summarization |
 | Structured context compaction | MemGPT + Generative Agents | OS metaphor → structured summary template |
 
 The Voyager + Reflexion combination is the one that matters most. Voyager showed that skill accumulation prevents catastrophic forgetting. Reflexion showed that verbal self-reflection enables improvement without weight updates. Hermes puts them together: create a skill (Voyager), use it, fail, reflect, patch it (Reflexion), and the skill library gets better over time. That's the compound growth mechanism that makes "the agent that grows with you" more than marketing.
@@ -310,13 +310,13 @@ Snapshot MEMORY.md once at session start, never update the system prompt during 
 
 ## Hooks & Easter Eggs
 
-**`hermes claw migrate` — the tell.** Not `hermes import-config`. Not `hermes migrate-from`. `hermes claw migrate`. Named after the project they're replacing. Supports `--dry-run` and `--preset user-data`.
+**`hermes claw migrate` - the tell.** Not `hermes import-config`. Not `hermes migrate-from`. `hermes claw migrate`. Named after the project they're replacing. Supports `--dry-run` and `--preset user-data`.
 
-**9,000 lines, one file, one class.** The kind of file that makes you run `wc -l` three times. Nine thousand lines of agent loop. Every PR touches it. Nobody's had the guts to refactor it. At this point it's load-bearing spaghetti.
+**9,000 lines, one file, one class.** The kind of file that makes you run `wc -l` three times. Nine thousand lines of agent loop. Every PR touches it. Nobody's had the guts to refactor it. Deeply entrenched by now.
 
-**`DELEGATE_BLOCKED_TOOLS` as philosophy.** That frozenset isn't just safety — it's a worldview. No recursion, no user interaction, no shared state, no code execution. The comment about reasoning step-by-step tells me nobody tried giving a child agent a multi-file refactor task yet.
+**`DELEGATE_BLOCKED_TOOLS` as philosophy.** That frozenset isn't just safety - it's a worldview. No recursion, no user interaction, no shared state, no code execution. The comment about reasoning step-by-step tells me nobody tried giving a child agent a multi-file refactor task yet.
 
-**Memory threat patterns inline.** `_MEMORY_THREAT_PATTERNS` sits right next to the memory write path. Defensive coding — patterns and the code they protect in the same file, so nobody can update one without seeing the other.
+**Memory threat patterns inline.** `_MEMORY_THREAT_PATTERNS` sits right next to the memory write path. Defensive coding - patterns and the code they protect in the same file, so nobody can update one without seeing the other.
 
 **The frozen snapshot trick.** `BuiltinMemoryProvider.system_prompt_block()` takes a snapshot at session start and never updates during the session. Prompt-cache optimization disguised as a design choice.
 
@@ -361,5 +361,5 @@ Snapshot MEMORY.md once at session start, never update the system prompt during 
 
 ---
 
-*Part of [awesome-ai-anatomy](https://github.com/NeuZhou/awesome-ai-anatomy) — source-level teardowns of how production AI systems actually work.*
+*Part of [awesome-ai-anatomy](https://github.com/NeuZhou/awesome-ai-anatomy) - source-level teardowns of how production AI systems actually work.*
 
