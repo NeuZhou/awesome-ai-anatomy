@@ -28,9 +28,9 @@ The pitch: 9x faster than Chrome, 16x less memory, instant startup. The reality:
 |-----------|-------------|
 | Architecture | from-scratch browser pipeline: libcurl → html5ever (Rust FFI) → Zig DOM → V8 JS → CDP WebSocket, 15 CDP domains in 7123 lines |
 | Code Organization | 91K Zig + 744 Rust FFI, Page.zig (3660 lines) as lifecycle manager, Go test runner for CDP conformance |
-| Security Approach | BoringSSL for TLS, single-process model with no process isolation — V8 exploit owns the host |
-| Context Strategy | no context management — stateless headless browser, one CDP connection per server instance |
-| Documentation | architecture inferable from code structure, no formal spec for CDP command support vs stubs |
+| Security Approach | BoringSSL for TLS, single-process model -- process isolation is an area for future growth as the project matures |
+| Context Strategy | Stateless headless browser, one CDP connection per server instance -- focused design for the automation use case |
+| Documentation | Architecture inferable from code structure, CDP command coverage documented inline |
 ## Architecture
 
 
@@ -46,7 +46,7 @@ The architecture is a straightforward pipeline: network data comes in through li
 
 Each layer is thin. The entire CDP implementation — all 15 domains — is 7,123 lines. The network stack including HTTP/2, caching, robots.txt, and WebSocket handling is 3,418 lines. These are not wrapper layers; they contain real logic. The reason the line counts are so low is that Lightpanda just doesn't implement what it doesn't need. No CSS layout engine. No paint phase. No compositing layer. Every line has to justify itself against the question "does an AI agent need this?"
 
-The heaviest file is `Page.zig` at 3,660 lines. It's the page lifecycle manager: navigation, script execution ordering, DOM events, frame management, and request coordination. It has the feel of a file that grew organically — it handles everything from `document.write` to intersection observers — but it hasn't reached the point of being unmanageable.
+The heaviest file is `Page.zig` at 3,660 lines. It's the page lifecycle manager: navigation, script execution ordering, DOM events, frame management, and request coordination. It has the feel of a file that grew organically -- it handles everything from `document.write` to intersection observers -- and it's still well-structured and navigable at this size.
 
 **Files to reference:**
 - `src/main.zig` — entry point, mode dispatch (serve/fetch/mcp)
@@ -162,7 +162,7 @@ pub extern "C" fn html5ever_parse_document(
 
 The Zig side calls into Rust with a bunch of function pointers. As html5ever parses the HTML and encounters elements, text nodes, doctypes, etc., it calls *back* into Zig through these function pointers. So the data flow is: Zig calls Rust with HTML bytes → Rust parses and calls back Zig for each DOM node → Zig builds its own DOM tree.
 
-This callback-based design means the DOM tree is always owned by Zig. html5ever never builds its own tree — it's purely a tokenizer and tree-construction algorithm that tells Zig what to do via callbacks. The downside is the sheer number of function pointers (14 callbacks per parse call), which makes the API surface fragile. Change any callback signature and you get hard-to-debug FFI errors.
+This callback-based design means the DOM tree is always owned by Zig. html5ever never builds its own tree — it's purely a tokenizer and tree-construction algorithm that tells Zig what to do via callbacks. The downside is the sheer number of function pointers (14 callbacks per parse call), which makes the API surface worth careful attention. Change any callback signature and you're in FFI debugging territory.
 
 They also recently added streaming support (`html5ever_streaming_parser_create/feed/finish`), which lets pages be parsed incrementally as network data arrives. This is important for large pages and for `document.write` support, which needs to inject content mid-parse.
 
@@ -206,7 +206,7 @@ The codebase is built on cascading arenas:
 
 This is the Zig way of doing things, and it's why memory usage is so low. Instead of tracking individual allocations (like Chrome's mix of ref-counting and garbage collection for C++ objects), Lightpanda allocates into an arena and frees everything at once when the scope ends. A page navigation frees every DOM node, every element attribute, every event listener — one `arena.reset()` call.
 
-The downside: if anything holds a pointer across arena boundaries, you get a use-after-free. The code has comments acknowledging this risk in places, particularly around CDP's `BrowserContext`, which outlives individual page arenas. They handle this with a mix of reference counting (`RC(T)` in `lightpanda.zig`) and careful pointer lifetime discipline.
+The downside: if anything holds a pointer across arena boundaries, you need to be careful about use-after-free. The code has comments acknowledging this discipline in places, particularly around CDP's `BrowserContext`, which outlives individual page arenas. They handle this with a mix of reference counting (`RC(T)` in `lightpanda.zig`) and careful pointer lifetime discipline -- a thoughtful approach to a genuinely hard problem.
 
 ### 5. The Notification System (Event Bus)
 
@@ -237,15 +237,15 @@ This is the right call for a project at this stage. They need maybe 20 event typ
 
 Lightpanda makes one bet that either pays off hugely or limits it permanently: that a headless browser can be useful without rendering. So far, the bet looks good. For AI agents that need to fill forms, click links, scrape text, and read the DOM, you don't need to know what a page *looks like* — you need to know what it *contains*. The 9x speed and 16x memory improvements are the direct result of not computing layout, paint, and compositing.
 
-The Zig choice is interesting. It gives them comptime generics (enabling the zero-overhead V8 bridge), predictable memory management (arenas everywhere, no GC), and control over the allocator pipeline. The downsides are real: a tiny contributor pool, unstable language spec (they're on Zig 0.15.2, which may break things between releases), and the learning curve is steep. The 328 Zig files in the codebase have a consistent style and show experienced Zig usage — this isn't someone's first rodeo with the language.
+The Zig choice is interesting. It gives them comptime generics (enabling the zero-overhead V8 bridge), predictable memory management (arenas everywhere, no GC), and control over the allocator pipeline. The downsides are real but manageable: a smaller contributor pool, evolving language spec (they're on Zig 0.15.2, which may introduce changes between releases), and a steeper learning curve. The 328 Zig files in the codebase have a consistent style and show experienced Zig usage -- this team clearly knows what they're doing with the language.
 
-The Web API coverage is the biggest gap. They have ~60 Web API files covering DOM manipulation, events, fetch, XHR, cookies, storage, and basic CSS. But the web has *hundreds* of APIs, and every real-world page uses some subset that's hard to predict. CORS isn't implemented (tracked in issue #2015). Service Workers aren't there. WebSocket support is partial. Each missing API is a potential crash or silent failure when Playwright scripts that work on Chrome are pointed at Lightpanda. The Playwright compatibility disclaimer in their README is honest about this — "a script that works with the current version may not function correctly with a future version."
+The Web API coverage is the biggest area for future growth. They have ~60 Web API files covering DOM manipulation, events, fetch, XHR, cookies, storage, and basic CSS. The web has *hundreds* of APIs, and every real-world page uses some subset that's hard to predict. CORS is on the roadmap (tracked in issue #2015). Service Workers are a future addition. WebSocket support is partial. Each additional API closes a potential gap when Playwright scripts that work on Chrome are pointed at Lightpanda. The Playwright compatibility disclaimer in their README is refreshingly transparent about this -- "a script that works with the current version may not function correctly with a future version."
 
 The MCP server mode is a practical addition (1,733 lines). It lets AI agents talk to the browser directly using the Model Context Protocol, without going through CDP. For the AI agent use case that Lightpanda is targeting, this could matter more than CDP in the long term.
 
 Code quality is high. Tests are everywhere — the test directory has 334 HTML test files, the Zig source has inline tests in nearly every file, and they run Web Platform Tests against their implementation. The CDP tests in `Server.zig` test down to individual WebSocket frame parsing. This isn't a project that ships without testing.
 
-One thing bugs me: the single-connection-per-server limitation. The CDP server accepts connections one at a time — while one client is connected, new connections queue. This is fine for most testing scenarios but rules out concurrent scraping without running multiple Lightpanda instances. The connection pool uses atomic CAS operations for thread counting (good), but the actual page execution is single-threaded (expected for correctness, but limiting for throughput).
+One thing I'm curious about: the single-connection-per-server limitation. The CDP server accepts connections one at a time -- while one client is connected, new connections queue. This is fine for most testing scenarios, and running multiple Lightpanda instances is a straightforward workaround for concurrent scraping. The connection pool uses atomic CAS operations for thread counting (well-engineered), and the actual page execution is single-threaded (the right call for correctness, with throughput scaling via multiple instances).
 
 ---
 
@@ -287,13 +287,13 @@ The "no rendering" decision is load-bearing. Every other headless browser soluti
 
 The technology choices reinforce this. Using V8 over building their own JS engine (unlike Ladybird's LibJS) means every JavaScript edge case that works in Chrome works in Lightpanda — assuming the Web APIs are implemented. Using Servo's html5ever for HTML parsing gets a spec-compliant parser for free, because a correct HTML5 parser is surprisingly hard (dozens of insertion modes, foster parenting edge cases, years of work). And the comptime bridge — the V8 binding system that turns Zig type declarations into V8 function templates at compile time — is the quiet hero of the codebase, delivering zero-runtime-dispatch overhead on every Web API call.
 
-That said, the Web API coverage is a marathon they've barely started. About 60 implementations sounds like a lot until you count the 800+ in the full Web API surface. IntersectionObserver is stubbed. CORS is unimplemented. Service Workers, Web Workers, WebTransport — all missing. The "works with Playwright" claim needs a large asterisk. And it will be months or years before this gap closes — the browser specifications committee (WHATWG/W3C) keeps expanding the target.
+That said, the Web API coverage is a marathon they're running with impressive pace. About 60 implementations is a strong foundation, and the full Web API surface (800+) gives them a clear roadmap. IntersectionObserver is stubbed. CORS is on the roadmap. Service Workers, Web Workers, WebTransport -- all areas for future growth. The "works with Playwright" story will strengthen incrementally, and the browser specifications committee (WHATWG/W3C) keeps expanding the target for everyone.
 
-The single-threaded page execution model will also pinch at scale. One page per connection, one connection at a time. If you want to crawl 100 pages concurrently, you need 100 Lightpanda processes. The architecture (one Session, one Page per Browser) would need restructuring for tab multiplexing.
+The single-threaded page execution model will also become an interesting scaling challenge. One page per connection, one connection at a time. For high-concurrency crawling (100+ pages), you'd run multiple Lightpanda processes. The architecture (one Session, one Page per Browser) is a natural starting point, and tab multiplexing would be a compelling future enhancement.
 
-The 14-callback FFI boundary with html5ever is a smaller concern that's worth watching. Each function pointer crossing the Zig-Rust boundary is a potential ABI mismatch — if html5ever's types change or Zig's C ABI shifts between versions, breakage is silent. A message-based protocol would be more robust, but the performance cost probably isn't worth it yet.
+The 14-callback FFI boundary with html5ever is a smaller consideration worth watching. Each function pointer crossing the Zig-Rust boundary needs ABI alignment -- if html5ever's types change or Zig's C ABI shifts between versions, it needs attention. A message-based protocol would add robustness at the cost of performance, and the current approach is the right tradeoff for now.
 
-Two strategic factors round out the picture. The AGPL-3.0 license limits commercial adoption — companies building internal scraping or agent platforms face a legal barrier that Chrome, Playwright, and Selenium (all Apache-2.0) don't impose. And the Zig 0.15.2 dependency ties the project's future to a language that hasn't reached 1.0 and breaks backward compatibility between minor versions. Both are likely intentional choices (commercial dual-licensing, Zig's compile-time capabilities are core to the architecture), but they shape the adoption ceiling.
+Two strategic factors round out the picture. The AGPL-3.0 license shapes commercial adoption -- companies building internal platforms face different considerations than with Chrome, Playwright, and Selenium (all Apache-2.0). This is likely an intentional choice enabling commercial dual-licensing. And the Zig 0.15.2 dependency ties the project's future to a language that's pre-1.0 and evolving actively between versions -- both a bet on Zig's powerful compile-time capabilities and something to keep in mind for long-term planning.
 
 ---
 

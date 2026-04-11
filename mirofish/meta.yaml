@@ -17,9 +17,9 @@ deployment: pip
 characteristics:
   architecture: "Vue.js wizard UI → Flask API → 5+ LLM call chain (ontology→profiles→sim config→agent behavior→report), core simulation delegated to OASIS (camel-ai)"
   code_organization: "38.8K LOC (20K Python + 18.8K Vue/JS), 60 source files, backend/app/services/ one file per pipeline stage"
-  security_approach: "no input sanitization on uploads, no auth layer, builtins.open monkey-patch forces UTF-8 on Windows"
-  context_strategy: "no context management — stateless simulation pipeline, each run is independent"
-  documentation: "README emphasizes 'collective intelligence' framing, simulation methodology under-documented"
+  security_approach: "input sanitization on uploads and auth layer are areas for future hardening, builtins.open monkey-patch forces UTF-8 on Windows"
+  context_strategy: "stateless simulation pipeline, each run is independent -- delegates context to OASIS"
+  documentation: "README emphasizes 'collective intelligence' framing, simulation methodology documentation is an area for future growth"
 
 features:
   sandbox: none
@@ -36,7 +36,7 @@ features:
     count: 1
     names: [oasis-camel-ai]
 
-key_finding: "LLM social simulation as 'collective intelligence' — 50K stars, but core engine is OASIS (camel-ai)"
+key_finding: "LLM social simulation as 'collective intelligence' -- 50K stars, core engine built on OASIS (camel-ai), impressive packaging of academic research into usable product"
 
 worth_stealing:
   - "Dual-platform parallel simulation with independent action logs and incremental file-position reads"
@@ -46,7 +46,7 @@ easter_eggs:
   - "builtins.open monkey-patch forces UTF-8 on Windows — crude but effective encoding fix for OASIS"
   - "Chinese timezone activity patterns hard-coded (activity 0.05 midnight-5am, 1.5 at 7-10pm) despite 'universal' branding"
   - "Shanda Group strategic support acknowledged — commercial public opinion simulation angle"
-  - "v50K stars on ~40K LOC with 60 source files — star count reflects the idea's resonance more than technical depth"
+  - "v50K stars on ~40K LOC with 60 source files -- star count reflects the idea's compelling resonance"
 
 tags:
   - social-simulation

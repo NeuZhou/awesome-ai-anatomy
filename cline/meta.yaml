@@ -14,10 +14,10 @@ maturity: production
 deployment: npm
 
 characteristics:
-  architecture: "4-layer hierarchy (Extension→Controller→Task→ToolExecutor), 3756-line Task god object, callback-injection coupling with 20+ constructor params"
+  architecture: "4-layer hierarchy (Extension->Controller->Task->ToolExecutor), 3756-line Task central orchestrator, callback-injection coupling with 20+ constructor params"
   code_organization: "560K LOC TypeScript, VS Code extension + React webview, npm package still named 'claude-dev'"
   security_approach: "human-in-the-loop approval by default via webview polling, YOLO mode toggle auto-approves all actions including shell"
-  context_strategy: "truncation-based: drops oldest messages when context window is full, no summarization"
+  context_strategy: "truncation-based with auto-condense for next-gen models, drops oldest messages when context window is full"
   documentation: ".clinerules/cline-overview.md internal architecture doc, hooks and prompt variant systems documented"
 
 features:
@@ -35,7 +35,7 @@ features:
     count: 43
     names: [anthropic, openai, bedrock, vertex, gemini, groq, deepseek, ollama, mistral, openrouter]
 
-key_finding: "3,756-line God Object, 40+ providers, YOLO mode, hooks system"
+key_finding: "3,756-line central orchestrator, 40+ providers, human-in-the-loop approval, hooks system"
 
 worth_stealing:
   - "43 provider adapters with factory pattern — broadest LLM provider support in any coding agent"

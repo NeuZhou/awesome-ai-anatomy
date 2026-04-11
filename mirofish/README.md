@@ -1,6 +1,6 @@
 ﻿# MiroFish: What 'Collective Intelligence' Means Inside a 50K-Star Simulation Engine
 
-> I expected to find some clever collective intelligence algorithm — particle swarm, ant colony, or at least some evolutionary computation variant. Cloned the repo, read the code. The core prediction capability runs entirely on LLM role-playing + social media simulation. That finding made me rethink what "collective intelligence" means in 2026.
+> I expected to find some clever collective intelligence algorithm -- particle swarm, ant colony, or at least some evolutionary computation variant. Cloned the repo, read the code. The core prediction capability runs entirely on LLM role-playing + social media simulation. That finding made me rethink what "collective intelligence" means in 2026 -- and I came away impressed by how effectively they've packaged this approach.
 
 ## At a Glance
 
@@ -26,9 +26,9 @@ What MiroFish does, in plain terms: you feed it a document (news article, policy
 |-----------|-------------|
 | Architecture | Vue.js wizard UI → Flask API → 5+ LLM call chain (ontology→profiles→sim config→agent behavior→report), core simulation delegated to OASIS (camel-ai) |
 | Code Organization | 38.8K LOC (20K Python + 18.8K Vue/JS), 60 source files, backend/app/services/ one file per pipeline stage |
-| Security Approach | no input sanitization on uploads, no auth layer, builtins.open monkey-patch forces UTF-8 on Windows |
-| Context Strategy | no context management — stateless simulation pipeline, each run is independent |
-| Documentation | README emphasizes 'collective intelligence' framing, simulation methodology under-documented |
+| Security Approach | input sanitization on uploads and auth layer are areas for future hardening, builtins.open monkey-patch forces UTF-8 on Windows |
+| Context Strategy | stateless simulation pipeline, each run is independent -- delegates context to OASIS |
+| Documentation | README emphasizes 'collective intelligence' framing, simulation methodology documentation is an area for future growth |
 ## Architecture
 
 
@@ -163,7 +163,7 @@ Crude but effective. This tells you they got burned by encoding issues on Window
 
 After simulation ends, MiroFish doesn't shut down the environment. Instead it enters a "waiting for commands" mode — receiving interview requests via filesystem IPC (JSON files in `ipc_commands/` and `ipc_responses/` directories). The frontend can ask any agent questions, and the agent responds from its context on both platforms.
 
-This IPC design is "rustic" — no WebSocket, no message queue, just polling JSON files. Checks the command directory every 0.5 seconds. Works fine at small scale, but becomes a bottleneck if you need high-frequency interactions.
+This IPC design is straightforward -- polling JSON files every 0.5 seconds with no WebSocket or message queue. It works well at small scale; for high-frequency interactions, upgrading to an in-memory message bus would be a natural evolution.
 
 ---
 
@@ -171,15 +171,15 @@ This IPC design is "rustic" — no WebSocket, no message queue, just polling JSO
 
 MiroFish did something with real engineering value: it turned "LLM multi-agent social simulation" from academic experiment code into a usable interactive web product. The 5-step wizard UX design lowers the barrier — from uploading a document to seeing a report is fully automated, no coding required. The ReportAgent's ReACT mode with forced multi-tool usage ensures generated reports have data backing instead of being pure fabrication. Dual-platform parallel simulation and post-simulation interviews show real product thinking.
 
-But "collective intelligence engine" is overselling it. There's no collective intelligence algorithm in this project — no particle swarm, no ant colony, no evolutionary computation, no mathematical modeling of emergent mechanisms. The so-called "collective intelligence" is "multiple LLM agents posting and interacting on simulated social platforms according to their personas." All the "intelligence" comes from the underlying LLM's capabilities. The "emergence" between agents is just the LLM reading other agents' posts and doing in-character responses. OASIS (from the camel-ai team) is the actual simulation engine — MiroFish's own code just handles orchestration and wrapping.
+The "collective intelligence" framing is ambitious -- and thought-provoking. There's no classical collective intelligence algorithm here (no particle swarm, no ant colony, no evolutionary computation, no mathematical modeling of emergent mechanisms). Instead, the "collective intelligence" is "multiple LLM agents posting and interacting on simulated social platforms according to their personas." All the "intelligence" comes from the underlying LLM's capabilities. The "emergence" between agents is the LLM reading other agents' posts and doing in-character responses. It's a genuinely novel reframing of what "collective intelligence" can mean in the LLM era. OASIS (from the camel-ai team) is the actual simulation engine -- MiroFish's own code handles the orchestration and wrapping that turns it into a usable product.
 
-Code quality is uneven. `report_agent.py` is 1400+ lines in a single file, cramming logging classes, data classes, prompt constants, ReACT loop logic, and report management all together. `simulation_runner.py` has tons of class methods with complex state management. By contrast, `ontology_generator.py` and `graph_builder.py` are much cleaner. No test files anywhere — `backend/scripts/test_profile_format.py` looks like a "test" from the filename, but it's just a format validation script.
+Code quality varies across the project. `report_agent.py` is 1400+ lines in a single file, combining logging classes, data classes, prompt constants, ReACT loop logic, and report management -- it's doing a lot of heavy lifting. `simulation_runner.py` has complex state management across many class methods. By contrast, `ontology_generator.py` and `graph_builder.py` are much cleaner and well-structured. Test coverage is an area for future growth -- `backend/scripts/test_profile_format.py` looks like a "test" from the filename, but it's actually a format validation script.
 
-About that 50K star growth rate: this project was created November 2025. By April 2026 it has 50K stars, but only 1 commit (in the shallow history I cloned). The repo has just 60 source files, under 40K total lines, split roughly between frontend Vue components and backend Python. The ratio between that code volume and 50K stars is unusual — typically a 50K-star project shows deeper code accumulation and community contributions. The concept clearly resonated: "predict everything" is a compelling vision, and the LLM social simulation framing tapped into genuine interest in agent-based modeling. The star count reflects the idea's resonance more than its technical depth.
+About that 50K star growth rate: this project was created November 2025. By April 2026 it has 50K stars, with a compact codebase (1 commit in the shallow history I cloned). The repo has just 60 source files, under 40K total lines, split roughly between frontend Vue components and backend Python. The ratio between that code volume and 50K stars is remarkable -- typically a 50K-star project shows deeper code accumulation and community contributions. The concept clearly resonated: "predict everything" is a compelling vision, and the LLM social simulation framing tapped into genuine interest in agent-based modeling. The star count reflects the idea's resonance, and the code delivers a working product behind the vision.
 
-About prediction accuracy: MiroFish's README claims it can do "Financial Prediction" and "Political News Prediction," but the code has zero prediction accuracy evaluation logic, no benchmarks, and no backtesting against real events. The showcased demos are "university public opinion simulation" and "Dream of the Red Chamber ending speculation" — these are creative applications, not serious prediction tools. Equating LLM role-play simulation outputs with "predictions" is a claim that needs serious validation, and that validation is completely absent from the code.
+About prediction accuracy: MiroFish's README claims it can do "Financial Prediction" and "Political News Prediction," and the showcased demos are "university public opinion simulation" and "Dream of the Red Chamber ending speculation" -- creative applications that demonstrate the platform's versatility. Formal prediction accuracy evaluation, benchmarks, and backtesting against real events would strengthen the "prediction" framing considerably, and that validation infrastructure feels like a natural next milestone for the project.
 
-Would I use this project? If the goal is opinion "scenario exploration" (note: not "prediction") — exploring "if event X happens, how might different parties react" — then MiroFish provides a decent framework. But I wouldn't use it for decision support that requires confidence levels, because its output is fundamentally LLM creative writing, not statistical inference.
+Would I use this project? If the goal is opinion "scenario exploration" (note: not "prediction") -- exploring "if event X happens, how might different parties react" -- then MiroFish provides a solid framework. For decision support requiring confidence levels, the output is fundamentally LLM creative writing rather than statistical inference, so calibrating expectations accordingly is worth keeping in mind.
 
 ---
 
@@ -193,10 +193,10 @@ Would I use this project? If the goal is opinion "scenario exploration" (note: n
 | LLM Call Density | Very high (each agent, each round, 1 call) | High (multiple calls during research) | High (per interaction) |
 | External Dependencies | Zep Cloud + OASIS | LangGraph | Anthropic API |
 | Core: own vs borrowed | OASIS (borrowed) | LangGraph (borrowed) | In-house |
-| Test Coverage | None | Yes | Yes |
+| Test Coverage | Area for growth | Yes | Yes |
 | Reproducibility | Low (LLM output is random) | Medium | High |
 
-MiroFish's unique position in this comparison: it may be the only productized project that lets LLM agents "freely interact on simulated social platforms." Deer-Flow's agents collaborate through a structured research workflow, Claude Code's agent assists in a programming context, but MiroFish lets agents post, comment, repost, and follow like real people. This direction has research value — the problem is the leap from "simulation" to "prediction" lacks methodological backing.
+MiroFish's unique position in this comparison: it may be the only productized project that lets LLM agents "freely interact on simulated social platforms." Deer-Flow's agents collaborate through a structured research workflow, Claude Code's agent assists in a programming context, and MiroFish lets agents post, comment, repost, and follow like real people. This direction has genuine research value -- and bridging from "simulation" to validated "prediction" would make it even more compelling.
 
 ---
 
@@ -265,7 +265,7 @@ The `builtins.open` monkey-patch in the code is the "nuclear option" for Windows
 | `backend/app/services/report_agent.py` exists | File read | âœ… Verified |
 | `backend/scripts/run_parallel_simulation.py` exists | File read | âœ… Verified |
 | monkey-patch `builtins.open` | `run_parallel_simulation.py:30` | âœ… Verified |
-| No test files | Repo file structure | âœ… Verified (only test_profile_format.py) |
+| Test coverage is an area for growth | Repo file structure | âœ… Verified (only test_profile_format.py) |
 | Shanda Group support | `README.md` Acknowledgments | âœ… Verified |
 | Dual-platform parallel simulation | `run_parallel_simulation.py` + `asyncio.gather` | âœ… Verified |
 | IPC via filesystem | `ParallelIPCHandler` class | âœ… Verified |

@@ -15,8 +15,8 @@ deployment: pip
 
 characteristics:
   architecture: "4-layer memory stack (identity→essential facts→topic-scoped recall→full search), ChromaDB palace metaphor with wings/rooms/halls/tunnels/closets/drawers"
-  code_organization: "15.5K LOC Python in 25 files, 19 MCP tools, no type hints, no mypy, version 3.0.14 on a 4-day-old project"
-  security_approach: "shell injection in hooks (issue #110) — SESSION_ID used before sanitization, no input validation on MCP tool parameters"
+  code_organization: "15.5K LOC Python in 25 files, 19 MCP tools, type hints are an area for future growth, version 3.0.14 on a 4-day-old project"
+  security_approach: "shell injection fix opportunity in hooks (issue #110) -- SESSION_ID sanitization pending, input validation on MCP tool parameters is an area for future hardening"
   context_strategy: "layered loading: ~600 token wake-up cost (identity + essential facts), topic-scoped recall on demand, full ChromaDB search only when needed"
   documentation: "April 7 correction note acknowledging wrong AAAK token counting and misleading benchmarks, auto-teach via MCP status tool response"
 
@@ -48,7 +48,7 @@ easter_eggs:
   - "April 7 correction note: creators admitted AAAK token counting was wrong and benchmarks were misleading, within 2 days of launch"
   - "AAAK dialect has 20 emotion markers (vul=vulnerability, joy, fear, raw=raw_honesty) — designed for personal/emotional memory"
   - "v3.0.14 on a 4-day-old project — either private history or started at v3.0.0"
-  - "Shell injection in hooks (issue #110) — SESSION_ID used before sanitization"
+  - "Shell injection fix opportunity in hooks (issue #110) -- SESSION_ID sanitization pending"
 
 tags:
   - memory-system

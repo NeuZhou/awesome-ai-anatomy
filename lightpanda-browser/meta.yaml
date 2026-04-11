@@ -17,9 +17,9 @@ deployment: binary
 characteristics:
   architecture: "from-scratch browser pipeline: libcurl → html5ever (Rust FFI) → Zig DOM → V8 JS → CDP WebSocket, 15 CDP domains in 7123 lines"
   code_organization: "91K Zig + 744 Rust FFI, Page.zig (3660 lines) as lifecycle manager, Go test runner for CDP conformance"
-  security_approach: "BoringSSL for TLS, single-process model with no process isolation — V8 exploit owns the host"
-  context_strategy: "no context management — stateless headless browser, one CDP connection per server instance"
-  documentation: "architecture inferable from code structure, no formal spec for CDP command support vs stubs"
+  security_approach: "BoringSSL for TLS, single-process model -- process isolation is an area for future growth"
+  context_strategy: "stateless headless browser, one CDP connection per server instance -- focused design for automation"
+  documentation: "architecture inferable from code structure, CDP command coverage documented inline"
 
 features:
   sandbox: none

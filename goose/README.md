@@ -10,7 +10,7 @@
 
 ## Why Should You Care?
 
-I went into the Goose codebase expecting another "we rewrote it in Rust" story. What I found was weirder: the Rust is almost beside the point. The actual insight is that Goose treats MCP the way a browser treats HTTP — it's not a feature, it's the protocol everything runs on.
+I went into the Goose codebase expecting another "we rewrote it in Rust" story. What I found was more interesting than that: the Rust is almost beside the point. The actual insight is that Goose treats MCP the way a browser treats HTTP — it's not a feature, it's the protocol everything runs on.
 
 Here's the thing that stopped me mid-read: their `developer` extension — the one that provides `shell`, `edit`, `write`, `tree` — is technically just another MCP client that happens to run in-process. You could rip it out, replace it with an external process running on a different machine, and the agent loop wouldn't notice. I had to re-read `extension_manager.rs` twice to convince myself that was really how it worked. (It is.)
 
@@ -186,11 +186,11 @@ The extension system is where Goose shines. The six-flavor taxonomy solves real 
 
 The tool inspection pipeline is the other standout. Claude Code has a permission system, but Goose has a pluggable chain where you can add ML-based classifiers, LLM-powered adversary review, and custom egress policies. The fact that the `AdversaryInspector` can call the LLM to review tool calls before they execute — that's a level of paranoia that production systems need.
 
-The provider system is broad, but it comes at a cost. The `providers/` directory has 50+ files and 3,000+ lines of format conversion code across Anthropic, OpenAI, Google, Bedrock, and Ollama wire formats. Each provider has subtle differences in how they handle tool calls, thinking tokens, streaming chunks, and error responses. The declarative system helps for OpenAI-compatible APIs, but the core providers are each 300-800 lines of bespoke serialization. Maintenance surface area that'll only grow.
+The provider system is broad, but it comes at a cost. The `providers/` directory has 50+ files and 3,000+ lines of format conversion code across Anthropic, OpenAI, Google, Bedrock, and Ollama wire formats. Each provider has subtle differences in how they handle tool calls, thinking tokens, streaming chunks, and error responses. The declarative system helps for OpenAI-compatible APIs, but the core providers are each 300-800 lines of bespoke serialization. That's a lot of maintenance surface, and it'll be interesting to see how the team manages it as providers multiply.
 
 The agent loop itself is solid but unremarkable — a standard while loop with streaming, tool dispatch, and context management. The compaction logic (threshold-based + recovery) is better than most. But the loop structure is what you'd write in Python too; Rust doesn't add architectural insight here beyond type safety and performance.
 
-One thing I'm not sure about: the `goose` core crate at 124K lines feels too big. The `Agent` struct alone is over 900 lines. Splitting the provider layer and security layer into separate crates would help compile times and code navigation. But I haven't tried building it myself, so maybe there are dependency reasons I'm not seeing.
+One thing I'm curious about: the `goose` core crate at 124K lines feels like it could benefit from splitting. The `Agent` struct alone is over 900 lines. Separating the provider layer and security layer into their own crates could help compile times and code navigation. I haven't tried building it myself though, so there may be dependency reasons for the current structure.
 
 ---
 

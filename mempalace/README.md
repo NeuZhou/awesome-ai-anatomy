@@ -1,6 +1,6 @@
 ﻿# MemPalace: 9,000 Lines of Python, 30,000 Stars, and an Actress
 
-> A Resident Evil star and a developer open-sourced a ChromaDB wrapper with a metaphor layer. Four days later it has 30K stars and a community that already debunked half the README claims. The 4-layer memory stack is a good idea. The AAAK dialect is not. The benchmarks are real — once you read the asterisks.
+> A Resident Evil star and a developer open-sourced a ChromaDB wrapper with a metaphor layer. Four days later it has 30K stars and a community that actively stress-tested the README claims. The 4-layer memory stack is a genuinely good idea. AAAK is ambitious and still evolving. The benchmarks are real -- once you read the asterisks.
 
 ## At a Glance
 
@@ -26,8 +26,8 @@ MemPalace is an AI memory system that stores verbatim conversation text in Chrom
 | Dimension | Description |
 |-----------|-------------|
 | Architecture | 4-layer memory stack (identity→essential facts→topic-scoped recall→full search), ChromaDB palace metaphor with wings/rooms/halls/tunnels/closets/drawers |
-| Code Organization | 15.5K LOC Python in 25 files, 19 MCP tools, no type hints, no mypy, version 3.0.14 on a 4-day-old project |
-| Security Approach | shell injection in hooks (issue #110) — SESSION_ID used before sanitization, no input validation on MCP tool parameters |
+| Code Organization | 15.5K LOC Python in 25 files, 19 MCP tools, type hints are an area for future growth, version 3.0.14 on a 4-day-old project |
+| Security Approach | shell injection in hooks (issue #110) -- SESSION_ID sanitization opportunity, input validation on MCP tool parameters is an area for future hardening |
 | Context Strategy | layered loading: ~600 token wake-up cost (identity + essential facts), topic-scoped recall on demand, full ChromaDB search only when needed |
 | Documentation | April 7 correction note acknowledging wrong AAAK token counting and misleading benchmarks, auto-teach via MCP status tool response |
 ## Architecture
@@ -102,13 +102,13 @@ graph TD
 
 The architecture is three layers deep: ingest at the top, ChromaDB + SQLite in the middle, and a 4-layer memory stack for retrieval. Everything converges on one ChromaDB collection (`mempalace_drawers`). The MCP server sits on top and exposes the whole thing as 19 tools.
 
-The most important design decision: **verbatim storage, structured retrieval.** Files go into drawers as-is. No LLM summarization during ingest. The structure (wings, rooms, halls, tunnels) provides the retrieval advantage — not extraction or rewriting. This is the opposite of Mem0 (which uses an LLM to extract facts) and Letta/MemGPT (which uses an LLM to manage memory edits).
+The most important design decision: **verbatim storage, structured retrieval.** Files go into drawers as-is. No LLM summarization during ingest. The structure (wings, rooms, halls, tunnels) provides the retrieval advantage - not extraction or rewriting. This is the opposite of Mem0 (which uses an LLM to extract facts) and Letta/MemGPT (which uses an LLM to manage memory edits).
 
 **Key files:**
-- `mempalace/layers.py` — The 4-layer stack (415 lines). This is the core idea.
-- `mempalace/mcp_server.py` — MCP server with 19 tools (718 lines). The integration surface.
-- `mempalace/dialect.py` — AAAK dialect (952 lines). The controversy.
-- `mempalace/searcher.py` — Search implementation (126 lines). It's `ChromaDB.query()` with metadata filters.
+- `mempalace/layers.py` - The 4-layer stack (415 lines). This is the core idea.
+- `mempalace/mcp_server.py` - MCP server with 19 tools (718 lines). The integration surface.
+- `mempalace/dialect.py` - AAAK dialect (952 lines). The controversy.
+- `mempalace/searcher.py` - Search implementation (126 lines). It's `ChromaDB.query()` with metadata filters.
 
 ---
 
@@ -120,10 +120,10 @@ This is the real product. Not AAAK. Not the palace metaphor. The layered loading
 
 | Layer | What It Does | Token Cost | When |
 |-------|-------------|------------|------|
-| **L0 — Identity** | Reads `~/.mempalace/identity.txt` | ~100 tokens | Every session |
-| **L1 — Essential Story** | Top 15 drawers by importance, grouped by room, hard-capped at 3,200 chars | ~500-800 tokens | Every session |
-| **L2 — On-Demand** | Wing/room filtered `col.get()` — up to 10 drawers per call | ~200-500 per call | When a topic comes up |
-| **L3 — Deep Search** | `col.query()` with semantic search + optional wing/room where-clause | Unlimited | Explicit search |
+| **L0 - Identity** | Reads `~/.mempalace/identity.txt` | ~100 tokens | Every session |
+| **L1 - Essential Story** | Top 15 drawers by importance, grouped by room, hard-capped at 3,200 chars | ~500-800 tokens | Every session |
+| **L2 - On-Demand** | Wing/room filtered `col.get()` - up to 10 drawers per call | ~200-500 per call | When a topic comes up |
+| **L3 - Deep Search** | `col.query()` with semantic search + optional wing/room where-clause | Unlimited | Explicit search |
 
 Wake-up cost: L0 + L1 = ~600-900 tokens. That leaves 95%+ of context free for actual conversation.
 
@@ -136,9 +136,9 @@ print(stack.recall(wing="my_app"))     # L2 on-demand
 print(stack.search("pricing change"))  # L3 deep search
 ```
 
-This is good design. The insight is that most AI sessions need identity + key facts (cheap) and occasionally need deep retrieval (expensive). Loading everything upfront — the approach Letta/MemGPT takes — burns context on stuff you might never reference. MemPalace's layered loading is closer to how operating systems handle memory: hot data in cache, warm data paged in on demand, cold data on disk.
+This is good design. The insight is that most AI sessions need identity + key facts (cheap) and occasionally need deep retrieval (expensive). Loading everything upfront - the approach Letta/MemGPT takes - burns context on stuff you might never reference. MemPalace's layered loading is closer to how operating systems handle memory: hot data in cache, warm data paged in on demand, cold data on disk.
 
-The L1 layer sorts drawers by an `importance` metadata field (falling back to 3, on a 1-5 scale), takes the top 15, groups them by room, truncates each to 200 chars, and hard-caps the total at 3,200 characters. It's a heuristic — there's no LLM judging importance — but "cheap and usually right" beats "expensive and slightly more right" when this runs on every single session start.
+The L1 layer sorts drawers by an `importance` metadata field (falling back to 3, on a 1-5 scale), takes the top 15, groups them by room, truncates each to 200 chars, and hard-caps the total at 3,200 characters. It's a heuristic - there's no LLM judging importance - but "cheap and usually right" beats "expensive and slightly more right" when this runs on every single session start.
 
 ### The "+34% Palace Boost" (Honest Version)
 
@@ -151,7 +151,7 @@ Search wing + hall:                 84.8%  (+24%)
 Search wing + room:                 94.8%  (+34%)
 ```
 
-This is ChromaDB's `where` clause with metadata filtering. It's `col.query(where={"wing": "my_app"})`. That's... metadata filtering. Every vector database supports this. The improvement is real — scoping search to a subset of vectors does improve precision — but it's not a novel retrieval mechanism. It's database indexing with a metaphor on top.
+This is ChromaDB's `where` clause with metadata filtering. It's `col.query(where={"wing": "my_app"})`. That's... metadata filtering. Every vector database supports this. The improvement is real - scoping search to a subset of vectors does improve precision - but it's not a novel retrieval mechanism. It's database indexing with a metaphor on top.
 
 The metaphor *is* the contribution. Wings and rooms give the user (and the AI) an intuitive way to scope searches. "Search the auth room in the driftwood wing" is easier to reason about than "apply where clause wing=driftwood AND room=auth-migration." The retrieval math is standard. The UX layer is the innovation.
 
@@ -163,9 +163,9 @@ The metaphor *is* the contribution. Wings and rooms give the user (and the AI) a
 
 Two ingestion paths, same destination:
 
-**`miner.py` (558 lines)** — Project file ingest. Walks a directory, skips standard ignore dirs (`.git`, `node_modules`, etc.), reads files with readable extensions (`.py`, `.md`, `.js`, etc.), splits them into 800-char chunks with 100-char overlap, hashes each chunk to deduplicate, and stores in ChromaDB with metadata (source_file, wing, room, timestamp).
+**`miner.py` (558 lines)** - Project file ingest. Walks a directory, skips standard ignore dirs (`.git`, `node_modules`, etc.), reads files with readable extensions (`.py`, `.md`, `.js`, etc.), splits them into 800-char chunks with 100-char overlap, hashes each chunk to deduplicate, and stores in ChromaDB with metadata (source_file, wing, room, timestamp).
 
-**`convo_miner.py` (336 lines)** — Conversation ingest. Same destination, different chunking: instead of fixed-size chunks, it chunks by exchange pair (one human message + one AI response = one drawer). Falls back to paragraph chunking if no `>` quote markers are found. Normalizes 5 chat formats (Claude Code, ChatGPT, Slack, generic) via `normalize.py` (284 lines).
+**`convo_miner.py` (336 lines)** - Conversation ingest. Same destination, different chunking: instead of fixed-size chunks, it chunks by exchange pair (one human message + one AI response = one drawer). Falls back to paragraph chunking if no `>` quote markers are found. Normalizes 5 chat formats (Claude Code, ChatGPT, Slack, generic) via `normalize.py` (284 lines).
 
 Both miners hash chunks before insert to avoid duplicates. No LLM is called during ingest. The room/wing assignment comes from YAML config (`mempalace.yaml`) in the project directory, not from content classification.
 
@@ -202,7 +202,7 @@ The problem, which the community found within hours of launch:
 
 1. **Token counting was wrong.** The README used `len(text)//3` instead of an actual tokenizer. Real counts: a sample English paragraph is 66 tokens, the AAAK version is 73 tokens. AAAK *costs more* at small scale.
 
-2. **"30x lossless compression" was nonsense.** AAAK is lossy by definition — it truncates sentences and replaces names with codes. The word "lossless" was incorrect. The 30x figure was never reproduced.
+2. **"30x lossless compression" was nonsense.** AAAK is lossy by definition - it truncates sentences and replaces names with codes. The word "lossless" was incorrect. The 30x figure was never reproduced.
 
 3. **Benchmark regression.** AAAK mode scores 84.2% R@5 vs raw mode's 96.6% on LongMemEval. The headline number was from raw mode. AAAK makes retrieval *worse*.
 
@@ -222,7 +222,7 @@ kg.invalidate("Kai", "works_on", "Orion", ended="2026-03-01")
 
 Now current queries skip it, historical queries still find it.
 
-This competes with Zep's Graphiti (Neo4j, cloud, $25/mo). Same idea — entities with time-bounded relationships — but SQLite instead of a graph database. For sub-10K entities, SQLite is fine. For enterprise scale, you'd want something else. But "free and local" is a strong pitch.
+This competes with Zep's Graphiti (Neo4j, cloud, $25/mo). Same idea - entities with time-bounded relationships - but SQLite instead of a graph database. For sub-10K entities, SQLite is fine. For enterprise scale, you'd want something else. But "free and local" is a strong pitch.
 
 ### MCP Server: 19 Tools
 
@@ -238,31 +238,31 @@ This competes with Zep's Graphiti (Neo4j, cloud, $25/mo). Same idea — entities
 
 **Agent Diary (2 tools):** diary_write, diary_read
 
-The `status` tool auto-teaches the AAAK spec and a "memory protocol" (5-step instruction) on first call. This is smart — the AI learns the system by calling a tool, not by reading a README.
+The `status` tool auto-teaches the AAAK spec and a "memory protocol" (5-step instruction) on first call. This is smart - the AI learns the system by calling a tool, not by reading a README.
 
 ### Hooks: Auto-Save and PreCompact
 
 Two shell scripts for Claude Code integration:
 
-**`mempal_save_hook.sh`** — Fires on Claude Code's `Stop` event. Counts human messages in the transcript. Every 15 messages, blocks the AI from stopping and tells it to save key topics to the palace. Uses `stop_hook_active` flag to prevent infinite loops (block → AI saves → tries to stop → hook sees save cycle → lets it through).
+**`mempal_save_hook.sh`** - Fires on Claude Code's `Stop` event. Counts human messages in the transcript. Every 15 messages, blocks the AI from stopping and tells it to save key topics to the palace. Uses `stop_hook_active` flag to prevent infinite loops (block → AI saves → tries to stop → hook sees save cycle → lets it through).
 
-**`mempal_precompact_hook.sh`** — Fires before context compression. Always blocks. Tells the AI to save *everything* before the context window shrinks. This is the safety net.
+**`mempal_precompact_hook.sh`** - Fires before context compression. Always blocks. Tells the AI to save *everything* before the context window shrinks. This is the safety net.
 
-**The shell injection (issue #110):** In `mempal_precompact_hook.sh`, `SESSION_ID` is extracted from JSON and used before sanitization — applying the same `tr -cd` sanitization from the save hook would close this gap.
+**The shell injection fix opportunity (issue #110):** In `mempal_precompact_hook.sh`, `SESSION_ID` is extracted from JSON and used before sanitization -- applying the same `tr -cd` sanitization from the save hook would close this gap.
 
 ---
 
 ## The Verdict
 
-MemPalace's value is in one file: `layers.py`. The 4-layer memory stack — identity + essential story on wake-up, topic-scoped recall on demand, full search when needed — is a pattern that every AI memory system should consider. It's the right abstraction: cheap wakeup, expensive search only when triggered.
+MemPalace's value is in one file: `layers.py`. The 4-layer memory stack - identity + essential story on wake-up, topic-scoped recall on demand, full search when needed - is a pattern that every AI memory system should consider. It's the right abstraction: cheap wakeup, expensive search only when triggered.
 
-The rest is a mixed bag. ChromaDB storage with metadata filtering works fine but isn't novel. The knowledge graph is a decent SQLite implementation of temporal triples. The MCP server is a clean tool surface. The entity system (1,320 lines) is thorough — streamlining it could reduce maintenance surface.
+The rest is a mixed bag of solid components. ChromaDB storage with metadata filtering works well and is straightforward. The knowledge graph is a decent SQLite implementation of temporal triples. The MCP server is a clean tool surface. The entity system (1,320 lines) is thorough -- streamlining it over time could reduce maintenance surface.
 
-AAAK is an interesting idea that needs more iteration — 952 lines of regex-based abbreviation that hasn't yet proven its value at small scale. The April 7 correction note shows the team is honest about this, which is a good sign.
+AAAK is an ambitious experiment that's still finding its footing -- 952 lines of regex-based abbreviation that hasn't yet proven its value at small scale, and may shine more as palaces grow larger. The April 7 correction note shows the team is honest and responsive, which is a great sign for the project's future.
 
-The star count — 30K in four days — reflects Milla Jovovich's reach beyond typical developer channels. That's not a criticism; it's context for calibrating stars as a quality signal.
+The star count -- 30K in four days -- reflects Milla Jovovich's reach beyond typical developer channels. That's noteworthy context for calibrating stars as a quality signal, and it also means the project has an unusually broad potential contributor base.
 
-Would I use it? The layered loading pattern, yes — it's worth adopting for any agent memory system. The ChromaDB storage with wing/room metadata is straightforward and works well. AAAK needs more iteration. The hooks are solid once the sanitization fix lands.
+Would I use it? The layered loading pattern, yes -- it's worth adopting for any agent memory system. The ChromaDB storage with wing/room metadata is straightforward and works well. AAAK is still maturing. The hooks are solid once the sanitization fix lands.
 
 ---
 
@@ -284,7 +284,7 @@ Would I use it? The layered loading pattern, yes — it's worth adopting for any
 
 The philosophical split: **MemPalace stores everything and retrieves selectively.** OpenHands stores everything and *compresses* selectively. Letta/MemGPT uses an LLM to *edit* memory blocks in place. Claude Code compacts on overflow.
 
-MemPalace's approach is cheapest (no LLM during ingest or default retrieval) and preserves the most information (verbatim text). The tradeoff is that search quality depends entirely on ChromaDB embeddings + metadata filtering — there's no intelligent reranking or contextual retrieval in the default path. OpenHands' condenser pipeline is more sophisticated but more expensive. Letta's approach gives the LLM control over what to remember, which is powerful but introduces the "LLM decides what matters" problem that MemPalace explicitly avoids.
+MemPalace's approach is cheapest (no LLM during ingest or default retrieval) and preserves the most information (verbatim text). The tradeoff is that search quality depends entirely on ChromaDB embeddings + metadata filtering - there's no intelligent reranking or contextual retrieval in the default path. OpenHands' condenser pipeline is more sophisticated but more expensive. Letta's approach gives the LLM control over what to remember, which is powerful but introduces the "LLM decides what matters" problem that MemPalace explicitly avoids.
 
 The temporal knowledge graph (SQLite triples with validity windows) is unique among these projects. None of the others track *when* facts were true. For use cases like "what did we decide about auth in January?" this matters.
 
@@ -310,13 +310,13 @@ I'd steal this interface for any agent memory system. The key insight: most sess
 The MCP `status` tool returns the AAAK spec and a 5-step "memory protocol" as part of its response. The AI learns the system by calling a tool, not by reading documentation or having instructions baked into the system prompt.
 
 ```python
-PALACE_PROTOCOL = """IMPORTANT — MemPalace Memory Protocol:
+PALACE_PROTOCOL = """IMPORTANT - MemPalace Memory Protocol:
 1. ON WAKE-UP: Call mempalace_status to load palace overview + AAAK spec.
 2. BEFORE RESPONDING about any person, project, or past event: call mempalace_search FIRST.
 ...
 ```
 
-This is a good pattern — tool responses as runtime documentation.
+This is a good pattern - tool responses as runtime documentation.
 
 ### 3. PreCompact Hook Strategy
 
@@ -339,7 +339,7 @@ For most AI memory use cases (< 10K entities), SQLite is the right choice over N
 
 ## Hooks & Easter Eggs
 
-**The actress angle is real.** Milla Jovovich (Alice in Resident Evil, Leeloo in The Fifth Element) is listed as the primary author. The GitHub account is `milla-jovovich`. Ben Sigman appears to be the technical co-creator. This isn't a vanity project — the code is real and functional — but the star velocity is partly a celebrity amplification effect.
+**The actress angle is real.** Milla Jovovich (Alice in Resident Evil, Leeloo in The Fifth Element) is listed as the primary author. The GitHub account is `milla-jovovich`. Ben Sigman appears to be the technical co-creator. This isn't a vanity project - the code is real and functional - but the star velocity is partly a celebrity amplification effect.
 
 **The April 7 correction note is the best part of the README.** Two days after launch, the creators published a detailed admission of what they got wrong: token counting, compression claims, benchmark framing, contradiction detection. They named the community members who found the problems. This is how open source should work.
 
@@ -349,7 +349,7 @@ For most AI memory use cases (< 10K entities), SQLite is the right choice over N
 
 **Specialist agents via JSON config.** The `~/.mempalace/agents/` directory holds JSON files for specialist agents (reviewer, architect, ops). Each gets its own wing and diary. The README pitches this against Letta's $20-200/mo pricing. In practice, it's just namespaced ChromaDB storage with a diary append tool.
 
-**ChromaDB is the only real dependency.** `pyproject.toml` lists `chromadb>=0.5.0,<0.7` and `pyyaml>=6.0`. That's it. No langchain, no llama-index, no torch. The entire system is ChromaDB + SQLite + stdlib Python. This is an underrated design choice — fewer dependencies mean fewer breaking upgrades.
+**ChromaDB is the only real dependency.** `pyproject.toml` lists `chromadb>=0.5.0,<0.7` and `pyyaml>=6.0`. That's it. No langchain, no llama-index, no torch. The entire system is ChromaDB + SQLite + stdlib Python. This is an underrated design choice - fewer dependencies mean fewer breaking upgrades.
 
 ---
 
@@ -379,7 +379,7 @@ For most AI memory use cases (< 10K entities), SQLite is the right choice over N
 | "+34% palace boost" is where-clause filtering | Read searcher.py: `kwargs["where"] = where` | Verified |
 | Shell injection in hooks | Read mempal_precompact_hook.sh: SESSION_ID used before sanitization | Verified |
 | Save hook uses SESSION_ID sanitization (tr) | Read mempal_save_hook.sh line 70 | Verified |
-| PreCompact hook lacks sanitization | Read mempal_precompact_hook.sh: no tr -cd call | Verified |
+| PreCompact hook sanitization opportunity | Read mempal_precompact_hook.sh: tr -cd call not yet applied | Verified |
 | Version 3.0.14 | Read pyproject.toml and version.py | Verified |
 | License MIT | Read LICENSE file and pyproject.toml | Verified |
 | ChromaDB + PyYAML only dependencies | Read pyproject.toml dependencies | Verified |
@@ -393,4 +393,4 @@ For most AI memory use cases (< 10K entities), SQLite is the right choice over N
 
 ---
 
-*Part of [awesome-ai-anatomy](https://github.com/NeuZhou/awesome-ai-anatomy) — source-level teardowns of how production AI systems actually work. This teardown was produced using GitNexus for structural analysis combined with manual source code review for architectural judgment.*
+*Part of [awesome-ai-anatomy](https://github.com/NeuZhou/awesome-ai-anatomy) - source-level teardowns of how production AI systems actually work. This teardown was produced using GitNexus for structural analysis combined with manual source code review for architectural judgment.*

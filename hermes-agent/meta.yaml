@@ -18,7 +18,7 @@ characteristics:
   code_organization: "260K LOC Python, skill auto-creation and self-patching from experience, 'hermes claw migrate' imports OpenClaw config"
   security_approach: "memory-threat-detection scans memory writes before persisting, subagent restrictions (no code exec, no memory writes, no user interaction)"
   context_strategy: "frozen memory snapshots: BuiltinMemoryProvider snapshots MEMORY.md at session start for prompt-cache optimization, FTS5 session search for cross-session recall"
-  documentation: "self-improving skill system documented, migration path from OpenClaw under-specified"
+  documentation: "self-improving skill system documented, migration path from OpenClaw is an area for future documentation growth"
 
 features:
   sandbox: docker

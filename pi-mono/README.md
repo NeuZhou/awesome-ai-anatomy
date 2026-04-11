@@ -22,7 +22,7 @@ const claudeCodeTools = [
 
 Pi renames its tools to match Claude Code's exact casing before sending requests to Anthropic. Why? Because Anthropic likely gives Claude Code preferential treatment — better rate limits, prompt caching, or routing. By mimicking Claude Code's tool names, Pi piggybacks on that treatment.
 
-This is wild. And it's shipped as *default behavior*, not an opt-in flag.
+This is audacious. And it's shipped as *default behavior*, not an opt-in flag.
 
 The thing is, beyond the stealth mode, there's genuinely good engineering here. The monorepo has the cleanest package boundaries I've seen in any coding agent project. `pi-tui` has zero dependency on `pi-ai` — the TUI library stands completely alone. In a world where most agent frameworks smear LLM concerns across every layer, that discipline is rare.
 
@@ -52,7 +52,7 @@ Pi is a monorepo of seven npm packages that together form a full stack for build
 |-----------|-------------|
 | Architecture | 7-package monorepo with game-engine layering: pi-ai (renderer abstraction), pi-agent-core (game loop), pi-tui (scene graph), pi-coding-agent (content) |
 | Code Organization | 147K LOC TypeScript across 583 .ts files, strict dependency graph (pi-tui has zero dependency on pi-ai), lazy provider loading via dynamic import + promise caching |
-| Security Approach | Stealth mode renames tools to match Claude Code's exact casing for compatibility, no independent security layer |
+| Security Approach | Stealth mode renames tools to match Claude Code's exact casing for compatibility, focused on agent functionality rather than a dedicated security layer |
 | Context Strategy | Summarize-based compaction, steering/follow-up two-lane input queue during agent execution |
 | Documentation | shittycodingagent.ai as honest branding, internal package boundaries need docs, 10 provider configs via registry |
 
@@ -133,7 +133,7 @@ Pi renames its tools to match Claude Code's exact casing before sending requests
 
 The author even runs `https://cchistory.mariozechner.at`, a side project that archives Claude Code's system prompts across versions. That's some serious competitive intelligence.
 
-I'll be honest — I'm not sure how I feel about this. It's technically impressive and solves a real problem (Anthropic's rate limits are brutal for third-party agents). But it's also impersonating another product's API surface, which carries forward-compatibility risk. Anthropic could detect it and flag the API key. The fact that it ships as default behavior and not opt-in is a bold choice.
+It's technically impressive and solves a real problem (Anthropic's rate limits are brutal for third-party agents). It is also impersonating another product's API surface, which is something to watch for forward-compatibility. Anthropic could detect it and adjust routing. The fact that it ships as default behavior and not opt-in is a bold choice.
 
 This touches on a broader tension in the agent ecosystem. If ACI design matters more than model choice, then tool naming conventions become a competitive moat — and Pi is choosing to breach it rather than build its own.
 
@@ -219,7 +219,7 @@ There's also overflow recovery: if an LLM returns a context-overflow error, Pi a
 
 The monorepo structure is the best I've seen in the coding agent space. Package boundaries are clean and meaningful — `pi-ai` (37K lines) and `pi-tui` (18K lines) are genuine standalone libraries that could live in their own repos. The dependency graph flows one way, and there's no "utils" dumping ground. This is unusual for agent projects.
 
-The 69K-line `coding-agent` package is both the strength and the weakness. It contains everything from compaction algorithms to TUI components to extension loading to session management. The `AgentSession` class alone is over 1,500 lines with mixed concerns: model management, compaction, retry logic, bash execution, extension lifecycle, session persistence — all in one class. This is the "god class" issue, just split across more methods than Hermes Agent's 9K-line `run_agent.py`. The game loop metaphor breaks down here — in a real game engine, the physics system, renderer, and input handler are separate objects.
+The 69K-line `coding-agent` package is the densest part of the codebase. It contains everything from compaction algorithms to TUI components to extension loading to session management. The `AgentSession` class alone is over 1,500 lines coordinating multiple concerns: model management, compaction, retry logic, bash execution, extension lifecycle, session persistence -- all in one class. This is a natural candidate for decomposition as the project grows. In a game engine analogy, the physics system, renderer, and input handler would be separate objects -- and the same pattern could be applied here to unlock even cleaner extensibility.
 
 The TUI library is legitimately good and underappreciated. Differential terminal rendering (only redraw changed lines/cells) is hard to get right, and Pi handles it with cursor marker protocols, Kitty image support, and proper ANSI escape handling. This is where Zechner's libGDX experience shows most clearly — game rendering is all about minimizing draw calls, and that's exactly what differential TUI rendering is.
 
@@ -306,7 +306,7 @@ Coupling tool execution with tool rendering in a single definition means tools o
 1. **Game-engine layering works for agents.** Renderer abstraction → game loop → scene graph → content. Pi proves this pattern produces the cleanest package boundaries in the coding agent space.
 2. **Lazy loading is free performance.** Dynamic import + promise caching for provider modules means startup cost stays constant regardless of how many providers you support. Every agent framework should do this.
 3. **Stealth mode is a canary for agent ecosystem politics.** When tool naming conventions become competitive moats, impersonation becomes a tempting strategy. Pi is just the first project to ship it openly.
-4. **A one-person project can compete at 32K stars.** But the OSS Weekend Mode and `AgentSession` god class show the cost. There's a ceiling to what one maintainer can architect cleanly.
+4. **A one-person project can compete at 32K stars.** The OSS Weekend Mode and dense `AgentSession` class show how much one talented maintainer can ship. Decomposing the core session class is a natural next step that would open the door to more contributors.
 5. **The TUI is the hidden gem.** `pi-tui` at 18K lines with differential rendering, Kitty image support, and zero LLM dependencies is genuinely reusable. If you're building any terminal UI for AI tools, look here first.
 
 ---

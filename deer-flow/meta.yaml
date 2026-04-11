@@ -17,7 +17,7 @@ deployment: docker
 characteristics:
   architecture: "14-layer middleware chain over LangGraph, order-dependent (ClarificationMiddleware must be last), FastAPI + Next.js dual backend"
   code_organization: "Python backend + TypeScript frontend, v2.0 ground-up rewrite sharing zero code with v1, LangGraph tightly coupled"
-  security_approach: "no auth, no RBAC — designed for trusted corporate network deployment, public use requires external auth layer"
+  security_approach: "delegates auth and RBAC to external layers -- designed for trusted corporate network deployment, public use pairs naturally with an external auth layer"
   context_strategy: "summarize-based compaction, DanglingToolCallMiddleware patches orphan tool calls from interrupted sessions"
   documentation: "v2.0 rewrite docs exist, middleware ordering undocumented outside the source code"
 
@@ -36,7 +36,7 @@ features:
     count: 1
     names: [langgraph]
 
-key_finding: "14-layer middleware chain, hash-based loop detection (warn@3, kill@5), no auth/RBAC"
+key_finding: "14-layer middleware chain, hash-based loop detection (warn@3, kill@5), delegates auth to external layers"
 
 worth_stealing:
   - "Middleware-first architecture: 14+ composable, testable middlewares for cross-cutting concerns"

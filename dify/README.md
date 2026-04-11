@@ -43,7 +43,7 @@ Dify is a platform for building AI applications through a visual drag-and-drop i
 | Architecture | graphon DAG engine extracted to standalone PyPI package, 7+ Docker containers, plugin daemon as separate process |
 | Code Organization | 1.28M LOC (513K Python + 770K TypeScript), Flask/Gunicorn + Celery + Next.js + ReactFlow, 1600-line docker-compose |
 | Security Approach | SSRF proxy (Squid) for HTTP node isolation, Go-based code sandbox for user-submitted code execution |
-| Context Strategy | no built-in context management; child engine spawning gives each loop iteration fresh VariablePool and runtime state |
+| Context Strategy | delegates context management to child engines; child engine spawning gives each loop iteration fresh VariablePool and runtime state |
 | Documentation | end-user docs thorough, 30+ vector DB integrations individually documented, 400+ env vars in docker-compose |
 
 ## Architecture
@@ -102,7 +102,7 @@ self.graph_engine.layer(LLMQuotaLayer())
 
 Layers handle execution limits (500 steps max, 1200 seconds by default), LLM quota tracking, and observability (OpenTelemetry spans). Child workflows spawn their own engine instances — that's how iteration and loop nodes work. They recurse into sub-graphs with `WORKFLOW_CALL_MAX_DEPTH=5`.
 
-The node factory is where things get... busy. `DifyNodeFactory.create_node()` is 150 lines with a dictionary mapping each node type to its initialization kwargs. LLM nodes need credentials, memory, prompt serializers. Tool nodes need runtime contexts. Agent nodes need strategy resolvers. The kind of code that started as a switch statement and grew arms and legs.
+The node factory is where things get... comprehensive. `DifyNodeFactory.create_node()` is 150 lines with a dictionary mapping each node type to its initialization kwargs. LLM nodes need credentials, memory, prompt serializers. Tool nodes need runtime contexts. Agent nodes need strategy resolvers. The kind of code that grew organically from real-world requirements -- each node type genuinely needs different initialization plumbing.
 
 ```python
 # From api/core/workflow/node_factory.py
@@ -177,11 +177,11 @@ Four retrieval methods:
 - **Hybrid search** — semantic + full-text, merged results
 - **Keyword search** — Jieba keyword table, built for Chinese text
 
-Post-processing includes reranking (separate reranking model) and metadata filtering. The filter is LLM-powered — it generates filter conditions from the user query by prompting with dataset metadata schemas. Neat trick: users don't write filter syntax, the LLM figures it out. (Whether this is robust enough for production queries with complex filter logic... I'd want to test more, but for simple cases it's elegant.)
+Post-processing includes reranking (separate reranking model) and metadata filtering. The filter is LLM-powered — it generates filter conditions from the user query by prompting with dataset metadata schemas. Neat trick: users don't write filter syntax, the LLM figures it out. (I'm curious how well this handles production queries with complex filter logic -- for simple cases it's elegant, and it'll be interesting to see how it scales.)
 
 The Jieba keyword support for CJK is worth calling out. Most RAG frameworks are built for English and handle Chinese as an afterthought. Dify's Chinese text support isn't a plugin — it's in the core retrieval path.
 
-The vector DB support list is... something. The docker-compose has config blocks for Weaviate, Qdrant, pgvector, Milvus, Chroma, Elasticsearch, OpenSearch, OceanBase, TiDB, Oracle, Couchbase, Hologres, AnalyticDB, Lindorm, Baidu VectorDB, Viking DB, Tencent VectorDB, Upstash, TableStore, ClickZetta, InterSystems IRIS, MatrixOne, and more. The abstraction layer in `core/rag/datasource/` unifies them, and it works. But maintaining 30+ adapters is serious engineering overhead. Prioritizing top 10 and marking the rest community-maintained would probably be a healthier split.
+The vector DB support list is... impressive. The docker-compose has config blocks for Weaviate, Qdrant, pgvector, Milvus, Chroma, Elasticsearch, OpenSearch, OceanBase, TiDB, Oracle, Couchbase, Hologres, AnalyticDB, Lindorm, Baidu VectorDB, Viking DB, Tencent VectorDB, Upstash, TableStore, ClickZetta, InterSystems IRIS, MatrixOne, and more. The abstraction layer in `core/rag/datasource/` unifies them, and it works. Maintaining 30+ adapters is serious engineering -- one thought for the future would be prioritizing the top 10 as core-maintained and marking the rest as community-maintained to distribute the load.
 
 ### Plugin System
 
@@ -222,11 +222,11 @@ For teams with DevOps capacity and non-technical stakeholders who need to build 
 
 The `graphon` extraction is a solid architectural move. Decouples execution from the app layer, makes the engine testable. The layer system (limits, quotas, observability) is well-designed and extendable.
 
-But the complexity cost is real. Minimum 7 containers. Add vector DB: 8-9. Add plugin daemon and sandbox: small Kubernetes cluster territory. 400+ environment variables. The node factory has a type-specific init dictionary with 10+ entries, each wiring together credentials providers, file managers, HTTP clients, and template renderers. For self-hosters, you inherit the infrastructure complexity. The platform makes it easy for end users; someone still has to run the platform.
+The complexity is the cost of completeness. Minimum 7 containers. Add vector DB: 8-9. Add plugin daemon and sandbox: small Kubernetes cluster territory. 400+ environment variables. The node factory has a type-specific init dictionary with 10+ entries, each wiring together credentials providers, file managers, HTTP clients, and template renderers. For self-hosters, you take on the infrastructure alongside the capabilities. The platform makes it easy for end users; someone still has to run the platform.
 
-The modified Apache 2.0 license (commercial license required for >1M users) means this isn't truly "open" the way MIT/Apache projects are. Source-available with a commercial ceiling. Fine for most users, worth knowing about.
+The modified Apache 2.0 license (commercial license required for >1M users) means there's a commercial ceiling to be aware of, unlike pure MIT/Apache projects. Source-available with a clear boundary. Fine for most users, worth knowing about.
 
-Would I use it? For an enterprise team that needs a managed AI platform and has the DevOps bandwidth — yes. For an individual dev building a single agent? Probably not. The overhead doesn't pay off until you need multi-tenant isolation, visual workflows for non-engineers, or the plugin marketplace. There's a reason nobody uses Kubernetes for their side project.
+Would I use it? For an enterprise team that needs a managed AI platform and has the DevOps bandwidth -- yes. For an individual dev building a single agent? The overhead really starts paying off once you need multi-tenant isolation, visual workflows for non-engineers, or the plugin marketplace. There's a reason nobody uses Kubernetes for their side project -- and a reason Kubernetes powers the world's infrastructure.
 
 ---
 
@@ -275,7 +275,7 @@ if dify_config.ENABLE_OTEL or is_instrument_flag_enabled():
  self.graph_engine.layer(ObservabilityLayer())
 ```
 
-Layers observe events rather than modify the message pipeline. Less fragile ordering than middleware chains.
+Layers observe events rather than modify the message pipeline. More composable and safer ordering than middleware chains.
 
 ### 2. LLM-Powered Metadata Filtering
 

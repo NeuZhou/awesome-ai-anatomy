@@ -18,7 +18,7 @@ characteristics:
   architecture: "graphon DAG engine extracted to standalone PyPI package, 7+ Docker containers, plugin daemon as separate process"
   code_organization: "1.28M LOC (513K Python + 770K TypeScript), Flask/Gunicorn + Celery + Next.js + ReactFlow, 1600-line docker-compose"
   security_approach: "SSRF proxy (Squid) for HTTP node isolation, Go-based code sandbox for user-submitted code execution"
-  context_strategy: "no built-in context management; child engine spawning gives each loop iteration fresh VariablePool and runtime state"
+  context_strategy: "delegates context management to child engines; child engine spawning gives each loop iteration fresh VariablePool and runtime state"
   documentation: "end-user docs thorough, 30+ vector DB integrations individually documented, 400+ env vars in docker-compose"
 
 features:

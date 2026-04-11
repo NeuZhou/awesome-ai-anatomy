@@ -35,7 +35,7 @@ features:
     count: 1
     names: [anthropic]
 
-key_finding: "4-layer context cascade, hidden pet system (18 species), 1729-line god object"
+key_finding: "4-layer context cascade, creative pet system (18 species), 1729-line central agentic loop"
 
 worth_stealing:
   - "4-layer context cascade: lossless before lossy, local before global — progressive degradation preserves maximum information"

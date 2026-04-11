@@ -17,8 +17,8 @@ characteristics:
   architecture: "30-agent team with 5-phase pipeline (plan→prd→exec→verify→fix), git worktree isolation per experiment, heuristic task-to-worker allocation via file-path overlap scoring"
   code_organization: "124K LOC TypeScript, plugin hook SDK with process isolation (1.5s timeout, SIGTERM→SIGKILL escalation), monotonic worker indexing"
   security_approach: "plugin process isolation via child process spawning, no shared state between workers, bounded fix loops (max 3 retries)"
-  context_strategy: "no built-in context management — delegates to host Codex CLI agent"
-  documentation: "agent roles and pipeline stages documented, Korean keywords in role-router (테스트, 커버리지, 디자인), no license file"
+  context_strategy: "delegates context management to the host Codex CLI agent -- focused on orchestration instead"
+  documentation: "agent roles and pipeline stages documented, Korean keywords in role-router, license file is an area for future addition"
 
 features:
   sandbox: none
@@ -47,7 +47,7 @@ easter_eggs:
   - "Same developer's second take: comparing OMC→OMX reveals which designs survived (file IPC, mkdir locking) and which got replaced (shared FS → worktrees)"
   - "Korean keywords in role-router: 테스트, 커버리지, 디자인 — thoughtful internationalization"
   - "Monotonic worker index: worker-3 stays worker-3 even after worker-2 is removed, preventing naming collisions"
-  - "No license file despite 19K stars"
+  - "License file not yet added despite 19K stars -- an open question for contributors"
 
 tags:
   - multi-agent

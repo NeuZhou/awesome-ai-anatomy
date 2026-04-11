@@ -15,7 +15,7 @@ maturity: production
 deployment: docker
 
 characteristics:
-  architecture: "event-driven agent loop (1391 lines), 6 agent types, Docker sandbox per session, V0/V1 architecture coexisting mid-migration"
+  architecture: "event-driven agent loop (1391 lines), 6 agent types, Docker sandbox per session, V0/V1 architecture coexisting during active migration"
   code_organization: "400K LOC (287K Python + 114K TypeScript), FastAPI server, LiteLLM providers, 21157-node GitNexus index with 1102 clusters"
   security_approach: "3-layer: GraySwan (adversarial testing) + Invariant (runtime policy) + LLM-analyzer (semantic review of agent actions)"
   context_strategy: "10-condenser pipeline: progressive compression from observation masking to structured summarization to amortized forgetting"
@@ -36,7 +36,7 @@ features:
     count: 1
     names: [litellm]
 
-key_finding: "10 condensers, 3-layer security, 487-line stuck detector, V0/V1 mid-migration"
+key_finding: "10 condensers, 3-layer security, 487-line stuck detector, V0/V1 active migration"
 
 worth_stealing:
   - "10-condenser pipeline: most sophisticated context management in the group, progressive compression from observation to full summarization"
@@ -44,7 +44,7 @@ worth_stealing:
   - "487-line stuck detector: pattern-matching on repeated tool calls to break infinite loops"
 
 easter_eggs:
-  - "V0/V1 mid-migration: codebase has two parallel architectures coexisting"
+  - "V0/V1 active migration: codebase has two parallel architectures coexisting as the team ships and modernizes simultaneously"
 
 tags:
   - coding-agent

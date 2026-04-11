@@ -150,7 +150,7 @@ Key decisions:
 
 The no-memory-writes constraint prevents a class of bugs where two children simultaneously try to update MEMORY.md. But it also means children can't benefit from each other's discoveries within a single turn.
 
-The no-code-execution constraint is the one I'm least sure about. The comment says children "should reason step-by-step" - but what about multi-file refactors where the child needs to actually run tests? I suspect this was a safety-first decision that'll get relaxed once someone hits the limitation on a real task.
+The no-code-execution constraint is the one I'm most curious about. The comment says children "should reason step-by-step" -- but I'm curious how this plays out with multi-file refactors where the child needs to actually run tests. I suspect this was a safety-first decision that'll get thoughtfully relaxed once someone hits the limitation on a real task.
 
 ---
 
@@ -250,11 +250,11 @@ This is the right instinct. Memory is a persistence vector for prompt injection:
 
 The learning loop works and is the main reason to care about Hermes. Skills get created from experience, patched in-place with security scanning, and the frozen snapshot trick for memory is worth stealing. Session search with FTS5 + LLM summarization solves a real problem I've been annoyed by personally.
 
-But let's not pretend this is from-scratch innovation. It's OpenClaw in Python, and the 9,000-line single-file agent loop is the kind of thing that happens when a project evolves fast. The subagent restrictions are safety-first, which I respect - but blocking code execution for child agents means multi-file refactors are going to hit a wall. Someone will find that limit soon.
+But let's be clear about the lineage. It's OpenClaw reimagined in Python, and the 9,000-line single-file agent loop is the kind of thing that happens when a project ships fast and iterates hard. The subagent restrictions are safety-first, which I respect -- and blocking code execution for child agents is a deliberate constraint that someone will eventually push against during multi-file refactors. It'll be interesting to see how the team evolves that boundary.
 
-The one-memory-provider limit is a constraint where the single-provider design keeps architecture simple. In 2026, you probably want at least a file store plus a semantic search layer. Combining both would unlock more value.
+The one-memory-provider limit is a deliberate simplification -- the single-provider design keeps the architecture clean and easy to reason about. In 2026, you probably want at least a file store plus a semantic search layer, and combining both would unlock even more value. That feels like a natural next step.
 
-No cost budgets. For an agent that advertises Modal and Daytona (serverless, pay-per-second), not having a "stop at $X" switch is asking for someone's cloud bill to go through the roof.
+No cost budgets yet. For an agent that advertises Modal and Daytona (serverless, pay-per-second), adding a "stop at $X" switch would be a natural and valuable addition -- cost guardrails are an area for future growth.
 
 ---
 
@@ -324,7 +324,7 @@ Snapshot MEMORY.md once at session start, never update the system prompt during 
 1. **Self-improving skills are Voyager + Reflexion in production.** Create from experience (Voyager), patch from failure (Reflexion). This is the compound growth mechanism that turns a tool into a teammate.
 2. **Memory is an attack surface.** Hermes is the first agent I've seen that scans memory writes for prompt injection before persisting. Everyone else should be doing this.
 3. **FTS5 beats embeddings for session recall.** No infrastructure, no vector DB, no GPU. Just SQLite. Less fancy, more practical.
-4. **The 9,000-line file is a warning, not a feature.** Fast-moving projects accumulate technical debt. Hermes proves you can get to 26K stars with it, but the maintenance cost is real.
+4. **The 9,000-line file is a sign of velocity, not carelessness.** Fast-moving projects accumulate structural debt. Hermes proves you can get to 26K stars shipping fast, and a future refactor could unlock even more contribution velocity.
 5. **Forking concepts is fine if you add value.** `hermes claw migrate` is honest about the lineage, and the self-improving skills + session search are genuine innovations on top of the OpenClaw foundation.
 
 ---

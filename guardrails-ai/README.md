@@ -26,9 +26,9 @@ Guardrails AI wraps LLM API calls and validates the output against a schema you 
 |-----------|-------------|
 | Architecture | onion-shape: Guard wraps Runner wraps ValidatorService wraps individual Validators, async validator execution by default |
 | Code Organization | 18K LOC Python in 178 files, 1076-line Guard central orchestrator class, Pydantic v2 + LiteLLM + OpenTelemetry |
-| Security Approach | validators pip-install from git URLs via Validator Hub (npm-for-LLM-constraints), supply chain risk on Hub packages |
+| Security Approach | validators pip-install from git URLs via Validator Hub (npm-for-LLM-constraints), supply chain integrity depends on Hub package vetting |
 | Context Strategy | streaming chunk accumulation: accumulates LLM response chunks until sentence boundary before validating |
-| Documentation | API docs and validator catalog thorough, jsonformer escape hatch under @experimental decorator, reask loop mechanics less documented |
+| Documentation | API docs and validator catalog thorough, jsonformer escape hatch under @experimental decorator, reask loop mechanics are an area for future documentation growth |
 ## Architecture
 
 
@@ -224,13 +224,13 @@ This is the commercial angle. The open-source library validates locally; the pai
 
 ## The Verdict
 
-The Guard class does a lot — schema container, validator registry, LLM caller, API client, history store, telemetry manager, and serialization target in 1,076 lines — extracting a few of those responsibilities would make it easier to extend.
+The Guard class does a lot -- schema container, validator registry, LLM caller, API client, history store, telemetry manager, and serialization target in 1,076 lines -- and there's an opportunity to extract a few of those responsibilities to make it even more extensible.
 
 The validator pipeline, on the other hand, is well-thought-out. The `OnFailAction` enum with 8 options covers every reasonable correction strategy. The DFS traversal of nested schemas with per-path validator maps is a clean design that handles real-world JSON structures. And the streaming validation support — accumulating chunks until a sentence boundary before validating — shows attention to production use cases.
 
-The Hub model is commercially smart but architecturally worth watching. Each validator is a separate pip package installed from git, so dependency management scales linearly — consolidating into fewer packages (like ClawGuard's single-package approach with 285+ patterns) would simplify production pinning.
+The Hub model is commercially smart and architecturally worth watching. Each validator is a separate pip package installed from git, so dependency management scales linearly -- consolidating into fewer packages (like ClawGuard's single-package approach with 285+ patterns) is one interesting comparison for how to simplify production pinning.
 
-The RAIL XML spec is largely superseded — the codebase has moved to Pydantic models and JSON Schema as the primary interface, and new users have no reason to touch the 815 lines of XML parsing that remain for backward compatibility.
+The RAIL XML spec is largely superseded -- the codebase has moved to Pydantic models and JSON Schema as the primary interface, and new users are well-served going straight to those. The 815 lines of XML parsing remain as a testament to the project's evolution and backward compatibility commitment.
 
 The telemetry integration is surprisingly thorough. OpenTelemetry tracing wraps every significant operation — guard calls, validator execution, LLM calls, reask loops. The `@trace` decorator from `hub_tracing.py` appears on every important method. This is the kind of observability infrastructure that separates a weekend project from a production tool.
 
