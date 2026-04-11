@@ -1,6 +1,6 @@
 ﻿# MemPalace: 9,000 Lines of Python, 30,000 Stars, and an Actress
 
-> A Resident Evil star and a developer open-sourced a ChromaDB wrapper with a metaphor layer. Four days later it has 30K stars and a community that actively stress-tested the README claims. The 4-layer memory stack is a genuinely good idea. AAAK is ambitious and still evolving. The benchmarks are real -- once you read the asterisks.
+> A Resident Evil star and a developer open-sourced a ChromaDB wrapper with a metaphor layer. Four days later it has 30K stars and a community that actively stress-tested the README claims. The 4-layer memory stack is a genuinely good idea. AAAK is ambitious and still evolving. The benchmarks are real — once you read the asterisks.
 
 ## At a Glance
 
@@ -27,7 +27,7 @@ MemPalace is an AI memory system that stores verbatim conversation text in Chrom
 |-----------|-------------|
 | Architecture | 4-layer memory stack (identity→essential facts→topic-scoped recall→full search), ChromaDB palace metaphor with wings/rooms/halls/tunnels/closets/drawers |
 | Code Organization | 15.5K LOC Python in 25 files, 19 MCP tools, type hints are an area for future growth, version 3.0.14 on a 4-day-old project |
-| Security Approach | shell injection in hooks (issue #110) -- SESSION_ID sanitization opportunity, input validation on MCP tool parameters is an area for future hardening |
+| Security Approach | shell injection in hooks (issue #110) — SESSION_ID sanitization opportunity, input validation on MCP tool parameters is an area for future hardening |
 | Context Strategy | layered loading: ~600 token wake-up cost (identity + essential facts), topic-scoped recall on demand, full ChromaDB search only when needed |
 | Documentation | April 7 correction note acknowledging wrong AAAK token counting and misleading benchmarks, auto-teach via MCP status tool response |
 ## Architecture
@@ -248,7 +248,7 @@ Two shell scripts for Claude Code integration:
 
 **`mempal_precompact_hook.sh`** - Fires before context compression. Always blocks. Tells the AI to save *everything* before the context window shrinks. This is the safety net.
 
-**The shell injection fix opportunity (issue #110):** In `mempal_precompact_hook.sh`, `SESSION_ID` is extracted from JSON and used before sanitization -- applying the same `tr -cd` sanitization from the save hook would close this gap.
+**The shell injection fix opportunity (issue #110):** In `mempal_precompact_hook.sh`, `SESSION_ID` is extracted from JSON and used before sanitization — applying the same `tr -cd` sanitization from the save hook would close this gap.
 
 ---
 
@@ -256,13 +256,13 @@ Two shell scripts for Claude Code integration:
 
 MemPalace's value is in one file: `layers.py`. The 4-layer memory stack - identity + essential story on wake-up, topic-scoped recall on demand, full search when needed - is a pattern that every AI memory system should consider. It's the right abstraction: cheap wakeup, expensive search only when triggered.
 
-The rest is a mixed bag of solid components. ChromaDB storage with metadata filtering works well and is straightforward. The knowledge graph is a decent SQLite implementation of temporal triples. The MCP server is a clean tool surface. The entity system (1,320 lines) is thorough -- streamlining it over time could reduce maintenance surface.
+The rest is a mixed bag of solid components. ChromaDB storage with metadata filtering works well and is straightforward. The knowledge graph is a decent SQLite implementation of temporal triples. The MCP server is a clean tool surface. The entity system (1,320 lines) is thorough — streamlining it over time could reduce maintenance surface.
 
-AAAK is an ambitious experiment that's still finding its footing -- 952 lines of regex-based abbreviation that hasn't yet proven its value at small scale, and may shine more as palaces grow larger. The April 7 correction note shows the team is honest and responsive, which is a great sign for the project's future.
+AAAK is an ambitious experiment that's still finding its footing — 952 lines of regex-based abbreviation that hasn't yet proven its value at small scale, and may shine more as palaces grow larger. The April 7 correction note shows the team is honest and responsive, which is a great sign for the project's future.
 
-The star count -- 30K in four days -- reflects Milla Jovovich's reach beyond typical developer channels. That's noteworthy context for calibrating stars as a quality signal, and it also means the project has an unusually broad potential contributor base.
+The star count — 30K in four days — reflects Milla Jovovich's reach beyond typical developer channels. That's noteworthy context for calibrating stars as a quality signal, and it also means the project has an unusually broad potential contributor base.
 
-Would I use it? The layered loading pattern, yes -- it's worth adopting for any agent memory system. The ChromaDB storage with wing/room metadata is straightforward and works well. AAAK is still maturing. The hooks are solid once the sanitization fix lands.
+Would I use it? The layered loading pattern, yes — it's worth adopting for any agent memory system. The ChromaDB storage with wing/room metadata is straightforward and works well. AAAK is still maturing. The hooks are solid once the sanitization fix lands.
 
 ---
 

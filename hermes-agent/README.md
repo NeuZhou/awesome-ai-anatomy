@@ -150,7 +150,7 @@ Key decisions:
 
 The no-memory-writes constraint prevents a class of bugs where two children simultaneously try to update MEMORY.md. But it also means children can't benefit from each other's discoveries within a single turn.
 
-The no-code-execution constraint is the one I'm most curious about. The comment says children "should reason step-by-step" -- but I'm curious how this plays out with multi-file refactors where the child needs to actually run tests. I suspect this was a safety-first decision that'll get thoughtfully relaxed once someone hits the limitation on a real task.
+The no-code-execution constraint is the one I'm most curious about. The comment says children "should reason step-by-step" — but I'm curious how this plays out with multi-file refactors where the child needs to actually run tests. I suspect this was a safety-first decision that'll get thoughtfully relaxed once someone hits the limitation on a real task.
 
 ---
 
@@ -250,11 +250,11 @@ This is the right instinct. Memory is a persistence vector for prompt injection:
 
 The learning loop works and is the main reason to care about Hermes. Skills get created from experience, patched in-place with security scanning, and the frozen snapshot trick for memory is worth stealing. Session search with FTS5 + LLM summarization solves a real problem I've been annoyed by personally.
 
-But let's be clear about the lineage. It's OpenClaw reimagined in Python, and the 9,000-line single-file agent loop is the kind of thing that happens when a project ships fast and iterates hard. The subagent restrictions are safety-first, which I respect -- and blocking code execution for child agents is a deliberate constraint that someone will eventually push against during multi-file refactors. It'll be interesting to see how the team evolves that boundary.
+But let's be clear about the lineage. It's OpenClaw reimagined in Python, and the 9,000-line single-file agent loop is the kind of thing that happens when a project ships fast and iterates hard. The subagent restrictions are safety-first, which I respect — and blocking code execution for child agents is a deliberate constraint that someone will eventually push against during multi-file refactors. It'll be interesting to see how the team evolves that boundary.
 
-The one-memory-provider limit is a deliberate simplification -- the single-provider design keeps the architecture clean and easy to reason about. In 2026, you probably want at least a file store plus a semantic search layer, and combining both would unlock even more value. That feels like a natural next step.
+The one-memory-provider limit is a deliberate simplification — the single-provider design keeps the architecture clean and easy to reason about. In 2026, you probably want at least a file store plus a semantic search layer, and combining both would unlock even more value. That feels like a natural next step.
 
-No cost budgets yet. For an agent that advertises Modal and Daytona (serverless, pay-per-second), adding a "stop at $X" switch would be a natural and valuable addition -- cost guardrails are an area for future growth.
+No cost budgets yet. For an agent that advertises Modal and Daytona (serverless, pay-per-second), adding a "stop at $X" switch would be a natural and valuable addition — cost guardrails are an area for future growth.
 
 ---
 

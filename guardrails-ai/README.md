@@ -224,13 +224,13 @@ This is the commercial angle. The open-source library validates locally; the pai
 
 ## The Verdict
 
-The Guard class does a lot -- schema container, validator registry, LLM caller, API client, history store, telemetry manager, and serialization target in 1,076 lines -- and there's an opportunity to extract a few of those responsibilities to make it even more extensible.
+The Guard class does a lot — schema container, validator registry, LLM caller, API client, history store, telemetry manager, and serialization target in 1,076 lines — and there's an opportunity to extract a few of those responsibilities to make it even more extensible.
 
 The validator pipeline, on the other hand, is well-thought-out. The `OnFailAction` enum with 8 options covers every reasonable correction strategy. The DFS traversal of nested schemas with per-path validator maps is a clean design that handles real-world JSON structures. And the streaming validation support — accumulating chunks until a sentence boundary before validating — shows attention to production use cases.
 
-The Hub model is commercially smart and architecturally worth watching. Each validator is a separate pip package installed from git, so dependency management scales linearly -- consolidating into fewer packages (like ClawGuard's single-package approach with 285+ patterns) is one interesting comparison for how to simplify production pinning.
+The Hub model is commercially smart and architecturally worth watching. Each validator is a separate pip package installed from git, so dependency management scales linearly — consolidating into fewer packages (like ClawGuard's single-package approach with 285+ patterns) is one interesting comparison for how to simplify production pinning.
 
-The RAIL XML spec is largely superseded -- the codebase has moved to Pydantic models and JSON Schema as the primary interface, and new users are well-served going straight to those. The 815 lines of XML parsing remain as a testament to the project's evolution and backward compatibility commitment.
+The RAIL XML spec is largely superseded — the codebase has moved to Pydantic models and JSON Schema as the primary interface, and new users are well-served going straight to those. The 815 lines of XML parsing remain as a testament to the project's evolution and backward compatibility commitment.
 
 The telemetry integration is surprisingly thorough. OpenTelemetry tracing wraps every significant operation — guard calls, validator execution, LLM calls, reask loops. The `@trace` decorator from `hub_tracing.py` appears on every important method. This is the kind of observability infrastructure that separates a weekend project from a production tool.
 
@@ -344,20 +344,20 @@ The honest take: if you're building a chatbot that needs to return valid JSON wi
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 6,635 stars | GitHub API `Invoke-RestMethod` | âœ… Verified (2026-04-06) |
-| 561 forks | GitHub API `Invoke-RestMethod` | âœ… Verified (2026-04-06) |
-| Apache-2.0 license | GitHub API `license.spdx_id` | âœ… Verified |
-| 18,079 lines of Python | `Get-Content | Measure-Object -Line` on 178 .py files in `guardrails/` | âœ… Verified |
-| First commit 2023-01-29 | GitHub API `created_at` | âœ… Verified |
-| v0.10.0 | `pyproject.toml` version field | âœ… Verified |
-| `guard.py` line count | `Get-Content | Measure-Object -Line` | âœ… Verified: 1,076 lines |
-| `runner.py` line count | `Get-Content | Measure-Object -Line` | âœ… Verified: 457 lines |
-| 8 OnFailAction variants | `types/on_fail.py` source | âœ… Verified |
-| RAIL XML parsing in `rail_schema.py` | File exists, 815 lines | âœ… Verified |
-| `_configure_hub_telemtry` typo | `guard.py` source grep | âœ… Verified |
-| `text2sql.py` exists | `applications/text2sql.py` file check | âœ… Verified |
-| Hub registry is JSON | `types/validator_registry.py` + `hub/registry.py` source | âœ… Verified |
-| `@experimental` decorator | `guardrails/decorators/experimental.py` file exists | âœ… Verified |
+| 6,635 stars | GitHub API `Invoke-RestMethod` | Verified Verified (2026-04-06) |
+| 561 forks | GitHub API `Invoke-RestMethod` | Verified Verified (2026-04-06) |
+| Apache-2.0 license | GitHub API `license.spdx_id` | Verified Verified |
+| 18,079 lines of Python | `Get-Content | Measure-Object -Line` on 178 .py files in `guardrails/` | Verified Verified |
+| First commit 2023-01-29 | GitHub API `created_at` | Verified Verified |
+| v0.10.0 | `pyproject.toml` version field | Verified Verified |
+| `guard.py` line count | `Get-Content | Measure-Object -Line` | Verified Verified: 1,076 lines |
+| `runner.py` line count | `Get-Content | Measure-Object -Line` | Verified Verified: 457 lines |
+| 8 OnFailAction variants | `types/on_fail.py` source | Verified Verified |
+| RAIL XML parsing in `rail_schema.py` | File exists, 815 lines | Verified Verified |
+| `_configure_hub_telemtry` typo | `guard.py` source grep | Verified Verified |
+| `text2sql.py` exists | `applications/text2sql.py` file check | Verified Verified |
+| Hub registry is JSON | `types/validator_registry.py` + `hub/registry.py` source | Verified Verified |
+| `@experimental` decorator | `guardrails/decorators/experimental.py` file exists | Verified Verified |
 
 </details>
 

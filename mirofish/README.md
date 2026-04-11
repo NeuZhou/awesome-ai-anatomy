@@ -1,6 +1,6 @@
 ﻿# MiroFish: What 'Collective Intelligence' Means Inside a 50K-Star Simulation Engine
 
-> I expected to find some clever collective intelligence algorithm -- particle swarm, ant colony, or at least some evolutionary computation variant. Cloned the repo, read the code. The core prediction capability runs entirely on LLM role-playing + social media simulation. That finding made me rethink what "collective intelligence" means in 2026 -- and I came away impressed by how effectively they've packaged this approach.
+> I expected to find some clever collective intelligence algorithm — particle swarm, ant colony, or at least some evolutionary computation variant. Cloned the repo, read the code. The core prediction capability runs entirely on LLM role-playing + social media simulation. That finding made me rethink what "collective intelligence" means in 2026 — and I came away impressed by how effectively they've packaged this approach.
 
 ## At a Glance
 
@@ -27,8 +27,8 @@ What MiroFish does, in plain terms: you feed it a document (news article, policy
 | Architecture | Vue.js wizard UI → Flask API → 5+ LLM call chain (ontology→profiles→sim config→agent behavior→report), core simulation delegated to OASIS (camel-ai) |
 | Code Organization | 38.8K LOC (20K Python + 18.8K Vue/JS), 60 source files, backend/app/services/ one file per pipeline stage |
 | Security Approach | input sanitization on uploads and auth layer are areas for future hardening, builtins.open monkey-patch forces UTF-8 on Windows |
-| Context Strategy | stateless simulation pipeline, each run is independent -- delegates context to OASIS |
-| Documentation | README emphasizes 'collective intelligence' framing, simulation methodology documentation is an area for future growth |
+| Context Strategy | stateless simulation pipeline, each run is independent — delegates context to OASIS |
+| Documentation | README emphasizes 'collective intelligence' framing, simulation methodology documentation is an room to grow |
 ## Architecture
 
 
@@ -163,7 +163,7 @@ Crude but effective. This tells you they got burned by encoding issues on Window
 
 After simulation ends, MiroFish doesn't shut down the environment. Instead it enters a "waiting for commands" mode — receiving interview requests via filesystem IPC (JSON files in `ipc_commands/` and `ipc_responses/` directories). The frontend can ask any agent questions, and the agent responds from its context on both platforms.
 
-This IPC design is straightforward -- polling JSON files every 0.5 seconds with no WebSocket or message queue. It works well at small scale; for high-frequency interactions, upgrading to an in-memory message bus would be a natural evolution.
+This IPC design is straightforward — polling JSON files every 0.5 seconds with no WebSocket or message queue. It works well at small scale; for high-frequency interactions, upgrading to an in-memory message bus would be a natural evolution.
 
 ---
 
@@ -171,15 +171,15 @@ This IPC design is straightforward -- polling JSON files every 0.5 seconds with 
 
 MiroFish did something with real engineering value: it turned "LLM multi-agent social simulation" from academic experiment code into a usable interactive web product. The 5-step wizard UX design lowers the barrier — from uploading a document to seeing a report is fully automated, no coding required. The ReportAgent's ReACT mode with forced multi-tool usage ensures generated reports have data backing instead of being pure fabrication. Dual-platform parallel simulation and post-simulation interviews show real product thinking.
 
-The "collective intelligence" framing is ambitious -- and thought-provoking. There's no classical collective intelligence algorithm here (no particle swarm, no ant colony, no evolutionary computation, no mathematical modeling of emergent mechanisms). Instead, the "collective intelligence" is "multiple LLM agents posting and interacting on simulated social platforms according to their personas." All the "intelligence" comes from the underlying LLM's capabilities. The "emergence" between agents is the LLM reading other agents' posts and doing in-character responses. It's a genuinely novel reframing of what "collective intelligence" can mean in the LLM era. OASIS (from the camel-ai team) is the actual simulation engine -- MiroFish's own code handles the orchestration and wrapping that turns it into a usable product.
+The "collective intelligence" framing is ambitious — and thought-provoking. There's no classical collective intelligence algorithm here (no particle swarm, no ant colony, no evolutionary computation, no mathematical modeling of emergent mechanisms). Instead, the "collective intelligence" is "multiple LLM agents posting and interacting on simulated social platforms according to their personas." All the "intelligence" comes from the underlying LLM's capabilities. The "emergence" between agents is the LLM reading other agents' posts and doing in-character responses. It's a genuinely novel reframing of what "collective intelligence" can mean in the LLM era. OASIS (from the camel-ai team) is the actual simulation engine — MiroFish's own code handles the orchestration and wrapping that turns it into a usable product.
 
-Code quality varies across the project. `report_agent.py` is 1400+ lines in a single file, combining logging classes, data classes, prompt constants, ReACT loop logic, and report management -- it's doing a lot of heavy lifting. `simulation_runner.py` has complex state management across many class methods. By contrast, `ontology_generator.py` and `graph_builder.py` are much cleaner and well-structured. Test coverage is an area for future growth -- `backend/scripts/test_profile_format.py` looks like a "test" from the filename, but it's actually a format validation script.
+Code quality varies across the project. `report_agent.py` is 1400+ lines in a single file, combining logging classes, data classes, prompt constants, ReACT loop logic, and report management — it's doing a lot of heavy lifting. `simulation_runner.py` has complex state management across many class methods. By contrast, `ontology_generator.py` and `graph_builder.py` are much cleaner and well-structured. Test coverage is an room to grow — `backend/scripts/test_profile_format.py` looks like a "test" from the filename, but it's actually a format validation script.
 
-About that 50K star growth rate: this project was created November 2025. By April 2026 it has 50K stars, with a compact codebase (1 commit in the shallow history I cloned). The repo has just 60 source files, under 40K total lines, split roughly between frontend Vue components and backend Python. The ratio between that code volume and 50K stars is remarkable -- typically a 50K-star project shows deeper code accumulation and community contributions. The concept clearly resonated: "predict everything" is a compelling vision, and the LLM social simulation framing tapped into genuine interest in agent-based modeling. The star count reflects the idea's resonance, and the code delivers a working product behind the vision.
+About that 50K star growth rate: this project was created November 2025. By April 2026 it has 50K stars, with a compact codebase (1 commit in the shallow history I cloned). The repo has just 60 source files, under 40K total lines, split roughly between frontend Vue components and backend Python. The ratio between that code volume and 50K stars is remarkable — typically a 50K-star project shows deeper code accumulation and community contributions. The concept clearly resonated: "predict everything" is a compelling vision, and the LLM social simulation framing tapped into genuine interest in agent-based modeling. The star count reflects the idea's resonance, and the code delivers a working product behind the vision.
 
-About prediction accuracy: MiroFish's README claims it can do "Financial Prediction" and "Political News Prediction," and the showcased demos are "university public opinion simulation" and "Dream of the Red Chamber ending speculation" -- creative applications that demonstrate the platform's versatility. Formal prediction accuracy evaluation, benchmarks, and backtesting against real events would strengthen the "prediction" framing considerably, and that validation infrastructure feels like a natural next milestone for the project.
+About prediction accuracy: MiroFish's README claims it can do "Financial Prediction" and "Political News Prediction," and the showcased demos are "university public opinion simulation" and "Dream of the Red Chamber ending speculation" — creative applications that demonstrate the platform's versatility. Formal prediction accuracy evaluation, benchmarks, and backtesting against real events would strengthen the "prediction" framing considerably, and that validation infrastructure feels like a natural next milestone for the project.
 
-Would I use this project? If the goal is opinion "scenario exploration" (note: not "prediction") -- exploring "if event X happens, how might different parties react" -- then MiroFish provides a solid framework. For decision support requiring confidence levels, the output is fundamentally LLM creative writing rather than statistical inference, so calibrating expectations accordingly is worth keeping in mind.
+Would I use this project? If the goal is opinion "scenario exploration" (note: not "prediction") — exploring "if event X happens, how might different parties react" — then MiroFish provides a solid framework. For decision support requiring confidence levels, the output is fundamentally LLM creative writing rather than statistical inference, so calibrating expectations accordingly is worth knowing.
 
 ---
 
@@ -196,7 +196,7 @@ Would I use this project? If the goal is opinion "scenario exploration" (note: n
 | Test Coverage | Area for growth | Yes | Yes |
 | Reproducibility | Low (LLM output is random) | Medium | High |
 
-MiroFish's unique position in this comparison: it may be the only productized project that lets LLM agents "freely interact on simulated social platforms." Deer-Flow's agents collaborate through a structured research workflow, Claude Code's agent assists in a programming context, and MiroFish lets agents post, comment, repost, and follow like real people. This direction has genuine research value -- and bridging from "simulation" to validated "prediction" would make it even more compelling.
+MiroFish's unique position in this comparison: it may be the only productized project that lets LLM agents "freely interact on simulated social platforms." Deer-Flow's agents collaborate through a structured research workflow, Claude Code's agent assists in a programming context, and MiroFish lets agents post, comment, repost, and follow like real people. This direction has genuine research value — and bridging from "simulation" to validated "prediction" would make it even more compelling.
 
 ---
 
@@ -253,22 +253,22 @@ The `builtins.open` monkey-patch in the code is the "nuclear option" for Windows
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 50,223 stars | GitHub API `stargazers_count` | âœ… Verified (2026-04-06) |
-| 7,385 forks | GitHub API `forks_count` | âœ… Verified |
-| Python + Vue.js | Repo file structure | âœ… Verified |
-| ~38,800 LOC | PowerShell `Measure-Object -Line` on *.py + *.vue + *.js | âœ… Verified (Python 20,025 + Vue/JS 18,790) |
-| AGPL-3.0 License | `LICENSE` file header | âœ… Verified |
-| Created 2025-11-26 | GitHub API `created_at` | âœ… Verified |
-| 60 source files | `Get-ChildItem -Include *.py,*.vue,*.js \| Measure-Object` | âœ… Verified |
-| OASIS (camel-oasis==0.2.5) | `requirements.txt` | âœ… Verified |
-| Zep Cloud dependency | `requirements.txt` (zep-cloud==3.13.0) + `config.py` | âœ… Verified |
-| `backend/app/services/report_agent.py` exists | File read | âœ… Verified |
-| `backend/scripts/run_parallel_simulation.py` exists | File read | âœ… Verified |
-| monkey-patch `builtins.open` | `run_parallel_simulation.py:30` | âœ… Verified |
-| Test coverage is an area for growth | Repo file structure | âœ… Verified (only test_profile_format.py) |
-| Shanda Group support | `README.md` Acknowledgments | âœ… Verified |
-| Dual-platform parallel simulation | `run_parallel_simulation.py` + `asyncio.gather` | âœ… Verified |
-| IPC via filesystem | `ParallelIPCHandler` class | âœ… Verified |
+| 50,223 stars | GitHub API `stargazers_count` | Verified Verified (2026-04-06) |
+| 7,385 forks | GitHub API `forks_count` | Verified Verified |
+| Python + Vue.js | Repo file structure | Verified Verified |
+| ~38,800 LOC | PowerShell `Measure-Object -Line` on *.py + *.vue + *.js | Verified Verified (Python 20,025 + Vue/JS 18,790) |
+| AGPL-3.0 License | `LICENSE` file header | Verified Verified |
+| Created 2025-11-26 | GitHub API `created_at` | Verified Verified |
+| 60 source files | `Get-ChildItem -Include *.py,*.vue,*.js \| Measure-Object` | Verified Verified |
+| OASIS (camel-oasis==0.2.5) | `requirements.txt` | Verified Verified |
+| Zep Cloud dependency | `requirements.txt` (zep-cloud==3.13.0) + `config.py` | Verified Verified |
+| `backend/app/services/report_agent.py` exists | File read | Verified Verified |
+| `backend/scripts/run_parallel_simulation.py` exists | File read | Verified Verified |
+| monkey-patch `builtins.open` | `run_parallel_simulation.py:30` | Verified Verified |
+| Test coverage is an area for growth | Repo file structure | Verified Verified (only test_profile_format.py) |
+| Shanda Group support | `README.md` Acknowledgments | Verified Verified |
+| Dual-platform parallel simulation | `run_parallel_simulation.py` + `asyncio.gather` | Verified Verified |
+| IPC via filesystem | `ParallelIPCHandler` class | Verified Verified |
 
 </details>
 

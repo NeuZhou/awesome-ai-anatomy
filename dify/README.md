@@ -102,7 +102,7 @@ self.graph_engine.layer(LLMQuotaLayer())
 
 Layers handle execution limits (500 steps max, 1200 seconds by default), LLM quota tracking, and observability (OpenTelemetry spans). Child workflows spawn their own engine instances — that's how iteration and loop nodes work. They recurse into sub-graphs with `WORKFLOW_CALL_MAX_DEPTH=5`.
 
-The node factory is where things get... comprehensive. `DifyNodeFactory.create_node()` is 150 lines with a dictionary mapping each node type to its initialization kwargs. LLM nodes need credentials, memory, prompt serializers. Tool nodes need runtime contexts. Agent nodes need strategy resolvers. The kind of code that grew organically from real-world requirements -- each node type genuinely needs different initialization plumbing.
+The node factory is where things get... comprehensive. `DifyNodeFactory.create_node()` is 150 lines with a dictionary mapping each node type to its initialization kwargs. LLM nodes need credentials, memory, prompt serializers. Tool nodes need runtime contexts. Agent nodes need strategy resolvers. The kind of code that grew organically from real-world requirements — each node type genuinely needs different initialization plumbing.
 
 ```python
 # From api/core/workflow/node_factory.py
@@ -177,11 +177,11 @@ Four retrieval methods:
 - **Hybrid search** — semantic + full-text, merged results
 - **Keyword search** — Jieba keyword table, built for Chinese text
 
-Post-processing includes reranking (separate reranking model) and metadata filtering. The filter is LLM-powered — it generates filter conditions from the user query by prompting with dataset metadata schemas. Neat trick: users don't write filter syntax, the LLM figures it out. (I'm curious how well this handles production queries with complex filter logic -- for simple cases it's elegant, and it'll be interesting to see how it scales.)
+Post-processing includes reranking (separate reranking model) and metadata filtering. The filter is LLM-powered — it generates filter conditions from the user query by prompting with dataset metadata schemas. Neat trick: users don't write filter syntax, the LLM figures it out. (I'm curious how well this handles production queries with complex filter logic — for simple cases it's elegant, and it'll be interesting to see how it scales.)
 
 The Jieba keyword support for CJK is worth calling out. Most RAG frameworks are built for English and handle Chinese as an afterthought. Dify's Chinese text support isn't a plugin — it's in the core retrieval path.
 
-The vector DB support list is... impressive. The docker-compose has config blocks for Weaviate, Qdrant, pgvector, Milvus, Chroma, Elasticsearch, OpenSearch, OceanBase, TiDB, Oracle, Couchbase, Hologres, AnalyticDB, Lindorm, Baidu VectorDB, Viking DB, Tencent VectorDB, Upstash, TableStore, ClickZetta, InterSystems IRIS, MatrixOne, and more. The abstraction layer in `core/rag/datasource/` unifies them, and it works. Maintaining 30+ adapters is serious engineering -- one thought for the future would be prioritizing the top 10 as core-maintained and marking the rest as community-maintained to distribute the load.
+The vector DB support list is... impressive. The docker-compose has config blocks for Weaviate, Qdrant, pgvector, Milvus, Chroma, Elasticsearch, OpenSearch, OceanBase, TiDB, Oracle, Couchbase, Hologres, AnalyticDB, Lindorm, Baidu VectorDB, Viking DB, Tencent VectorDB, Upstash, TableStore, ClickZetta, InterSystems IRIS, MatrixOne, and more. The abstraction layer in `core/rag/datasource/` unifies them, and it works. Maintaining 30+ adapters is serious engineering — one thought for the future would be prioritizing the top 10 as core-maintained and marking the rest as community-maintained to distribute the load.
 
 ### Plugin System
 
@@ -226,7 +226,7 @@ The complexity is the cost of completeness. Minimum 7 containers. Add vector DB:
 
 The modified Apache 2.0 license (commercial license required for >1M users) means there's a commercial ceiling to be aware of, unlike pure MIT/Apache projects. Source-available with a clear boundary. Fine for most users, worth knowing about.
 
-Would I use it? For an enterprise team that needs a managed AI platform and has the DevOps bandwidth -- yes. For an individual dev building a single agent? The overhead really starts paying off once you need multi-tenant isolation, visual workflows for non-engineers, or the plugin marketplace. There's a reason nobody uses Kubernetes for their side project -- and a reason Kubernetes powers the world's infrastructure.
+Would I use it? For an enterprise team that needs a managed AI platform and has the DevOps bandwidth — yes. For an individual dev building a single agent? The overhead really starts paying off once you need multi-tenant isolation, visual workflows for non-engineers, or the plugin marketplace. There's a reason nobody uses Kubernetes for their side project — and a reason Kubernetes powers the world's infrastructure.
 
 ---
 

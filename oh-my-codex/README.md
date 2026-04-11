@@ -35,7 +35,7 @@ This is Yeachan Heo's second take on the multi-agent orchestration problem. His 
 | Architecture | 30-agent team with 5-phase pipeline (plan→prd→exec→verify→fix), git worktree isolation per experiment, heuristic task-to-worker allocation via file-path overlap scoring |
 | Code Organization | 124K LOC TypeScript, plugin hook SDK with process isolation (1.5s timeout, SIGTERM→SIGKILL escalation), monotonic worker indexing |
 | Security Approach | plugin process isolation via child process spawning, no shared state between workers, bounded fix loops (max 3 retries) |
-| Context Strategy | delegates context management to the host Codex CLI agent -- focused on orchestration instead |
+| Context Strategy | delegates context management to the host Codex CLI agent — focused on orchestration instead |
 | Documentation | agent roles and pipeline stages documented, Korean keywords in role-router, license file is an area for future addition |
 ## Architecture
 
@@ -145,7 +145,7 @@ Some frameworks use an LLM call to decide which agent should handle a task. OMX 
 
 **Problem:** You have N workers and M tasks. You need to assign tasks so workers specialize naturally without explicit configuration.
 
-**Solution:** Score each worker by: role match (+18/+12), file-path overlap (+12 per shared path hint), domain overlap (+4 per keyword), and load penalty (âˆ'4 per existing task). Workers that already touched `src/team/` score higher for new `src/team/` tasks. Specialization emerges from history.
+**Solution:** Score each worker by: role match (+18/+12), file-path overlap (+12 per shared path hint), domain overlap (+4 per keyword), and load penalty (-ˆ'4 per existing task). Workers that already touched `src/team/` score higher for new `src/team/` tasks. Specialization emerges from history.
 
 **How to steal it:** In your task queue, maintain a `scope_hints: Set<string>` per worker. On each assignment, add `path:{normalized}` and `domain:{keyword}` from the task description. Score candidates by `overlap * 4 - assignments * 4`. Pick the highest. ~150 lines of code, zero LLM calls.
 
@@ -225,9 +225,9 @@ The allocation policy is a compact, well-structured task-routing module I've rea
 3. **Score each worker** against the task:
   - Role match: +18 if the worker's primary role matches, +12 for secondary match, +9 for unassigned workers
   - Path/domain overlap: +4 per overlapping hint (paths weighted 3Ã- over domains)
-  - Negative overlap penalty: âˆ'3 if the task has hints but the worker has no overlap
-  - Load penalty: âˆ'4 per currently assigned task
-  - Blocked-task penalty: âˆ'1 extra per assignment for tasks with dependencies
+  - Negative overlap penalty: -ˆ'3 if the task has hints but the worker has no overlap
+  - Load penalty: -ˆ'4 per currently assigned task
+  - Blocked-task penalty: -ˆ'1 extra per assignment for tasks with dependencies
 4. **Tie-break** by overlap count, then assignment count, then original index
 
 The result: workers naturally specialize. Once a worker touches `src/team/`, it gets more `src/team/` tasks. This is emergent locality without explicit affinity configuration.
@@ -293,7 +293,7 @@ Every design choice has a cost. Three worth flagging:
 
 - **Debugging 30 agents across 5 phases.** When something fails in a pipeline this deep, tracing the root cause requires reading tmux pane logs, mailbox files, and the dispatch queue state. The delivery log and phase controller state help a lot, and centralized error aggregation would make this even more powerful.
 
-- **File-based IPC latency.** The inbox/outbox JSONL mechanism works well for the send-and-check cadence of coding tasks. For sub-second communication you'd want an in-memory message bus, and for OMX's use case the file-based approach is the right trade-off -- simple, debuggable, and reliable.
+- **File-based IPC latency.** The inbox/outbox JSONL mechanism works well for the send-and-check cadence of coding tasks. For sub-second communication you'd want an in-memory message bus, and for OMX's use case the file-based approach is the right trade-off — simple, debuggable, and reliable.
 
 ## Cross-Project Comparison
 
