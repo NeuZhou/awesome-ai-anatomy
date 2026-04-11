@@ -326,23 +326,23 @@ There's a `LP` CDP domain (the only non-standard one) in `domains/lp.zig`. This 
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 27,287 stars | GitHub API | Verified Verified (2026-04-06) |
-| 1,120 forks | GitHub API | Verified Verified (2026-04-06) |
+| 27,287 stars | GitHub API | Verified (2026-04-06) |
+| 1,120 forks | GitHub API | Verified (2026-04-06) |
 | ~91K lines of Zig | line count of src/**/*.zig | Verified 90,498 lines in 328 files |
-| 744 lines of Rust | line count of src/html5ever/*.rs | Verified Verified |
-| AGPL-3.0 license | GitHub API | Verified Verified |
-| First commit 2023-02-07 | GitHub API created_at | Verified Verified |
+| 744 lines of Rust | line count of src/html5ever/*.rs | Verified |
+| AGPL-3.0 license | GitHub API | Verified |
+| First commit 2023-02-07 | GitHub API created_at | Verified |
 | Latest release 0.2.8 | GitHub Releases API | Verified 2026-04-02 |
 | 15 CDP domains | ls src/cdp/domains/*.zig | Verified 17 files (15 domains + lp + testing helper) |
 | 60+ Web API files | ls src/browser/webapi/**/*.zig | Verified 60 top-level + subdirectory files |
 | Page.zig ~3,660 lines | count of src/browser/Page.zig | Verified 3,663 lines |
 | 334 HTML test files | count of src/**/*.html | Verified 334 files |
 | V8 via zig-v8-fork | build.zig.zon dependency | Verified v0.3.7 |
-| html5ever from Servo | Cargo.toml dependency | Verified Verified |
+| html5ever from Servo | Cargo.toml dependency | Verified |
 | libcurl integration | build.zig linkCurl function | Verified curl-8.18.0 |
 | BoringSSL for TLS | build.zig buildBoringSsl | Verified via boringssl-zig |
 | "9x faster, 16x less memory" claim | README benchmarks link | Verified Links to benchmarks repo |
-| Zig 0.15.2 requirement | build.zig.zon minimum_zig_version | Verified Verified |
+| Zig 0.15.2 requirement | build.zig.zon minimum_zig_version | Verified |
 | MCP server support | src/mcp/ directory (5 files) | Verified 1,733 lines |
 | No CORS implementation | README status checklist | Verified Unchecked, issue #2015 |
 | 14 callbacks in html5ever FFI | src/html5ever/lib.rs function signature | Verified Counted |
