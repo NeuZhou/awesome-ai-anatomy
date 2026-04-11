@@ -14,7 +14,7 @@ I went into the Goose codebase expecting another "we rewrote it in Rust" story. 
 
 Here's the thing that stopped me mid-read: their `developer` extension — the one that provides `shell`, `edit`, `write`, `tree` — is technically just another MCP client that happens to run in-process. You could rip it out, replace it with an external process running on a different machine, and the agent loop wouldn't notice. I had to re-read `extension_manager.rs` twice to convince myself that was really how it worked. (It is.)
 
-If you've read the MCP spec or the Toolformer paper (Schick et al., 2023) on how LLMs learn *when* to call tools, Goose is what happens when you take that idea to its logical extreme: don't just let the model use tools — make tools the *only* thing the model can do. The agent loop becomes a scheduler, and MCP becomes the instruction set.
+Goose is what happens when you take the "LLM as router + specialized tools" idea to its logical extreme: don't just let the model use tools — make tools the *only* thing the model can do. The agent loop becomes a scheduler, and MCP becomes the instruction set.
 
 ## At a Glance
 
@@ -130,11 +130,11 @@ Five inspectors, each implementing the `ToolInspector` trait, each producing `In
 
 The reply loop inside `reply_internal` is the heart of the system. It's a `loop` (not a `for`) with a configurable maximum turns counter (default 1000 — generous). Each iteration: build the prompt, call the provider, parse the response, categorize tool calls into frontend/backend, run them through the inspection pipeline, execute approved ones in parallel, wait for user approval on flagged ones, collect results, append to conversation, and loop.
 
-If you've read the ReAct paper (Yao et al., 2022), this is a textbook Thought-Action-Observation cycle — except Goose skips the explicit "Thought" trace and lets the LLM reason internally. The loop structure is ReAct with the training wheels off.
+If you squint, this is a textbook think → act → observe cycle — except Goose skips the explicit "Thought" trace and lets the LLM reason internally. The loop structure is that classic pattern with the training wheels off.
 
 Three things I noticed:
 
-**Compaction happens eagerly.** Before the loop even starts, the agent checks if the conversation exceeds a configurable threshold (default 80% of context window). If it does, it summarizes the history using the LLM and replaces the conversation. Smarter than Claude Code's approach of waiting until the provider returns a context-length error — though Goose handles that fallback too with a recovery compaction path inside the loop. (This echoes MemGPT's virtual context management idea — proactive page-out rather than reactive overflow handling.)
+**Compaction happens eagerly.** Before the loop even starts, the agent checks if the conversation exceeds a configurable threshold (default 80% of context window). If it does, it summarizes the history using the LLM and replaces the conversation. Smarter than waiting until the provider returns a context-length error — proactive page-out rather than reactive overflow handling. Though Goose handles that fallback too with a recovery compaction path inside the loop.
 
 **Tool-pair summarization runs concurrently.** While the agent processes the current turn's tool calls, a background `JoinHandle` is summarizing older tool request/response pairs from previous turns. This keeps the context window lean without blocking the main loop. The summarized pairs get their metadata marked `agent_invisible` so the provider doesn't see them, while the summary message replaces them.
 
@@ -191,20 +191,6 @@ The provider system is broad, but it comes at a cost. The `providers/` directory
 The agent loop itself is solid but unremarkable — a standard while loop with streaming, tool dispatch, and context management. The compaction logic (threshold-based + recovery) is better than most. But the loop structure is what you'd write in Python too; Rust doesn't add architectural insight here beyond type safety and performance.
 
 One thing I'm not sure about: the `goose` core crate at 124K lines feels too big. The `Agent` struct alone is over 900 lines. Splitting the provider layer and security layer into separate crates would help compile times and code navigation. But I haven't tried building it myself, so maybe there are dependency reasons I'm not seeing.
-
----
-
-## The MCP Bet: Where This Fits in the Research Landscape
-
-Goose's "everything is MCP" philosophy deserves a deeper look through the lens of academic work on tool-augmented LLMs.
-
-The MRKL paper (Karpas et al., 2022) first proposed the idea of LLM as router + specialized expert modules. Toolformer (Schick et al., 2023) showed LLMs could *self-teach* when to invoke tools. But both assumed heterogeneous tool interfaces — each expert module had its own API. Goose asks: what if every module spoke the same protocol?
-
-This is a bet on protocol convergence. The HuggingGPT paper (Shen et al., 2023) hinted at this too — using the LLM as an orchestrator for Hugging Face models, but the models were the protocol. Goose replaces "models" with "MCP servers" and gets something more general: any capability, anywhere, same wire format.
-
-The practical consequence: tool routing (the hard part of MRKL) becomes trivial. When every extension exposes tools through the same `McpClientTrait` interface, the LLM doesn't need to learn different calling conventions — it just picks from a flat list of tool names and JSON schemas. The dispatch layer handles the rest.
-
-Whether this scales depends on how well MCP handles the long tail of tool types. Right now, Goose has 7 extension variants to cover different deployment scenarios. If MCP 2.0 changes the wire format, all 7 need updating. That's the protocol risk.
 
 ---
 
@@ -283,7 +269,7 @@ Background-summarizing old tool request/response pairs while the current turn ex
 
 ## Key Takeaways
 
-1. **MCP-first design makes tool routing a solved problem.** When every extension speaks one protocol, the LLM just picks from a flat list. No adapter layers, no format conversion, no routing heuristics. This is MRKL's vision finally implemented with a real protocol.
+1. **MCP-first design makes tool routing a solved problem.** When every extension speaks one protocol, the LLM just picks from a flat list. No adapter layers, no format conversion, no routing heuristics. Goose proves the "LLM as router" vision works when you commit to a universal wire format.
 2. **A 31-entry env var blocklist is more security than most agents ship total.** The inspection pipeline (5 inspectors, including LLM-powered review) is the most thorough I've seen in any open-source agent.
 3. **Declarative provider configs should be an industry standard.** Adding a new OpenAI-compatible provider in 10 lines of JSON is the right level of abstraction. Every multi-provider framework should steal this.
 4. **Rust is viable for AI agents but costs more code.** 124K lines of Rust for what would be ~40K in TypeScript. The payoff is type safety and performance, but the contribution barrier is real.

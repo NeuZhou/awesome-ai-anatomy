@@ -26,7 +26,7 @@ This is wild. And it's shipped as *default behavior*, not an opt-in flag.
 
 The thing is, beyond the stealth mode, there's genuinely good engineering here. The monorepo has the cleanest package boundaries I've seen in any coding agent project. `pi-tui` has zero dependency on `pi-ai` — the TUI library stands completely alone. In a world where most agent frameworks smear LLM concerns across every layer, that discipline is rare.
 
-This also opens an interesting compatibility question that the broader agent ecosystem hasn't solved. When every agent starts implementing MCP, mimicking tool interfaces, and speaking the same protocols — where does "compatible" end and "impersonating" begin? The SWE-agent paper (Yang et al., 2024) showed that Agent-Computer Interface design has outsized impact on performance. Pi takes that insight to its logical extreme: if the interface matters more than the model, why not use the *best* interface you can find, even if someone else designed it?
+The SWE-agent paper (Yang et al., 2024) showed that ACI design — how the agent interfaces with tools — matters more than model choice for coding performance. If that's true, then tool naming conventions become a competitive moat — and Pi is choosing to breach it rather than build its own.
 
 ## At a Glance
 
@@ -135,7 +135,7 @@ The author even runs `https://cchistory.mariozechner.at`, a side project that ar
 
 I'll be honest — I'm not sure how I feel about this. It's technically impressive and solves a real problem (Anthropic's rate limits are brutal for third-party agents). But it's also impersonating another product's API surface, which carries forward-compatibility risk. Anthropic could detect it and flag the API key. The fact that it ships as default behavior and not opt-in is a bold choice.
 
-This touches on a broader tension in the agent ecosystem. The SWE-agent paper showed that ACI design matters more than model choice. If that's true, then tool naming conventions become a competitive moat — and Pi is choosing to breach it rather than build its own.
+This touches on a broader tension in the agent ecosystem. If ACI design matters more than model choice, then tool naming conventions become a competitive moat — and Pi is choosing to breach it rather than build its own.
 
 ---
 
@@ -165,7 +165,7 @@ followUp(message: AgentMessage): void {
 }
 ```
 
-This maps directly to how game engines handle input buffering — you don't process the jump command mid-physics-step; you queue it and apply it at the right phase boundary. It's the ReAct loop (Yao et al., 2022) with human-in-the-loop steering bolted on, and it's a pattern I wish more agents adopted.
+This maps directly to how game engines handle input buffering — you don't process the jump command mid-physics-step; you queue it and apply it at the right phase boundary. It's the classic think → act → observe loop with human-in-the-loop steering bolted on, and it's a pattern I wish more agents adopted.
 
 ### The Extension System — "Everything is a Plugin" Done Right
 
@@ -211,7 +211,7 @@ export interface SessionBeforeCompactEvent {
 }
 ```
 
-There's also overflow recovery: if an LLM returns a context-overflow error, Pi automatically removes the error message, runs compaction, and retries. Combined with auto-retry for rate limits (exponential backoff with configurable max retries), the system handles most transient failures without user intervention. The approach echoes MemGPT's virtual context management (Packer et al., 2023) — treating the context window as managed memory rather than a fixed buffer.
+There's also overflow recovery: if an LLM returns a context-overflow error, Pi automatically removes the error message, runs compaction, and retries. Combined with auto-retry for rate limits (exponential backoff with configurable max retries), the system handles most transient failures without user intervention. The approach treats the context window as managed memory rather than a fixed buffer — proactive compression instead of crash-and-retry.
 
 ---
 
@@ -231,7 +231,7 @@ Would I use pi-ai as a standalone LLM library? Yes, if I needed multi-provider s
 
 The stealth mode deserves a deeper discussion because it touches something the agent ecosystem hasn't resolved.
 
-When the MCP spec standardizes tool interfaces, and projects like Goose build entire architectures around protocol compatibility, a natural question emerges: who owns a tool naming convention? The SWE-agent paper (Yang et al., 2024) demonstrated that ACI design — how the agent interfaces with tools — matters more than model choice for coding performance. If tool names are part of the ACI, then Claude Code's `Read`/`Write`/`Edit`/`Bash` convention is arguably the most battle-tested ACI in the ecosystem.
+When the MCP spec standardizes tool interfaces, and projects like Goose build entire architectures around protocol compatibility, a natural question emerges: who owns a tool naming convention? If tool names are part of the ACI (Agent-Computer Interface), then Claude Code's `Read`/`Write`/`Edit`/`Bash` convention is arguably the most battle-tested ACI in the ecosystem.
 
 Pi's stealth mode is the logical conclusion of that insight: if ACI matters most, use the best ACI available. The fact that it also happens to unlock rate limit benefits is either a bonus or the whole point, depending on how cynical you are.
 

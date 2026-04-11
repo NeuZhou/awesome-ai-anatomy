@@ -75,7 +75,7 @@ const DISPATCH_LOCK_INITIAL_POLL_MS = 25;
 const DISPATCH_LOCK_MAX_POLL_MS = 500;
 ```
 
-If this pattern looks familiar, you might have seen it in distributed systems. Lamport's work on mutual exclusion ([Lamport 1978](https://lamport.azurewebsites.net/pubs/time-clocks.pdf)) established the theory, but the *practical* trick of using filesystem atomicity as a lock primitive has been a folk technique in Unix sysadmin for decades — lock directories for cron jobs, PID files, NFS-safe coordination. The [Open Group's specification](https://pubs.opengroup.org/onlinepubs/9699919799/functions/mkdir.html) guarantees `mkdir` atomicity, which is why it shows up in everything from Maildir to Git's own ref locking.
+If this pattern looks familiar, you might have seen it in distributed systems. The *practical* trick of using filesystem atomicity as a lock primitive has been a folk technique in Unix sysadmin for decades — lock directories for cron jobs, PID files, NFS-safe coordination. The [Open Group's specification](https://pubs.opengroup.org/onlinepubs/9699919799/functions/mkdir.html) guarantees `mkdir` atomicity, which is why it shows up in everything from Maildir to Git's own ref locking.
 
 OMC essentially reinvents this for agent coordination. And I think it's the right call? The workers are **separate processes** — real Claude, Codex, and Gemini CLI instances running in tmux panes. They can't share memory. Sockets would work but add complexity. File-based IPC is the lowest-common-denominator thing that just... works.
 
@@ -93,7 +93,7 @@ OMC defines 19 agent roles with model tier assignments.
 
 The interesting bit isn't the number of agents — it's the model routing. Simple tasks get Haiku (cheap), complex reasoning gets Opus (expensive), everything else gets Sonnet. The `critic` agent specifically uses Haiku because criticism doesn't need deep reasoning — it just needs to point out problems.
 
-This maps directly to what the research community calls **model routing** or **LLM cascading**. FrugalGPT ([Chen et al., 2023](https://arxiv.org/abs/2305.05176)) showed you can cut costs up to 98% by routing queries to the cheapest model that can handle them. RouteLLM ([Ong et al., 2024](https://arxiv.org/abs/2406.18665)) formalized this further with trained routers that predict query difficulty. OMC's approach is simpler — static role-to-tier mapping rather than dynamic routing — but it captures the core insight: not every token needs your most expensive model.
+This maps directly to what's called **model routing** or **LLM cascading** — the idea that you can cut costs dramatically by routing queries to the cheapest model that can handle them. FrugalGPT ([Chen et al., 2023](https://arxiv.org/abs/2305.05176)) formalized this and showed up to 98% cost savings. OMC's approach is simpler — static role-to-tier mapping rather than dynamic routing — but it captures the core insight: not every token needs your most expensive model.
 
 Each agent's prompt is loaded from a Markdown file in `/agents/*.md`, which means you can customize agent behavior without touching code. Prompt-as-config, basically.
 
@@ -113,15 +113,13 @@ A subtle but important detail: tasks with `metadata.permanentlyFailed === true` 
 
 ---
 
-## The Multi-Agent Angle (and what the papers say)
+## The Multi-Agent Angle
 
-So here's the thing — OMC is implementing multi-agent coordination in production, and there's a whole body of academic work on exactly this problem.
+So here's the thing — OMC is implementing multi-agent coordination in production, and there's a whole body of work on exactly this problem.
 
-CAMEL ([Li et al., NeurIPS 2023](https://arxiv.org/abs/2303.17760)) established the role-playing paradigm: assign agents distinct roles, let them talk. OMC has 19 roles. MetaGPT ([Hong et al., 2023](https://arxiv.org/abs/2308.00352)) argued that free-form dialogue between agents leads to "hallucination contagion" — one agent hallucinates, the next one builds on it — and proposed structured SOP-based communication instead (agents pass PRDs and design docs, not chat messages). ChatDev ([Qian et al., ACL 2024](https://arxiv.org/abs/2307.07924)) took a middle ground with their Chat Chain approach.
+The academic multi-agent literature (CAMEL, MetaGPT, ChatDev) has been arguing for years about the best communication structure: free-form dialogue vs. structured outputs vs. rigid pipelines. The key insight from MetaGPT was that free-form dialogue between agents leads to "hallucination contagion" — one agent hallucinates, the next one builds on it — so you should pass structured documents, not chat messages.
 
-OMC lands somewhere between these. The agents communicate through structured JSONL files (closer to MetaGPT's structured approach), but the coordination is looser than MetaGPT's rigid pipeline.  The survey by [Guo et al. (2024)](https://arxiv.org/abs/2402.01680) categorizes multi-agent communication structures as layered, centralized, decentralized, or shared-message-pool — OMC's file-based inbox/outbox is basically a shared message pool with directory-level partitioning.
-
-What I find interesting: MetaGPT's structured output approach (pass documents, not chat) directly addresses the hallucination contagion problem. OMC's JSONL messages are structured, but the _content_ is still free text. I don't know if hallucination contagion is a real problem at this scale (19 agents is a lot of telephone-game hops), but it's something worth watching.
+OMC lands somewhere between these approaches. The agents communicate through structured JSONL files (closer to the "pass documents, not chat" school), but the coordination is looser than a rigid pipeline. The _content_ is still free text though. I don't know if hallucination contagion is a real problem at this scale (19 agents is a lot of telephone-game hops), but it's something worth watching.
 
 ---
 
@@ -172,20 +170,6 @@ const prompt = fs.readFileSync(`./agents/${agentRole}.md`, "utf-8");
 ```
 
 **Structured file-based agent communication.** If your agents are separate processes (not threads), JSONL inbox/outbox files are simpler than setting up a message broker. You lose throughput but gain debuggability — you can literally `cat` the message history. For agent orchestration where each "message" triggers an LLM call that takes 2-10 seconds, filesystem latency is noise.
-
----
-
-## Paper References
-
-| Topic | Paper | Relevance to OMC |
-|-------|-------|-------------------|
-| Multi-agent role-playing | [CAMEL (Li et al., NeurIPS 2023)](https://arxiv.org/abs/2303.17760) | OMC's 19-role system is CAMEL's role-playing at scale |
-| Structured multi-agent SOP | [MetaGPT (Hong et al., 2023)](https://arxiv.org/abs/2308.00352) | OMC uses structured JSONL, not free chat — similar intuition |
-| Chat-chain coordination | [ChatDev (Qian et al., ACL 2024)](https://arxiv.org/abs/2307.07924) | OMC's pipeline phases echo ChatDev's Chat Chain |
-| Multi-agent survey | [Guo et al., 2024](https://arxiv.org/abs/2402.01680) | Taxonomy of agent communication patterns |
-| LLM cost routing | [FrugalGPT (Chen et al., 2023)](https://arxiv.org/abs/2305.05176) | Theoretical basis for OMC's model tier routing |
-| Router training | [RouteLLM (Ong et al., 2024)](https://arxiv.org/abs/2406.18665) | Dynamic routing (OMC uses static mapping instead) |
-| Distributed mutex theory | [Lamport, 1978](https://lamport.azurewebsites.net/pubs/time-clocks.pdf) | Foundation for OMC's mkdir-based locking approach |
 
 ---
 

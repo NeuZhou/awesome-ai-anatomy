@@ -33,7 +33,7 @@ Oh, and the entire codebase has deprecation banners dated April 1, 2026. That da
 
 OpenHands is a web-based AI agent platform for software development. Runs code in Docker sandboxes, supports 6 agent types, has 10 memory condensation strategies, 3 security analyzers, integrations with 7 git platforms, and an enterprise layer. Originally called OpenDevin (the "let's build open-source Devin" project), it rebranded to OpenHands and the GitHub org moved from `All-Hands-AI` to `OpenHands` (`OpenHands/OpenHands`).
 
-> **Paper link:** The OpenHands platform paper — *"OpenHands: An Open Platform for AI Software Developers as Generalist Agents"* (Wang, Neubig et al., arXiv:2407.16741, ICLR 2025) — lays out the architecture, sandbox design, and multi-agent coordination that this codebase implements. The related *SWE-agent* paper (Yang et al., arXiv:2405.15793) introduced the Agent-Computer Interface (ACI) concept that directly shaped how CodeActAgent interacts with shell, files, and browser. If you're wondering why the tool design looks the way it does — that's the lineage.
+> **Paper link:** The OpenHands platform paper — *"OpenHands: An Open Platform for AI Software Developers as Generalist Agents"* (Wang, Neubig et al., arXiv:2407.16741, ICLR 2025) — covers the architecture, sandbox design, and multi-agent coordination.
 
 ---
 
@@ -148,7 +148,7 @@ The important thing to internalize: **this codebase is mid-migration.** Every fi
 
 Most agents have one context management strategy. "Summarize when full" or "truncate from the beginning." Pick one, that's it. OpenHands has **ten**, and you can chain them.
 
-This draws directly from the MemGPT paper (Packer et al., arXiv:2310.08560) — the idea of treating the LLM's context window like an OS treats main memory, with intelligent paging in and out. But OpenHands goes further than MemGPT's two-tier approach by offering a whole menu of condensation strategies with different tradeoffs:
+This draws directly from the MemGPT paper (Packer et al., arXiv:2310.08560) — the idea of treating the LLM's context window like an OS treats main memory, with intelligent paging in and out. But OpenHands goes further than a simple two-tier approach by offering a whole menu of condensation strategies with different tradeoffs:
 
 | Condenser | Lines | Strategy |
 |-----------|-------|----------|
@@ -184,7 +184,7 @@ SecurityAnalyzer (base)
 
 **InvariantAnalyzer** (133 lines) uses a policy engine. You define rules about what the agent can/cannot do, and it checks each action against them. There's an "ask for confirmation" mode where violations trigger user approval instead of denial. Pretty flexible.
 
-**LLMRiskAnalyzer** (48 lines) is the lightest — it asks the *same LLM* driving the agent to evaluate the risk of its own action. Yeah, self-evaluation has known limitations (the Reflexion paper by Shinn et al. showed that self-reflection helps but isn't foolproof). But it's zero-cost in dependencies and catches obvious stuff.
+**LLMRiskAnalyzer** (48 lines) is the lightest — it asks the *same LLM* driving the agent to evaluate the risk of its own action. Yeah, self-evaluation has known limitations (self-reflection helps but isn't foolproof). But it's zero-cost in dependencies and catches obvious stuff.
 
 No other open-source agent I've looked at combines all three. Goose has pattern matching + LLM review. Claude Code has an allowlist. OpenHands stacks external ML + policy engine + self-evaluation, and they're composable.
 
@@ -221,7 +221,7 @@ OpenHands ships six agents, but `CodeActAgent` does the heavy lifting. The rest 
 
 `CodeActAgent` (316 lines) uses function calling to invoke tools — not free-form text. Each tool is a class: `create_cmd_run_tool` for bash, `BrowserTool` for web, `LLMBasedFileEditTool` for AI edits, `create_str_replace_editor_tool` for surgical replacements, `CondensationRequestTool` for voluntary context compression, `ThinkTool` for scratchpad reasoning, `create_task_tracker_tool` for progress tracking, and `FinishTool` for completion.
 
-The tool design here echoes the SWE-agent paper's ACI insight — the interface you give the agent matters more than which model you use. CodeActAgent's 8 tools are carefully scoped: bash for general work, two different edit tools (AI-powered vs surgical), and that meta-cognitive condensation request tool.
+The tool design here reflects a key insight: the interface you give the agent matters more than which model you use. CodeActAgent's 8 tools are carefully scoped: bash for general work, two different edit tools (AI-powered vs surgical), and that meta-cognitive condensation request tool.
 
 ### The Event-Driven Core
 
@@ -245,7 +245,7 @@ AgentController.on_event() → step() → agent.step(state)
                               Next step...
 ```
 
-This is essentially a ReAct loop (Yao et al., arXiv:2210.03629) implemented as event sourcing. The `ActionType` enum has 20+ variants: `RUN`, `READ`, `WRITE`, `EDIT`, `BROWSE`, `BROWSE_INTERACTIVE`, `RUN_IPYTHON`, `DELEGATE`, `FINISH`, `REJECT`, `MCP`, `THINK`. Each maps to a typed dataclass. The event sourcing means you can replay the entire agent session from the event log — useful for debugging, less useful for your storage bill.
+This is essentially a think → act → observe loop implemented as event sourcing. The `ActionType` enum has 20+ variants: `RUN`, `READ`, `WRITE`, `EDIT`, `BROWSE`, `BROWSE_INTERACTIVE`, `RUN_IPYTHON`, `DELEGATE`, `FINISH`, `REJECT`, `MCP`, `THINK`. Each maps to a typed dataclass. The event sourcing means you can replay the entire agent session from the event log — useful for debugging, less useful for your storage bill.
 
 ### Docker Sandboxing
 
@@ -262,7 +262,7 @@ The Docker runtime mounts a workspace directory and runs an `action_execution_se
 
 `AgentController` supports hierarchical delegation. When CodeActAgent emits an `AgentDelegateAction`, the controller spawns a child `AgentController` with a different agent type. The child has its own state, its own iteration budget, and can delegate further. Parent/child tracked via `parent` and `delegate` properties.
 
-So you get patterns like: CodeActAgent delegates web research to BrowsingAgent, which finishes and returns results to the parent. Each delegate runs within a global iteration budget. Reminds me of the HuggingGPT paper's task decomposition (Shen et al., arXiv:2303.17580) — an orchestrator LLM dispatching to specialized agents — but implemented as a concrete runtime mechanism rather than prompt engineering.
+So you get patterns like: CodeActAgent delegates web research to BrowsingAgent, which finishes and returns results to the parent. Each delegate runs within a global iteration budget. The pattern is the same as any orchestrator dispatching to specialized agents — but implemented as a concrete runtime mechanism rather than prompt engineering.
 
 ---
 
@@ -339,7 +339,7 @@ Any agent framework could use this. Define condensation strategies as plugins, r
 
 ### 2. Voluntary Condensation Requests
 
-Give the agent a tool to say "compress my history now." Meta-cognitive memory management — the agent participates in its own context budget. This is the MemGPT idea made concrete: the agent isn't just a passive consumer of its context window, it actively manages what stays and what goes.
+Give the agent a tool to say "compress my history now." Meta-cognitive memory management — the agent participates in its own context budget. The agent isn't just a passive consumer of its context window, it actively manages what stays and what goes.
 
 ### 3. Probabilistic Forgetting (AmortizedForgettingCondenser)
 

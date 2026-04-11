@@ -119,7 +119,7 @@ def system_prompt_block(self) -> str:
 
 This avoids recompiling the system prompt every time the agent writes a memory entry. If your provider charges for prompt tokens and you have a 4K-word MEMORY.md, this saves real money over a long session. It's a prompt-cache optimization disguised as a design choice.
 
-The approach connects to the Generative Agents paper (Park et al., 2023), which defined the observation → reflection → planning memory architecture. Hermes simplifies this: MEMORY.md is the reflection layer (curated insights), daily files are the observation layer (raw logs), and the frozen snapshot ensures the reflection layer doesn't thrash the prompt cache during a session.
+The approach connects to a broader idea about agent memory — separating "observations" (raw logs) from "reflections" (curated insights). Hermes simplifies this: MEMORY.md is the reflection layer, daily files are the observation layer, and the frozen snapshot ensures the reflection layer doesn't thrash the prompt cache during a session.
 
 ---
 
@@ -174,7 +174,7 @@ SUMMARY_PREFIX = (
 )
 ```
 
-The structured summary template is the key improvement over naive compression. Instead of "summarize everything," it asks the model to specifically track goals, decisions made, and files modified. This connects to MemGPT's (Packer et al., 2023) virtual context management - treating context as managed memory with explicit page-in/page-out policies rather than a dumb buffer.
+The structured summary template is the key improvement over naive compression. Instead of "summarize everything," it asks the model to specifically track goals, decisions made, and files modified. This treats context as managed memory with explicit page-in/page-out policies rather than a dumb buffer.
 
 ---
 
@@ -196,7 +196,7 @@ Flow:
 
 When you ask "what did I work on last week?", it doesn't grep MEMORY.md - it searches actual conversation transcripts, finds the most relevant sessions, and uses a cheap model (Gemini Flash) to summarize them. The main model's context stays clean.
 
-This is the missing piece that the Generative Agents paper implied but didn't fully implement. Park et al. had a memory stream with recency-weighted retrieval. Hermes has full-text search over raw transcripts. The FTS5 approach is less elegant but more practical - you don't need embedding infrastructure, and SQLite is already in every Python installation.
+This is the missing piece that most agent memory systems imply but don't fully implement. Typical approaches use recency-weighted retrieval over memory streams. Hermes has full-text search over raw transcripts. The FTS5 approach is less elegant but more practical — you don't need embedding infrastructure, and SQLite is already in every Python installation.
 
 ---
 
@@ -260,17 +260,14 @@ No cost budgets. For an agent that advertises Modal and Daytona (serverless, pay
 
 ## The Academic Lineage: What Hermes Actually Implements
 
-It's worth mapping Hermes's features to the papers that proposed them, because Hermes is - possibly accidentally - the most faithful implementation of several research ideas I've seen in a production agent.
+It's worth mapping Hermes's two core features to the papers that proposed them, because this is — possibly accidentally — the most faithful implementation of these research ideas I've seen in a production agent.
 
 | Hermes Feature | Academic Origin | What Changed |
 |----------------|----------------|-------------|
 | Skill creation from experience | Voyager (Wang et al., 2023) - skill library | JavaScript functions → SKILL.md files |
 | Skill self-improvement | Reflexion (Shinn et al., 2023) - verbal RL | Retry with reflection → in-place skill patching |
-| Frozen memory snapshots | Generative Agents (Park et al., 2023) - observation/reflection separation | Embedding retrieval → markdown files |
-| FTS5 session search | MemGPT (Packer et al., 2023) - virtual context management | Page in/out → FTS5 + Gemini Flash summarization |
-| Structured context compaction | MemGPT + Generative Agents | OS metaphor → structured summary template |
 
-The Voyager + Reflexion combination is the one that matters most. Voyager showed that skill accumulation prevents catastrophic forgetting. Reflexion showed that verbal self-reflection enables improvement without weight updates. Hermes puts them together: create a skill (Voyager), use it, fail, reflect, patch it (Reflexion), and the skill library gets better over time. That's the compound growth mechanism that makes "the agent that grows with you" more than marketing.
+The Voyager + Reflexion combination is what makes it work. Voyager showed that skill accumulation prevents catastrophic forgetting. Reflexion showed that verbal self-reflection enables improvement without weight updates. Hermes puts them together: create a skill (Voyager), use it, fail, reflect, patch it (Reflexion), and the skill library gets better over time. That's the compound growth mechanism that makes "the agent that grows with you" more than marketing.
 
 ---
 

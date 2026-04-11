@@ -42,9 +42,9 @@ The other number that jumped out: **17,237 lines of sandbox code**. Three platfo
 
 | Dimension | Description |
 |-----------|-------------|
-| Architecture | Queue-pair async event system — reminiscent of the [CoALA cognitive architecture](https://arxiv.org/abs/2309.02427) separation of action/perception channels. 88 Rust workspace crates, dual Cargo+Bazel build |
+| Architecture | Queue-pair async event system — cleanly separating action/perception channels. 88 Rust workspace crates, dual Cargo+Bazel build |
 | Code Organization | 549K LOC Rust across 1389 files, 162 test files, strict crate boundaries with codex-core (176K), codex-tui (112K), codex-cli (5K) |
-| Security Approach | 4-layer defense-in-depth that maps to what [AgentDojo](https://arxiv.org/abs/2406.13352) identifies as critical surfaces: approval → Guardian AI → OS sandbox → network proxy |
+| Security Approach | 4-layer defense-in-depth covering the critical surfaces: approval → Guardian AI → OS sandbox → network proxy |
 | Context Strategy | Two-phase memory extraction: per-rollout raw extraction then cross-rollout consolidation. Simpler than Claude Code's 4-layer cascade — honestly not sure if that's a feature or a gap |
 | Documentation | Crate-level docs, architecture decision records. Cross-crate architecture requires reading the code (there's no high-level design doc, which is annoying) |
 
@@ -82,9 +82,9 @@ The other number that jumped out: **17,237 lines of sandbox code**. Three platfo
 
 The core idea: Codex CLI is a **queue-pair** system. The `Codex` struct exposes a `Sender<Submission>` and a `Receiver<Event>`. Push operations in, get events out. Model calls, tool execution, sandbox management, approval flows — all of it happens inside this async loop.
 
-If you've read the [CoALA paper](https://arxiv.org/abs/2309.02427) (Cognitive Architectures for Language Agents), this should look familiar. CoALA argues that agent architectures need a clear separation between the "cognition core" and the "action interfaces." Codex's queue-pair does exactly that — the TUI, App Server, and MCP Server are just different action interfaces submitting to the same cognition core.
+If you think about agent architectures needing a clear separation between the "cognition core" and the "action interfaces" — as the [CoALA paper](https://arxiv.org/abs/2309.02427) (Cognitive Architectures for Language Agents) argues — this is exactly that. The TUI, App Server, and MCP Server are just different action interfaces submitting to the same cognition core.
 
-(I'm probably over-indexing on the CoALA parallel here. The Codex team might have just wanted clean async boundaries. But the structural similarity is hard to ignore.)
+(The Codex team might have just wanted clean async boundaries. But the structural similarity to CoALA is hard to ignore.)
 
 ---
 
@@ -126,7 +126,7 @@ Codex::spawn() {
 }
 ```
 
-This is a standard [ReAct loop](https://arxiv.org/abs/2210.03629) (think → act → observe → think again) wrapped in Rust's async machinery. Nothing conceptually novel — the novelty is in what wraps around it.
+This is a standard think → act → observe → think again loop wrapped in Rust's async machinery. Nothing conceptually novel — the novelty is in what wraps around it.
 
 **Key sub-modules within core:**
 
@@ -201,7 +201,7 @@ The `arg0` crate enables symlink-based dispatch: if the binary is invoked as `co
 
 **Paths:** `codex-rs/tools/` (definitions) + `codex-rs/core/src/tools/` (runtime)
 
-Three-layer architecture that maps pretty directly to the [Toolformer](https://arxiv.org/abs/2302.04761) idea — the model decides *when* to call a tool, *what* to pass, and *how* to use the result. But where Toolformer focuses on the model learning tool-use timing through self-supervision, Codex externalizes the routing into a typed system:
+Three-layer architecture where the model decides *when* to call a tool, *what* to pass, and *how* to use the result. The routing is externalized into a typed system:
 
 1. **Tool Definitions** (`codex-tools/`) — Pure data. `ToolDefinition` = name + description + JSON schema + type. No execution logic.
 2. **Tool Router** (`core/tools/router.rs`) — Maps tool names to handlers. Builds specs from config, MCP tools, dynamic tools, and discoverable tools.
@@ -253,7 +253,7 @@ Progressive sandbox escalation: if a sandboxed execution fails due to permission
 
 17,237 lines of sandbox code. This is where most of the paranoia budget went.
 
-If you've read the [agent security literature](https://arxiv.org/abs/2402.06664) — particularly the work showing GPT-4 agents can autonomously hack websites via SQL injection without prior knowledge of the vulnerability — you understand why this matters. An agent that can run arbitrary shell commands is an agent that can do real damage. The [OWASP LLM Top 10](https://genai.owasp.org/llm-top-10/) lists "Excessive Agency" (LLM08) as a top risk for exactly this reason.
+An agent that can run arbitrary shell commands is an agent that can do real damage. "Excessive Agency" is consistently flagged as a top risk for AI agents — and for good reason. Research has shown that GPT-4 agents can autonomously exploit vulnerabilities without prior knowledge of them.
 
 Codex's answer: don't just tell the agent what it can't do. Make the OS enforce it.
 
@@ -337,7 +337,7 @@ Hooks are shell commands in `hooks.json` that receive JSON on stdin and return J
 
 **Paths:** `codex-rs/skills/` + `codex-rs/core-skills/`
 
-Skills are markdown files (`SKILLS.md`) injected into the model's system prompt. Not code — prompt engineering packaged as a file convention. This is the [Voyager](https://arxiv.org/abs/2305.16291) skill library idea (store reusable capabilities, retrieve them by description matching) but at the prompt level instead of the code level.
+Skills are markdown files (`SKILLS.md`) injected into the model's system prompt. Not code — prompt engineering packaged as a file convention. Think of it as a skill library where capabilities are stored as descriptions and retrieved by matching, but at the prompt level instead of the code level.
 
 ```rust
 // codex-rs/core-skills/src/model.rs
@@ -386,7 +386,7 @@ Codex integrates MCP in **both directions**:
 
 Tool names from MCP servers get namespaced: `"<server_name>__<tool_name>"` (double-underscore delimiter). The elicitation protocol lets MCP servers request interactive user input during tool calls — bidirectional communication that most frameworks don't have.
 
-Worth noting: [MCP is becoming a new attack surface](https://arxiv.org/abs/2503.XXXXX) for injection attacks. The namespacing helps a bit but doesn't solve the trust problem. More on that in the security section.
+Worth noting: MCP is becoming a new attack surface for injection attacks. The namespacing helps a bit but doesn't solve the trust problem. More on that in the security section.
 
 ---
 
@@ -425,7 +425,7 @@ How it works:
 
 The connection to [Constitutional AI (Bai et al., 2022)](https://arxiv.org/abs/2212.08073) is direct. Constitutional AI has the model generate a response, then critique it against a set of principles, then revise. Guardian does the same thing: generate an action plan, have a second model critique it against safety principles, proceed only if it passes. The "constitution" here is implicit in the Guardian's system prompt rather than an explicit principle list, which I think is a missed opportunity — a declarative rule set would be easier to audit and update.
 
-There's an inherent circularity here that's worth thinking about. The Guardian AI is made by the same company as the agent AI. If there's a systematic blind spot in one, it might exist in the other. The [Sleeper Agents paper (Hubinger et al., 2024)](https://arxiv.org/abs/2401.05566) showed that safety training can't reliably remove hidden behaviors — which means an external Guardian using the same family of models has the same blind spots. Still better than no review, but not a silver bullet.
+There's an inherent circularity here that's worth thinking about. The Guardian AI is made by the same company as the agent AI. If there's a systematic blind spot in one, it might exist in the other. Safety training can't reliably remove all hidden behaviors — which means an external Guardian using the same family of models has the same blind spots. Still better than no review, but not a silver bullet.
 
 ---
 
@@ -500,7 +500,7 @@ The `Sender<Submission>` / `Receiver<Event>` design is unusual for agents. Most 
 3. **Clean shutdown** — Drop the sender, receiver drains, session exits
 4. **Testability** — Feed scripted submissions, assert on events
 
-The [CoALA framework](https://arxiv.org/abs/2309.02427) advocates exactly this kind of separation between the agent's "internal cognition" and its "external interfaces." Whether the Codex team read that paper or arrived at the same design independently, I don't know. (I suspect the latter. Async channels are just good Rust engineering.)
+This kind of separation between internal cognition and external interfaces is exactly what good async architecture looks like. Whether the Codex team was inspired by academic frameworks or arrived at it independently, the result is the same — clean boundaries that enable multi-surface deployment.
 
 ---
 
@@ -546,7 +546,7 @@ Layer 3: OS Sandbox (filesystem + process isolation)
 Layer 4: Network Proxy (traffic interception + domain filtering)
 ```
 
-This maps well to what the security literature recommends. The [indirect prompt injection survey (Abdelnabi et al., 2023)](https://arxiv.org/abs/2302.12173) emphasized that agent security needs layered defense because any single layer can be bypassed. The [AgentDojo benchmark (Debenedetti et al., 2024)](https://arxiv.org/abs/2406.13352) tested exactly this — and found that SOTA LLMs fail even without active attacks, let alone sophisticated ones.
+This maps well to what the security literature recommends. Layered defense is essential because any single layer can be bypassed. Benchmarks consistently show that SOTA LLMs fail security tests even without active attacks, let alone sophisticated ones.
 
 ### Approval Policies
 
@@ -570,12 +570,12 @@ pub enum AskForApproval {
 | Network exfiltration | MITM proxy + domain allowlist | DNS tunneling, steganography |
 | File system escape | Landlock/Seatbelt path restrictions | Symlink race conditions |
 | Supply chain (MCP servers) | Tool name namespacing | Malicious server returns bad results |
-| Memory injection | Model-summarized, not raw | Poisoned summaries ([Zombie Agents](https://arxiv.org/abs/2402.XXXXX) showed this is real) |
+| Memory injection | Model-summarized, not raw | Poisoned summaries (this is a known attack vector) |
 | Privilege escalation | `PR_SET_NO_NEW_PRIVS`, restricted tokens | Kernel vulns |
 
 ### What's Missing
 
-1. **Tool output sanitization** — Guardian reviews actions *before* execution but nothing filters outputs *after*. A command could return output containing prompt injection that steers the model's next action. The [indirect injection paper](https://arxiv.org/abs/2302.12173) specifically called this out as a gap.
+1. **Tool output sanitization** — Guardian reviews actions *before* execution but nothing filters outputs *after*. A command could return output containing prompt injection that steers the model's next action. This is a well-known gap in agent security that multiple researchers have flagged.
 
 2. **Sandbox escape detection** — Failed sandbox operations return errors but don't trigger alerts. Runtime monitoring for unexpected network connections or file access outside allowed paths would help.
 
@@ -642,7 +642,7 @@ struct GuardianAssessment {
 // Auto-approve if risk_score < 80
 ```
 
-This is [Constitutional AI](https://arxiv.org/abs/2212.08073) for runtime actions. If you're building any agent that executes tools, this pattern beats both "always ask" and "never ask."
+This is Constitutional AI applied to runtime actions. If you're building any agent that executes tools, this pattern beats both "always ask" and "never ask."
 
 **~200 lines** to implement a basic version.
 
@@ -657,7 +657,7 @@ struct Agent {
 }
 ```
 
-Steal this if your agent needs to work as a CLI, API, desktop app, or IDE extension without duplicating the core logic. The [CoALA paper](https://arxiv.org/abs/2309.02427) provides the theoretical backing if you need to convince your team.
+Steal this if your agent needs to work as a CLI, API, desktop app, or IDE extension without duplicating the core logic. Clean separation between cognition and interfaces is what makes multi-surface agents possible.
 
 ### 3. Progressive Sandbox Escalation
 

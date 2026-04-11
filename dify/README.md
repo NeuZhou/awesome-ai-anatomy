@@ -32,7 +32,7 @@ The other thing that stood out: when a workflow hits a loop or iteration node, D
 
 Dify is a platform for building AI applications through a visual drag-and-drop interface. Open a browser, connect nodes into workflows, hook up a knowledge base (RAG), pick a model provider, hit publish. Ships as 7+ Docker containers. Supports everything from chatbots to multi-step agent workflows with human-in-the-loop approval gates. "Zapier for LLM apps" is the elevator pitch — but with its own RAG engine, code sandbox, and plugin marketplace.
 
-> **Paper context:** Dify's RAG pipeline implements ideas from the foundational RAG paper — *"Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"* (Lewis et al., 2020, arXiv:2005.11401) — but extends it significantly with hybrid search, LLM-powered metadata filtering, and CJK-specific keyword handling via Jieba. The workflow engine's DAG execution model shares DNA with the broader agent-as-workflow trend surveyed in *"A Survey on Large Language Model based Autonomous Agents"* (Wang et al., arXiv:2308.11432), where the Planning module decomposes tasks into executable graphs. Dify just makes that graph visible and editable by non-engineers.
+> **Paper context:** Dify's RAG pipeline implements ideas from the foundational RAG paper — *"Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"* (Lewis et al., 2020, arXiv:2005.11401) — but extends it significantly with hybrid search, LLM-powered metadata filtering, and CJK-specific keyword handling via Jieba. The workflow engine's DAG execution model fits the broader agent-as-workflow trend, where a Planning module decomposes tasks into executable graphs. Dify just makes that graph visible and editable by non-engineers.
 
 ---
 
@@ -161,7 +161,7 @@ The node types tell you what Dify thinks a "workflow" is:
 
 The iteration node deserves a closer look. It doesn't just loop inside the existing engine — it builds a child `GraphEngine` with its own `VariablePool` and runtime state. Each iteration gets fresh variable scopes. The cost: iterate over 50 items and you spawn 50 mini-engines. Hence `MAX_ITERATIONS_NUM=99` and `LOOP_NODE_MAX_COUNT=100`.
 
-This child engine approach reminds me of how the Generative Agents paper (Park et al., arXiv:2304.03442) handled agent sub-tasks — isolated planning contexts that don't pollute the parent's state. Dify applies the same principle to workflow execution.
+This child engine approach is the right way to handle iteration — isolated planning contexts that don't pollute the parent's state. Each iteration gets its own variable scope, its own runtime, its own failure boundary.
 
 ### RAG Pipeline
 
@@ -210,9 +210,7 @@ class PluginInstaller(BasePluginClient):
  return response.content
 ```
 
-Every plugin call goes through the daemon. Adds latency (HTTP round-trip per call) but gives process isolation — a bad plugin can't crash the main API. The tradeoff vs in-process plugins (DeerFlow's middleware, OpenClaw's skills) is safety for speed and deployment complexity. One more service to monitor, one more log stream, one more container.
-
-This follows the Voyager paper's (Wang et al., arXiv:2305.16291) insight about skill libraries — except Voyager stored skills as executable code snippets in-process, while Dify goes further with process isolation. The safety benefits are clear for multi-tenant scenarios where you don't trust third-party plugin code.
+Every plugin call goes through the daemon. Adds latency (HTTP round-trip per call) but gives process isolation — a bad plugin can't crash the main API. The tradeoff vs in-process plugins (DeerFlow's middleware, OpenClaw's skills) is safety for speed and deployment complexity. One more service to monitor, one more log stream, one more container. The safety benefits are clear for multi-tenant scenarios where you don't trust third-party plugin code.
 
 ---
 

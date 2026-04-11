@@ -106,7 +106,7 @@ while (true) {
  ⑥ No tools? → return response → exit
 ```
 
-If you've read the ReAct paper (Yao et al., 2022) — Thought-Action-Observation in a loop — this is that, but production-grade. The paper describes the pattern in clean pseudocode. Claude Code shows what it looks like at 510K lines with streaming, parallel tool execution, and a 4-layer context cascade bolted on.
+If you've seen the "think → act → observe → repeat" pattern in any agent framework — this is that, but production-grade. Claude Code shows what that loop looks like at 510K lines with streaming, parallel tool execution, and a 4-layer context cascade bolted on.
 
 **Why while(true) instead of a state machine?**
 
@@ -173,7 +173,7 @@ ToolDefinition = {
 
 **Why this works at 40 tools:** Tools have almost no shared behavior worth inheriting. A file reader and a bash executor have less in common than you'd think. Shared concerns (validation, error handling) are handled by higher-order functions, not base classes.
 
-There's an interesting parallel here to Toolformer (Schick et al., 2023), which showed that LLMs can learn *when* to call tools, not just *how*. Claude Code takes a different path — instead of the model learning tool timing through self-supervision, each tool carries a `description` that Claude uses to decide when it's relevant. It's the MRKL (Karpas et al., 2022) idea made concrete: LLM as router, tools as expert modules. The `buildTool()` pattern is basically what happens when you take MRKL's "modular expert routing" and implement it as a factory function.
+There's an interesting parallel here to Toolformer (Schick et al., 2023), which showed that LLMs can learn *when* to call tools, not just *how*. Claude Code takes a different path — instead of the model learning tool timing through self-supervision, each tool carries a `description` that Claude uses to decide when it's relevant. It's the same idea made concrete: LLM as router, tools as expert modules. The `buildTool()` pattern is basically what happens when you take "modular expert routing" and implement it as a factory function.
 
 **Where it might break:** At 100+ tools with "tool families" (10 database tools sharing connection management, transaction handling, retry logic). The `buildTool()` boilerplate would balloon — 70% repeated pipeline configuration. Solution: lightweight tool factories (still functions, not classes) for tool families.
 
@@ -223,7 +223,7 @@ if (feature('ABLATION_BASELINE')) {
 }
 ```
 
-This is a research lab building a product, not a product company doing research. They can quantify the impact of every feature. Most companies can't — or won't — pay this complexity tax. Reminds me of Reflexion (Shinn et al., 2023) in spirit: the idea that you need structured feedback loops to know if what you're doing actually works. Reflexion does it with verbal self-reflection; Anthropic does it with ablation flags. Same instinct, different mechanism.
+This is a research lab building a product, not a product company doing research. They can quantify the impact of every feature. Most companies can't — or won't — pay this complexity tax. The instinct here is the same as any structured feedback loop: you need to know if what you're doing actually works. Some teams do it with verbal self-reflection; Anthropic does it with ablation flags. Same instinct, different mechanism.
 
 ---
 
@@ -383,7 +383,7 @@ const readFileTool = buildTool({
 
 1. **query.ts God Object** — 1,729 lines handling everything. Merge conflicts in multi-person teams. Implicit state assumptions between distant code sections. Splitting into orchestrator/dispatcher/context-manager would reduce merge contention but hey, it ships.
 
-2. **Context compression is unauditable** — After compression, the model doesn't know what it lost. It can't flag "I may be missing context here." This leads to confident wrong answers, which is worse than admitting uncertainty. (The Reflexion paper had something to say about this — agents that can reflect on failure do better. Hard to reflect on context you don't know you lost.)
+2. **Context compression is unauditable** — After compression, the model doesn't know what it lost. It can't flag "I may be missing context here." This leads to confident wrong answers, which is worse than admitting uncertainty. (Agents that can reflect on failure do better — but it's hard to reflect on context you don't know you lost.)
 
 3. **Worker nesting prohibition** — Prevents recursive task decomposition. "Refactor all error handling in this project" ideally decomposes hierarchically. The flat worker model forces the main agent to do all decomposition, becoming a bottleneck.
 
@@ -411,7 +411,7 @@ const readFileTool = buildTool({
 
 2. **Stream-then-execute beats wait-then-execute** — start tool execution during model generation. The UX improvement justifies the engineering complexity.
 
-3. **Functional composition > inheritance for tool systems** — at least up to ~100 tools. The Toolformer/MRKL lineage points toward LLMs choosing tools by description, and `buildTool()` is the cleanest implementation of that idea I've seen.
+3. **Functional composition > inheritance for tool systems** — at least up to ~100 tools. The Toolformer lineage points toward LLMs choosing tools by description, and `buildTool()` is the cleanest implementation of that idea I've seen.
 
 4. **Use research methods in production** — ablation testing, quantified feature impact. Know what each feature actually contributes. Most teams won't do this. The best ones do.
 
