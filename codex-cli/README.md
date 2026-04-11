@@ -1,9 +1,11 @@
 ﻿# OpenAI Codex CLI: 549K Lines of Rust, a Guardian AI That Reviews Its Own AI, and the Most Paranoid Sandbox in Any Coding Agent
 
-> **The first production Rust-native AI coding agent, dissected.**
-> 549,000 lines of Rust across 1,389 files. 88 workspace crates. A three-layer sandbox that runs on macOS, Linux, and Windows. All open source under Apache-2.0.
+> OpenAI rebuilt "Claude Code but in Rust" — and ended up with 17K lines of sandbox code, an AI that approves its own AI's actions, and a MITM proxy that intercepts every network call. 549K lines across 88 crates. Here's what they actually built.
 
-> **Who is this for:** Engineers building AI agents, coding tools, or anyone curious about what happens when you rebuild "Claude Code but in Rust" from scratch — and end up with something architecturally quite different.
+> **TL;DR:**
+> - **What:** OpenAI's open-source Rust-native coding agent — 549K lines, 88 workspace crates, with native OS sandboxing on macOS/Linux/Windows and a queue-pair architecture that decouples the agent core from any frontend
+> - **Why it matters:** The Guardian pattern (a second AI risk-scores every dangerous action, auto-approves if score < 80) solves the approval-fatigue problem every agent framework has. The 3-platform sandbox (17K LOC) is the deepest security implementation in any open-source agent
+> - **What you'll learn:** How `mkdir`-based locks, Landlock+seccomp+bubblewrap sandboxing, and MITM network proxies work in practice — plus why 88 Rust crates is both too many and exactly right
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/openai/codex/blob/main/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/openai/codex/blob/main/docs/contributing.md)
@@ -406,7 +408,7 @@ The exec-server enables **remote execution** — Codex can run commands on a dif
 
 **Path:** `codex-rs/core/src/guardian/` (~1,500 lines)
 
-Perhaps the most innovative module. When a tool call requires approval (e.g., writing a file), the Guardian system can **automatically approve or deny** it using a second AI call:
+The module I spent the most time on. When a tool call requires approval (e.g., writing a file), the Guardian system can **automatically approve or deny** it using a second AI call:
 
 ```rust
 // codex-rs/core/src/guardian/mod.rs
@@ -774,7 +776,7 @@ Compared to Claude Code's four-layer compaction cascade (HISTORY_SNIP → Microc
 
 ### 2. The Sandbox Is the Product Differentiator
 
-Most coding agents treat sandboxing as an afterthought. Codex CLI treats it as the **primary feature**. The 17K lines of sandbox code + 8K lines of network proxy are not technical debt — they're the product. This is especially significant in enterprise contexts where security isn't optional.
+Most coding agents treat sandboxing as an afterthought. Codex CLI treats it as the **primary feature**. The 17K lines of sandbox code + 8K lines of network proxy are not technical debt — they're the product. In enterprise contexts where security isn't optional, this is the selling point.
 
 ### 3. Guardian AI Review Is the Future of Approval UX
 

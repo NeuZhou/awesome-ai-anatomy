@@ -1,8 +1,11 @@
-﻿# oh-my-claudecode: 19 Agents, File-Based IPC, and a Very Ambitious Plugin
+﻿# oh-my-claudecode: 19 Agents Coordinated via mkdir-Based Locks, 194K Lines of TypeScript
 
-> Someone took Claude Code and strapped a 19-agent team orchestration system on top of it. I read through 194K lines of TypeScript to figure out if it works.
+> A Claude Code plugin spawns 19 agents across 3 different AI models, and they talk to each other through the filesystem. I read 194K lines to see how.
 
-> **TL;DR:** oh-my-claudecode coordinates Claude, Codex, and Gemini CLI workers through file-based IPC with mkdir-based locking. 19 specialized agents, model tier routing (Haiku for cheap tasks, Opus for complex), and a plan→exec→verify→fix pipeline. The risk: it's a plugin that depends on Claude Code's internals — one Anthropic release could break everything.
+> **TL;DR:**
+> - **What:** A Claude Code plugin that adds 19-agent team orchestration — Claude, Codex, and Gemini workers coordinated through file-based IPC with mkdir-based locking
+> - **Why it matters:** Only multi-model agent framework in production — routes Haiku for cheap tasks, Opus for reasoning, runs a plan→exec→verify→fix pipeline
+> - **What you'll learn:** How file-based IPC with `mkdir` locks works as a cross-process mutex, how model tier routing cuts token costs 30-50%, and why depending on Claude Code's internals is a real risk
 
 ## At a Glance
 
@@ -45,7 +48,7 @@ The weird part: it also spawns Codex and Gemini CLI workers alongside Claude. So
 
 ## File-Based IPC: The Most Interesting Design Decision
 
-This is the thing that makes OMC architecturally unique. Instead of thread pools (DeerFlow) or in-process delegation (Hermes), OMC coordinates agents through the **filesystem**:
+This is the design choice that sets OMC apart from every other framework I've analyzed. Instead of thread pools (DeerFlow) or in-process delegation (Hermes), OMC coordinates agents through the **filesystem**:
 
 ```
 .omc/state/team/{team-name}/
@@ -138,6 +141,19 @@ One thing to keep in mind: as a **plugin** that depends on Claude Code's interna
 **mkdir-based cross-process locking.** If you need to coordinate separate processes and can't use advisory locks (because NFS or Windows), `mkdir` with O_EXCL is atomic everywhere. OMC's implementation with stale lock detection and exponential backoff polling is production-ready.
 
 **Model tier routing with prompt-as-Markdown separation.** Assigning Haiku to `critic` (cheap, fast) and Opus to `code-reviewer` (needs deep reasoning) saves 30-50% on tokens. Pair that with loading agent prompts from `.md` files instead of hardcoding them in TypeScript, and non-engineers can tune agent behavior without touching code. Two low-effort wins that compound.
+
+```typescript
+// Simplified from agent-definitions.ts
+const AGENT_MODEL_MAP = {
+  critic:        "haiku",    // cheap — just point out problems
+  codeReviewer:  "opus",     // expensive — needs deep reasoning
+  planner:       "sonnet",   // mid-tier — good enough for planning
+  uiDeveloper:   "sonnet",
+};
+
+// Agent prompts loaded from markdown, not hardcoded
+const prompt = fs.readFileSync(`./agents/${agentRole}.md`, "utf-8");
+```
 
 ---
 

@@ -2,10 +2,12 @@
 
 # Claude Code: 510K Lines, a 1729-Line God Object, and 18 Virtual Pet Species Hidden in a Coding Agent
 
-> **The most advanced AI coding agent in production, dissected.**
-> 510,000 lines of TypeScript. 1,903 files. The complete architecture of how Anthropic built an AI that codes autonomously - revealed through an accidental npm source map leak.
+> Anthropic's coding agent leaked through an npm source map. 510K lines of TypeScript, 1,903 files — the entire architecture exposed. Here's what's inside.
 
-> **Who is this for:** Engineers building AI agents, coding tools, or anyone curious about how a top-tier AI product is architected in production.
+> **TL;DR:**
+> - **What:** Anthropic's production AI coding agent — 510K lines of TypeScript running on Bun, with 40+ tools as pure functions and a single 1,729-line `query.ts` driving the agentic loop
+> - **Why it matters:** The 4-layer context cascade (lossless deletion → cache hiding → structured archival → full compression) is the most sophisticated context management in any shipping agent
+> - **What you'll learn:** How streaming tool execution with RWLock works, why `buildTool()` factories beat class inheritance at 40 tools, and why Bun's compile-time macros physically delete unreleased features from the binary
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -307,11 +309,59 @@ Claude Code is the most complex and most opinionated of the four — it controls
 ### 1. The 4-Layer Context Cascade
 Lossless before lossy, local before global. Most agents do one-shot summarization or sliding windows. Claude Code's progressive degradation — surgical deletion → cache-level hiding → structured archival → full compression — preserves maximum information at each stage. Any long-running agent benefits from this pattern.
 
+```typescript
+// Simplified from Claude Code's context management
+async function manageContext(conversation: Message[]): Promise<Message[]> {
+  // Layer 1: Lossless — snip messages not referenced by later turns
+  conversation = historySnip(conversation);
+  
+  // Layer 2: Cache-level — hide tokens without modifying content
+  conversation = microcompact(conversation);
+  
+  // Layer 3: Structured archival — compress old turns, keep structure
+  if (tokenCount(conversation) > THRESHOLD_L3) {
+    conversation = contextCollapse(conversation);
+  }
+  
+  // Layer 4: Nuclear — full summarization (lossy, last resort)
+  if (tokenCount(conversation) > THRESHOLD_L4) {
+    conversation = await autocompact(conversation);
+  }
+  return conversation;
+}
+```
+
 ### 2. Streaming Tool Execution with RWLock
 Start executing read-only tools while the model is still generating. Read tools run in parallel; write tools get exclusive locks. The UX speedup is real and the implementation is straightforward — a reader-writer lock pattern applied to tool dispatch.
 
+```typescript
+// Simplified RWLock for tool execution
+const toolLock = new RWLock();
+
+async function executeTool(tool: Tool, input: unknown) {
+  if (tool.isReadOnly()) {
+    return toolLock.withReadLock(() => tool.call(input));  // parallel
+  } else {
+    return toolLock.withWriteLock(() => tool.call(input)); // exclusive
+  }
+}
+```
+
 ### 3. `buildTool()` Factory Over Inheritance
 Each tool is a plain object with schema, permissions, execution, UI rendering, and context summary — all co-located in one file. No base class, no inheritance chain, no registration ceremony. At 40+ tools this scales better than class hierarchies because tools share almost no behavior.
+
+```typescript
+// Every tool follows this pattern — no base class needed
+const readFileTool = buildTool({
+  name: "read_file",
+  description: "Read contents of a file",
+  inputSchema: z.object({ path: z.string() }),
+  isReadOnly: () => true,
+  call: async function*(input) { yield fs.readFileSync(input.path, "utf-8"); },
+  renderToolUse: (props) => <FileReadView {...props} />,
+  getToolUseSummary: (result) => `Read ${result.path} (${result.length} chars)`,
+});
+```
 
 ---
 
