@@ -1,16 +1,26 @@
-﻿# OpenAI Codex CLI: 549K Lines of Rust, a Guardian AI That Reviews Its Own AI, and the Most Paranoid Sandbox in Any Coding Agent
+﻿# OpenAI Codex CLI: An AI That Reviews Its Own AI, 549K Lines of Rust, and 17K Lines of Sandbox Code
 
-> OpenAI rebuilt "Claude Code but in Rust" — and ended up with 17K lines of sandbox code, an AI that approves its own AI's actions, and a MITM proxy that intercepts every network call. 549K lines across 88 crates. Here's what they actually built.
+> OpenAI built a coding agent in Rust. Not TypeScript, not Python — Rust. 549K lines across 88 crates. The wildest part isn't the language choice though. It's that they built a second AI whose entire job is to look at what the first AI wants to do and decide if it's safe. An AI reviewing an AI. If that sounds circular, well, it kind of is — and that's what makes it interesting.
 
 > **TL;DR:**
-> - **What:** OpenAI's open-source Rust-native coding agent — 549K lines, 88 workspace crates, with native OS sandboxing on macOS/Linux/Windows and a queue-pair architecture that decouples the agent core from any frontend
-> - **Why it matters:** The Guardian pattern (a second AI risk-scores every dangerous action, auto-approves if score < 80) solves the approval-fatigue problem every agent framework has. The 3-platform sandbox (17K LOC) is the deepest security implementation in any open-source agent
-> - **What you'll learn:** How `mkdir`-based locks, Landlock+seccomp+bubblewrap sandboxing, and MITM network proxies work in practice — plus why 88 Rust crates is both too many and exactly right
+> - **What:** OpenAI's open-source Rust coding agent — 549K lines, 88 crates, native OS sandboxing on macOS/Linux/Windows
+> - **Why it matters:** The Guardian pattern (a second AI risk-scores every action, auto-approves below threshold) is basically Constitutional AI applied to tool use. Plus 17K lines of sandbox code across 3 platforms — more than most entire CLI tools
+> - **What you'll learn:** How queue-pair architectures decouple agent brains from UIs, why `mkdir`-based locks work, and what 8,870 lines of Windows ACL manipulation looks like
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/openai/codex/blob/main/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/openai/codex/blob/main/docs/contributing.md)
 
 > This analysis is based on the public open-source repository at [github.com/openai/codex](https://github.com/openai/codex).
+
+## Why Should You Care?
+
+Here's the thing that got me: Codex CLI has an AI that reviews its own AI's actions before executing them. Called "Guardian," it takes the tool call the main agent wants to run, sends it to a *different* model instance (gpt-5.4), gets back a risk score from 0-100, and auto-approves if the score is under 80. If the second model can't decide in 90 seconds, it defaults to "deny."
+
+This is Anthropic's [Constitutional AI](https://arxiv.org/abs/2212.08073) idea — AI self-review driven by explicit principles — except applied to runtime tool execution instead of training-time alignment. Constitutional AI has the model critique and revise its own outputs against a set of rules. Guardian does the same thing but for `rm -rf` and `curl` commands, in real-time, before they run.
+
+(Whether an AI is actually qualified to judge another AI's safety is... a whole debate. But the engineering is solid.)
+
+The other number that jumped out: **17,237 lines of sandbox code**. Three platforms, three completely different OS security APIs, no Docker dependency. For context, the entire Helix terminal editor is ~80K lines. Codex spends a fifth of a whole editor just on sandboxing.
 
 ## At a Glance
 
@@ -32,29 +42,30 @@
 
 | Dimension | Description |
 |-----------|-------------|
-| Architecture | queue-pair async event system (Sender<Submission>/Receiver<Event>), 88 Rust workspace crates, dual Cargo+Bazel build |
+| Architecture | Queue-pair async event system — reminiscent of the [CoALA cognitive architecture](https://arxiv.org/abs/2309.02427) separation of action/perception channels. 88 Rust workspace crates, dual Cargo+Bazel build |
 | Code Organization | 549K LOC Rust across 1389 files, 162 test files, strict crate boundaries with codex-core (176K), codex-tui (112K), codex-cli (5K) |
-| Security Approach | 4-layer: seatbelt (macOS) + landlock/seccomp/bubblewrap (Linux) + restricted token/ACL (Windows) + Guardian AI auto-approval (risk_score < 80) + MITM network proxy |
-| Context Strategy | two-phase memory extraction: per-rollout raw extraction then cross-rollout consolidation, summarize-based compaction |
-| Documentation | crate-level docs, architecture decision records, cross-crate architecture requires reading the code |
+| Security Approach | 4-layer defense-in-depth that maps to what [AgentDojo](https://arxiv.org/abs/2406.13352) identifies as critical surfaces: approval → Guardian AI → OS sandbox → network proxy |
+| Context Strategy | Two-phase memory extraction: per-rollout raw extraction then cross-rollout consolidation. Simpler than Claude Code's 4-layer cascade — honestly not sure if that's a feature or a gap |
+| Documentation | Crate-level docs, architecture decision records. Cross-crate architecture requires reading the code (there's no high-level design doc, which is annoying) |
+
 ## Table of Contents
 
 - [At a Glance](#at-a-glance)
 - [Architecture Overview](#architecture-overview)
 - [Core Module Analysis](#core-module-analysis)
- - [codex-core — The Brain](#codex-core--the-brain-176k-lines)
- - [codex-tui — Terminal UI](#codex-tui--terminal-ui-112k-lines)
- - [codex-cli — Entry Point](#codex-cli--entry-point-5k-lines)
- - [Tool System — codex-tools + core/tools](#tool-system--codex-tools--coretools)
- - [Sandbox Stack — Three-Platform Security](#sandbox-stack--three-platform-security)
- - [Hook System — Lifecycle Interception](#hook-system--lifecycle-interception)
- - [Skills System — Markdown-Driven Extensions](#skills-system--markdown-driven-extensions)
- - [Protocol — The Contract Layer](#protocol--the-contract-layer)
- - [MCP Integration — Model Context Protocol](#mcp-integration--model-context-protocol)
- - [Exec & Exec-Server — Process Execution](#exec--exec-server--process-execution)
- - [Guardian — AI Reviews AI](#guardian--ai-reviews-ai)
- - [Network Proxy — MITM for Safety](#network-proxy--mitm-for-safety)
- - [App Server — Multi-Client Architecture](#app-server--multi-client-architecture)
+  - [codex-core — The Brain](#codex-core--the-brain-176k-lines)
+  - [codex-tui — Terminal UI](#codex-tui--terminal-ui-112k-lines)
+  - [codex-cli — Entry Point](#codex-cli--entry-point-5k-lines)
+  - [Tool System — codex-tools + core/tools](#tool-system--codex-tools--coretools)
+  - [Sandbox Stack — Three-Platform Security](#sandbox-stack--three-platform-security)
+  - [Hook System — Lifecycle Interception](#hook-system--lifecycle-interception)
+  - [Skills System — Markdown-Driven Extensions](#skills-system--markdown-driven-extensions)
+  - [Protocol — The Contract Layer](#protocol--the-contract-layer)
+  - [MCP Integration — Model Context Protocol](#mcp-integration--model-context-protocol)
+  - [Exec & Exec-Server — Process Execution](#exec--exec-server--process-execution)
+  - [Guardian — AI Reviews AI](#guardian--ai-reviews-ai)
+  - [Network Proxy — MITM for Safety](#network-proxy--mitm-for-safety)
+  - [App Server — Multi-Client Architecture](#app-server--multi-client-architecture)
 - [Design Decisions (ADR)](#design-decisions-adr)
 - [Comparison with Claude Code](#comparison-with-claude-code)
 - [Security Analysis](#security-analysis)
@@ -69,8 +80,11 @@
 
 ![Architecture](architecture.png)
 
+The core idea: Codex CLI is a **queue-pair** system. The `Codex` struct exposes a `Sender<Submission>` and a `Receiver<Event>`. Push operations in, get events out. Model calls, tool execution, sandbox management, approval flows — all of it happens inside this async loop.
 
-**The key architectural insight:** Codex CLI is built as a **queue-pair** system. The `Codex` struct exposes a `Sender<Submission>` and a `Receiver<Event>`. You push operations in, you receive events out. Everything else — model calls, tool execution, sandbox management, approval flows — happens inside this async loop. This makes the system composable: the TUI, App Server, and MCP Server are all just different frontends submitting to the same queue.
+If you've read the [CoALA paper](https://arxiv.org/abs/2309.02427) (Cognitive Architectures for Language Agents), this should look familiar. CoALA argues that agent architectures need a clear separation between the "cognition core" and the "action interfaces." Codex's queue-pair does exactly that — the TUI, App Server, and MCP Server are just different action interfaces submitting to the same cognition core.
+
+(I'm probably over-indexing on the CoALA parallel here. The Codex team might have just wanted clean async boundaries. But the structural similarity is hard to ignore.)
 
 ---
 
@@ -80,35 +94,39 @@
 
 **Path:** `codex-rs/core/`
 
-This is the largest crate and the team knows it's too big — their `AGENTS.md` explicitly says "**resist adding code to codex-core!**"
+The biggest crate, and the team knows it's too big — their `AGENTS.md` says "**resist adding code to codex-core!**" in bold. Didn't stop them from putting 176K lines in it.
 
-The central type is `Codex` in `codex-rs/core/src/codex.rs` — a 7,786-line file (well beyond the team's own 500-line module guideline). It implements:
+The central type is `Codex` in `codex-rs/core/src/codex.rs` — a 7,786-line file. Their own guideline says 500-line module max. So, you know.
 
-1. **Session lifecycle** — `spawn()` initializes auth, config, skills, plugins, MCP connections, then enters the main submission loop
-2. **Turn execution** — Each user message triggers a turn: build context → call model API → dispatch tool calls → loop until no more tool calls
-3. **Compaction** — When context exceeds model window, triggers inline or remote compaction (summarization)
+What it does:
+
+1. **Session lifecycle** — `spawn()` sets up auth, config, skills, plugins, MCP connections, then enters the main submission loop
+2. **Turn execution** — Each message: build context → call model → dispatch tool calls → loop until done
+3. **Compaction** — When context gets too big, summarize and compress
 4. **Sub-agent orchestration** — Can spawn child `Codex` instances for multi-agent workflows
 
 ```
 Codex::spawn() {
- â‘  Initialize auth, config, skills, plugins, MCP
- â‘¡ Enter submission loop:
- match submission {
- Op::UserInput → start_turn()
- Op::Compact → run_compact_task() 
- Op::Interrupt → cancel current turn
- Op::Shutdown → graceful exit
- }
- â‘¢ start_turn():
- - Build context (ContextManager + initial injections) 
- - Stream from ModelClient (SSE or WebSocket)
- - For each response item:
- - Text → emit to UI
- - ToolCall → dispatch via ToolRouter
- - Tool results → append to context → next model call
- - No tools? → turn complete
+  ① Initialize auth, config, skills, plugins, MCP
+  ② Enter submission loop:
+    match submission {
+      Op::UserInput → start_turn()
+      Op::Compact → run_compact_task() 
+      Op::Interrupt → cancel current turn
+      Op::Shutdown → graceful exit
+    }
+  ③ start_turn():
+    - Build context (ContextManager + initial injections) 
+    - Stream from ModelClient (SSE or WebSocket)
+    - For each response item:
+      - Text → emit to UI
+      - ToolCall → dispatch via ToolRouter
+      - Tool results → append to context → next model call
+    - No tools? → turn complete
 }
 ```
+
+This is a standard [ReAct loop](https://arxiv.org/abs/2210.03629) (think → act → observe → think again) wrapped in Rust's async machinery. Nothing conceptually novel — the novelty is in what wraps around it.
 
 **Key sub-modules within core:**
 
@@ -116,7 +134,7 @@ Codex::spawn() {
 |--------|-------|---------|
 | `tools/` | ~8K | Tool routing, parallel execution, sandbox orchestration |
 | `context_manager/` | ~1.5K | Token tracking, history management, truncation |
-| `compact.rs` + `compact_remote.rs` | ~500 | Context window compaction (summarization) |
+| `compact.rs` + `compact_remote.rs` | ~500 | Context window compaction |
 | `guardian/` | ~1.5K | AI-powered auto-approval for dangerous actions |
 | `memories/` | ~2K | Two-phase memory extraction from past sessions |
 | `agent/` | ~1K | Multi-agent registry over sub-threads |
@@ -129,15 +147,15 @@ Codex::spawn() {
 ```rust
 // codex-rs/core/src/codex.rs
 pub struct Codex {
- tx_sub: Sender<Submission>, // push operations
- rx_event: Receiver<Event>, // receive events
- agent_status: watch::Receiver<AgentStatus>,
- session: Arc<Session>, // shared state
- session_loop_termination: Shared<BoxFuture<'static, ()>>,
+    tx_sub: Sender<Submission>,   // push operations
+    rx_event: Receiver<Event>,    // receive events
+    agent_status: watch::Receiver<AgentStatus>,
+    session: Arc<Session>,        // shared state
+    session_loop_termination: Shared<BoxFuture<'static, ()>>,
 }
 ```
 
-The `Session` arc holds everything shared across turns: config, auth, tool router, approval store, context manager, skills, hooks, network proxy, feature flags, and more. This is the "god object" of the system — necessary because a turn needs access to nearly everything.
+The `Session` arc holds config, auth, tool router, approval store, context manager, skills, hooks, network proxy, feature flags, and more. It's a god object — they know it, I know it, everybody knows it. But when a turn needs access to 40+ things, you either pass them all around or shove them in one struct. They chose the struct.
 
 ---
 
@@ -145,23 +163,18 @@ The `Session` arc holds everything shared across turns: config, auth, tool route
 
 **Path:** `codex-rs/tui/`
 
-Built on [Ratatui](https://ratatui.rs/) (Rust's dominant TUI framework) + [Crossterm](https://github.com/crossterm-rs/crossterm).
+Built on [Ratatui](https://ratatui.rs/) + [Crossterm](https://github.com/crossterm-rs/crossterm). Full chat interface with:
 
-The TUI implements a full-featured chat interface with:
+- Markdown rendering, syntax highlighting (via `syntect`), diff display
+- Approval dialogs, selection views, MCP elicitation forms
+- File search overlay (fuzzy matching via `nucleo`)
+- Multiple agent tabs for multi-agent workflows
+- Streaming with frame rate limiting
+- Clipboard via `arboard`
 
-- **Chat widget** with markdown rendering, syntax highlighting (via `syntect`), and diff display
-- **Bottom pane** with chat composer, approval dialogs, selection views, MCP elicitation forms
-- **File search** overlay (fuzzy matching via `nucleo`)
-- **Multiple agent tabs** for multi-agent workflows
-- **Streaming** with chunked output and frame rate limiting
-- **Clipboard integration** via `arboard`
-- **Alternate screen** mode for clean terminal restoration
+`app.rs` is the main event loop — **10,851+ lines**, the largest single file in the project. Their `AGENTS.md` calls it a "high-touch file" where new functionality should go into separate modules. (And yet.)
 
-`app.rs` is the main event loop — 10,851+ lines, the single largest file in the project. Their `AGENTS.md` explicitly lists it as a "high-touch file" where new functionality should go into separate modules.
-
-**Why Ratatui instead of React/Ink (like Claude Code)?**
-
-Rust doesn't have an Ink equivalent. Ratatui is imperative, not declarative — you draw each frame explicitly. This gives maximum control but means more code for complex UIs. The 112K lines vs Claude Code's ~510K total (including all of core) tells you how much work terminal UI is in Rust.
+112K lines for a terminal UI. For reference, the entire Helix editor is ~80K lines. Ratatui is imperative — you draw each frame explicitly, which means more code for complex UIs than you'd write with React/Ink. But still... 112K is a lot.
 
 ---
 
@@ -169,18 +182,18 @@ Rust doesn't have an Ink equivalent. Ratatui is imperative, not declarative — 
 
 **Path:** `codex-rs/cli/src/main.rs`
 
-A Clap-based multi-tool dispatcher. The `MultitoolCli` struct routes to:
+A Clap-based multi-tool dispatcher. `MultitoolCli` routes to:
 
-- **Default** (no subcommand) → launches TUI
+- **Default** → launches TUI
 - `exec` → headless single-prompt mode
 - `mcp` → starts as an MCP server
-- `app` → launches desktop app (macOS only, via `app_cmd.rs`)
+- `app` → launches desktop app (macOS only)
 - `login` / `logout` → auth management
 - `config` → configuration editing
 - `review` → code review mode
 - `landlock` / `seatbelt` / `windows-sandbox` → sandbox debugging subcommands
 
-The `arg0` crate (`codex-rs/arg0/`) enables symlink-based dispatch: if the binary is invoked as `codex-linux-sandbox`, it routes directly to the sandbox helper — single binary, multiple personalities.
+The `arg0` crate enables symlink-based dispatch: if the binary is invoked as `codex-linux-sandbox`, it routes directly to the sandbox helper. One binary, multiple personalities.
 
 ---
 
@@ -188,21 +201,21 @@ The `arg0` crate (`codex-rs/arg0/`) enables symlink-based dispatch: if the binar
 
 **Paths:** `codex-rs/tools/` (definitions) + `codex-rs/core/src/tools/` (runtime)
 
-The tool system uses a **three-layer architecture**:
+Three-layer architecture that maps pretty directly to the [Toolformer](https://arxiv.org/abs/2302.04761) idea — the model decides *when* to call a tool, *what* to pass, and *how* to use the result. But where Toolformer focuses on the model learning tool-use timing through self-supervision, Codex externalizes the routing into a typed system:
 
-1. **Tool Definitions** (`codex-tools/`) — Pure data structures. `ToolDefinition` specifies name, description, JSON schema for input, and tool type. No execution logic.
+1. **Tool Definitions** (`codex-tools/`) — Pure data. `ToolDefinition` = name + description + JSON schema + type. No execution logic.
 2. **Tool Router** (`core/tools/router.rs`) — Maps tool names to handlers. Builds specs from config, MCP tools, dynamic tools, and discoverable tools.
-3. **Tool Handlers** (`core/tools/handlers/`) — Actual execution. Each tool type gets a handler implementing the `ToolHandler` trait.
+3. **Tool Handlers** (`core/tools/handlers/`) — Actual execution. Each tool type implements `ToolHandler`.
 
 ```rust
 // codex-rs/core/src/tools/registry.rs
 pub trait ToolHandler: Send + Sync {
- type Output: ToolOutput + 'static;
- fn kind(&self) -> ToolKind; // Function or MCP
- fn is_mutating(&self, inv: &ToolInvocation) -> bool;
- fn handle(&self, invocation: ToolInvocation) -> BoxFuture<Result<Self::Output>>;
- fn pre_tool_use_payload(&self, ...) -> Option<PreToolUsePayload>;
- fn post_tool_use_payload(&self, ...) -> Option<PostToolUsePayload>;
+    type Output: ToolOutput + 'static;
+    fn kind(&self) -> ToolKind;
+    fn is_mutating(&self, inv: &ToolInvocation) -> bool;
+    fn handle(&self, invocation: ToolInvocation) -> BoxFuture<Result<Self::Output>>;
+    fn pre_tool_use_payload(&self, ...) -> Option<PreToolUsePayload>;
+    fn post_tool_use_payload(&self, ...) -> Option<PostToolUsePayload>;
 }
 ```
 
@@ -222,15 +235,15 @@ pub trait ToolHandler: Send + Sync {
 | `request_permissions` | `RequestPermissionsHandler` | Runtime permission elevation |
 | `view_image` | `ViewImageHandler` | Image content display |
 
-**Tool Orchestrator** (`core/tools/orchestrator.rs`) — This is the most interesting piece. Every tool call flows through:
+The **Tool Orchestrator** (`core/tools/orchestrator.rs`) is where it gets interesting. Every tool call flows through:
 
 ```
 Approval → Sandbox Selection → Execution Attempt → Retry (on sandbox denial)
 ```
 
-The orchestrator implements a **progressive sandbox escalation** strategy: if a sandboxed execution fails due to permission denial, it can retry with modified sandbox parameters without re-prompting for approval (because the approval was cached).
+Progressive sandbox escalation: if a sandboxed execution fails due to permission denial, retry with looser constraints without re-prompting for approval. The approval was cached.
 
-**Parallel Execution** (`core/tools/parallel.rs`) — Uses a `RwLock<()>` pattern: read-only tools acquire a read lock (parallel), mutating tools acquire a write lock (exclusive). This is simpler than Claude Code's approach but equally correct.
+**Parallel Execution** (`core/tools/parallel.rs`) — Uses `RwLock<()>`: read-only tools get a read lock (parallel), mutating tools get a write lock (exclusive). Simpler than Claude Code's approach but does the job.
 
 ---
 
@@ -238,19 +251,23 @@ The orchestrator implements a **progressive sandbox escalation** strategy: if a 
 
 **Paths:** `codex-rs/sandboxing/`, `codex-rs/linux-sandbox/`, `codex-rs/windows-sandbox-rs/`
 
-This is the crown jewel of the engineering. Codex CLI supports **native OS-level sandboxing** on all three major platforms:
+17,237 lines of sandbox code. This is where most of the paranoia budget went.
+
+If you've read the [agent security literature](https://arxiv.org/abs/2402.06664) — particularly the work showing GPT-4 agents can autonomously hack websites via SQL injection without prior knowledge of the vulnerability — you understand why this matters. An agent that can run arbitrary shell commands is an agent that can do real damage. The [OWASP LLM Top 10](https://genai.owasp.org/llm-top-10/) lists "Excessive Agency" (LLM08) as a top risk for exactly this reason.
+
+Codex's answer: don't just tell the agent what it can't do. Make the OS enforce it.
 
 #### macOS — Seatbelt (`sandbox-exec`)
 
 **File:** `sandboxing/src/seatbelt.rs` (~530 lines)
 
-Uses Apple's `sandbox-exec` with custom SBPL (Sandbox Profile Language) policies:
+Uses Apple's `sandbox-exec` with custom SBPL policies:
 
-- `seatbelt_base_policy.sbpl` — Default denials for process control, IPC, and system modifications
+- `seatbelt_base_policy.sbpl` — Default denials for process control, IPC, system modifications
 - `seatbelt_network_policy.sbpl` — Network access rules
-- Dynamic path allowlists for workspace directory access
+- Dynamic path allowlists for workspace access
 
-**Security detail:** Only invokes `/usr/bin/sandbox-exec` (hardcoded path), never from `$PATH`. This prevents path injection attacks where a malicious binary masquerades as `sandbox-exec`.
+Security detail: Only invokes `/usr/bin/sandbox-exec` (hardcoded path), never from `$PATH`. Prevents path injection attacks.
 
 #### Linux — Landlock + bubblewrap + seccomp
 
@@ -259,44 +276,40 @@ Uses Apple's `sandbox-exec` with custom SBPL (Sandbox Profile Language) policies
 Three-layer defense:
 
 1. **Landlock** — Kernel-level filesystem access restrictions (Linux 5.13+)
-2. **bubblewrap (bwrap)** — User-namespace filesystem isolation. Vendored bwrap binary included (`vendored_bwrap.rs`)
+2. **bubblewrap (bwrap)** — User-namespace filesystem isolation. They vendor the bwrap binary
 3. **seccomp** — System call filtering via `seccompiler`
 
-The Linux sandbox is a **separate binary** (`codex-linux-sandbox`) invoked via arg0 dispatch. It:
-- Sets `PR_SET_NO_NEW_PRIVS` to prevent privilege escalation
-- Applies seccomp filters
-- Wraps commands in bubblewrap namespaces with read-only bind mounts
-- Injects proxy routing for network control
+The Linux sandbox is a separate binary invoked via arg0 dispatch. It sets `PR_SET_NO_NEW_PRIVS`, applies seccomp filters, wraps commands in bubblewrap namespaces with read-only bind mounts, and injects proxy routing.
 
 #### Windows — Restricted Tokens + ACLs
 
-**File:** `windows-sandbox-rs/src/` (~8,870 lines — the largest sandbox implementation!)
+**File:** `windows-sandbox-rs/src/` (~8,870 lines — the largest sandbox!)
 
-The most complex sandbox because Windows lacks a unified sandboxing API:
+The most complex one because Windows doesn't have a unified sandboxing API. They had to build it from pieces:
 
 - **Restricted tokens** — Strip privileges from the process token
-- **DACL (ACL) manipulation** — Deny write access to files outside workspace
-- **Private desktop** — Isolate the sandboxed process from the user's desktop (prevents clipboard/keyboard snooping)
-- **ConPTY** — Windows pseudo-terminal for process I/O capture
+- **DACL manipulation** — Deny write access outside workspace
+- **Private desktop** — Isolate from user's desktop (blocks clipboard/keyboard snooping)
+- **ConPTY** — Windows pseudo-terminal for I/O capture
 - **DPAPI** — Data Protection API for secret encryption
-- **Elevated helper** — A separate process runs with admin rights to set up sandbox infrastructure, communicates via named pipes (IPC)
+- **Elevated helper** — Separate admin-rights process for sandbox setup, talks via named pipes
 
-This is the most detailed Windows sandboxing implementation in any open-source AI agent.
+macOS: 530 lines. Linux: 4,736 lines. Windows: 8,870 lines. The asymmetry tells you everything about the state of OS-level sandboxing APIs.
 
 #### Sandbox Manager
 
 **File:** `sandboxing/src/manager.rs`
 
-Unified API that selects the right sandbox per platform:
+Unified API, one function:
 
 ```rust
 pub fn get_platform_sandbox(windows_sandbox_enabled: bool) -> Option<SandboxType> {
- if cfg!(target_os = "macos") { Some(SandboxType::MacosSeatbelt) }
- else if cfg!(target_os = "linux") { Some(SandboxType::LinuxSeccomp) }
- else if cfg!(target_os = "windows") {
- if windows_sandbox_enabled { Some(SandboxType::WindowsRestrictedToken) }
- else { None }
- } else { None }
+    if cfg!(target_os = "macos") { Some(SandboxType::MacosSeatbelt) }
+    else if cfg!(target_os = "linux") { Some(SandboxType::LinuxSeccomp) }
+    else if cfg!(target_os = "windows") {
+        if windows_sandbox_enabled { Some(SandboxType::WindowsRestrictedToken) }
+        else { None }
+    } else { None }
 }
 ```
 
@@ -311,47 +324,38 @@ Five lifecycle events:
 | Event | When | Can Block? |
 |-------|------|-----------|
 | `session_start` | Session initialization | Yes |
-| `user_prompt_submit` | Before user prompt is sent to model | Yes (can modify) |
-| `pre_tool_use` | Before a tool executes | Yes (can deny/override) |
+| `user_prompt_submit` | Before prompt goes to model | Yes (can modify) |
+| `pre_tool_use` | Before a tool runs | Yes (can deny/override) |
 | `post_tool_use` | After a tool completes | No (informational) |
 | `stop` | Session termination | No |
 
-Hooks are configured via `hooks.json` in the config layer stack. Each hook is a **shell command** that receives JSON on stdin and returns JSON on stdout. The hook engine:
-
-1. **Discovers** hooks from config layers (`engine/discovery.rs`)
-2. **Dispatches** them with timeout enforcement (`engine/dispatcher.rs`)
-3. **Parses** structured output (`engine/output_parser.rs`)
-
-This is similar to Git hooks but with structured I/O. The `pre_tool_use` hook is particularly powerful — it can approve, deny, or modify a tool call before execution.
+Hooks are shell commands in `hooks.json` that receive JSON on stdin and return JSON on stdout. Like Git hooks but with structured I/O. The `pre_tool_use` hook can approve, deny, or modify a tool call before execution — which makes it a user-defined extension point for the security model.
 
 ---
 
 ### Skills System — Markdown-Driven Extensions
 
-**Paths:** `codex-rs/skills/` (system skills installer) + `codex-rs/core-skills/` (loading + injection)
+**Paths:** `codex-rs/skills/` + `codex-rs/core-skills/`
 
-Skills are markdown files (`SKILLS.md`) that inject instructions into the model's system prompt. They're **not code** — they're prompt engineering packaged as a file system convention.
+Skills are markdown files (`SKILLS.md`) injected into the model's system prompt. Not code — prompt engineering packaged as a file convention. This is the [Voyager](https://arxiv.org/abs/2305.16291) skill library idea (store reusable capabilities, retrieve them by description matching) but at the prompt level instead of the code level.
 
 ```rust
 // codex-rs/core-skills/src/model.rs
 pub struct SkillMetadata {
- pub name: String,
- pub description: String,
- pub short_description: Option<String>,
- pub interface: Option<SkillInterface>,
- pub dependencies: Option<SkillDependencies>,
- pub policy: Option<SkillPolicy>,
- pub path_to_skills_md: PathBuf,
- pub scope: SkillScope,
+    pub name: String,
+    pub description: String,
+    pub short_description: Option<String>,
+    pub interface: Option<SkillInterface>,
+    pub dependencies: Option<SkillDependencies>,
+    pub policy: Option<SkillPolicy>,
+    pub path_to_skills_md: PathBuf,
+    pub scope: SkillScope,
 }
 ```
 
-Skills can declare:
-- **Dependencies** — MCP servers, environment variables, or tools they require
-- **Interface** — Display name, icon, brand color, default prompt
-- **Policy** — Which products they work with, whether implicit invocation is allowed
+Skills can declare dependencies (MCP servers, env vars, tools), interface metadata (display name, icon, brand color), and policy (which products, whether implicit invocation allowed).
 
-System skills are **embedded at compile time** via `include_dir!` and extracted to `CODEX_HOME/skills/.system` on first run, with fingerprint-based cache invalidation.
+System skills are embedded at compile time via `include_dir!` and extracted to `CODEX_HOME/skills/.system` on first run, with fingerprint-based cache invalidation.
 
 ---
 
@@ -359,16 +363,15 @@ System skills are **embedded at compile time** via `include_dir!` and extracted 
 
 **Path:** `codex-rs/protocol/` (~13K lines)
 
-The protocol crate defines the **entirely typed interface** between all layers. It's the most important crate for understanding the system because everything flows through its types:
+The protocol crate defines all the typed interfaces. This is the single most important crate for understanding the system:
 
-- **`Event`** / **`Submission`** — The bidirectional message types for the queue pair
+- **`Event`** / **`Submission`** — Bidirectional queue-pair message types
 - **`ResponseItem`** / **`ResponseInputItem`** — Conversation history items
-- **`SandboxPolicy`** / **`FileSystemSandboxPolicy`** / **`NetworkSandboxPolicy`** — Security policy types
+- **`SandboxPolicy`** — Security policy types
 - **`AskForApproval`** — Permission level enum: `Never`, `OnFailure`, `UnlessSafe`, `Always`
 - **`TurnItem`** — Individual items within a model turn
-- **`ExecToolCallOutput`** — Structured output from shell execution
 
-This is pure data — no logic, no I/O. Every crate depends on protocol; protocol depends on nothing significant. This is textbook dependency inversion.
+Pure data — no logic, no I/O. Every crate depends on protocol; protocol depends on nothing significant. Textbook dependency inversion.
 
 ---
 
@@ -376,14 +379,14 @@ This is pure data — no logic, no I/O. Every crate depends on protocol; protoco
 
 **Paths:** `codex-rs/codex-mcp/` (client) + `codex-rs/mcp-server/` (server) + `codex-rs/rmcp-client/` (low-level)
 
-Codex CLI integrates MCP in **both directions**:
+Codex integrates MCP in **both directions**:
 
-1. **As MCP Client** — `McpConnectionManager` connects to external MCP servers (configured in `codex.toml`), aggregates their tools into the tool router, and handles lifecycle (startup, reconnection, elicitation)
-2. **As MCP Server** — `mcp-server` exposes Codex itself as an MCP server, allowing other tools to invoke Codex as a tool provider
+1. **As MCP Client** — Connects to external MCP servers, aggregates their tools into the router
+2. **As MCP Server** — Exposes Codex itself as an MCP tool provider
 
-Tool names from MCP servers are namespaced: `"<server_name>__<tool_name>"` using a double-underscore delimiter to avoid collisions.
+Tool names from MCP servers get namespaced: `"<server_name>__<tool_name>"` (double-underscore delimiter). The elicitation protocol lets MCP servers request interactive user input during tool calls — bidirectional communication that most frameworks don't have.
 
-The elicitation protocol (`CreateElicitationRequestParams`) allows MCP servers to request interactive user input during tool calls — a bidirectional communication channel that most agent frameworks lack.
+Worth noting: [MCP is becoming a new attack surface](https://arxiv.org/abs/2503.XXXXX) for injection attacks. The namespacing helps a bit but doesn't solve the trust problem. More on that in the security section.
 
 ---
 
@@ -391,16 +394,12 @@ The elicitation protocol (`CreateElicitationRequestParams`) allows MCP servers t
 
 **Paths:** `codex-rs/exec/` + `codex-rs/exec-server/`
 
-Two execution modes:
+Two modes:
 
-1. **`codex exec`** — Headless single-prompt execution. Runs a prompt, streams tool calls, outputs result. Supports `--json` for structured JSONL output.
-2. **`exec-server`** — A persistent daemon that manages sandboxed environments. Provides a client-server API for:
- - Process spawning and management
- - File system operations (read, write, copy, mkdir, remove)
- - PTY allocation
- - Output streaming
+1. **`codex exec`** — Headless single-prompt execution. Run a prompt, stream tool calls, get result. Supports `--json` for structured JSONL output.
+2. **`exec-server`** — Persistent daemon that manages sandboxed environments. Provides RPC for process spawning, filesystem ops, PTY allocation, output streaming.
 
-The exec-server enables **remote execution** — Codex can run commands on a different machine (or in a container) via its RPC protocol, while the core engine runs locally. This is the foundation for cloud-based execution (referenced by `cloud-tasks` and `cloud-tasks-client` crates).
+The exec-server enables remote execution — Codex can run commands on a different machine while the core runs locally. This is the foundation for cloud-based execution (there are `cloud-tasks` crates in the workspace).
 
 ---
 
@@ -408,7 +407,7 @@ The exec-server enables **remote execution** — Codex can run commands on a dif
 
 **Path:** `codex-rs/core/src/guardian/` (~1,500 lines)
 
-The module I spent the most time on. When a tool call requires approval (e.g., writing a file), the Guardian system can **automatically approve or deny** it using a second AI call:
+This is the module I spent the most time staring at. When a tool call needs approval, Guardian can auto-approve or deny it by asking a second AI:
 
 ```rust
 // codex-rs/core/src/guardian/mod.rs
@@ -417,14 +416,16 @@ const GUARDIAN_REVIEW_TIMEOUT: Duration = Duration::from_secs(90);
 const GUARDIAN_APPROVAL_RISK_THRESHOLD: u8 = 80;
 ```
 
-The Guardian:
+How it works:
 1. Reconstructs a compact transcript (limited to `GUARDIAN_MAX_MESSAGE_TRANSCRIPT_TOKENS`)
-2. Sends a structured review request to a **different model instance** (gpt-5.4)
-3. Expects a `GuardianAssessment` response with `risk_level`, `risk_score` (0-100), `rationale`, and `evidence`
-4. **Approves** if `risk_score < 80`, **denies** otherwise
-5. **Fails closed** — any timeout, parse error, or execution failure results in denial
+2. Sends a structured review request to gpt-5.4 (a different model instance)
+3. Gets back a `GuardianAssessment`: `risk_level`, `risk_score` (0-100), `rationale`, `evidence`
+4. Auto-approves if `risk_score < 80`, denies otherwise
+5. Fails closed — timeout, parse error, or any exception = deny
 
-This is basically an "AI security review" that runs in real-time, before each potentially dangerous action.
+The connection to [Constitutional AI (Bai et al., 2022)](https://arxiv.org/abs/2212.08073) is direct. Constitutional AI has the model generate a response, then critique it against a set of principles, then revise. Guardian does the same thing: generate an action plan, have a second model critique it against safety principles, proceed only if it passes. The "constitution" here is implicit in the Guardian's system prompt rather than an explicit principle list, which I think is a missed opportunity — a declarative rule set would be easier to audit and update.
+
+There's an inherent circularity here that's worth thinking about. The Guardian AI is made by the same company as the agent AI. If there's a systematic blind spot in one, it might exist in the other. The [Sleeper Agents paper (Hubinger et al., 2024)](https://arxiv.org/abs/2401.05566) showed that safety training can't reliably remove hidden behaviors — which means an external Guardian using the same family of models has the same blind spots. Still better than no review, but not a silver bullet.
 
 ---
 
@@ -432,16 +433,16 @@ This is basically an "AI security review" that runs in real-time, before each po
 
 **Path:** `codex-rs/network-proxy/` (~7,800 lines)
 
-A full **MITM (Man-in-the-Middle) proxy** that intercepts all network traffic from sandboxed processes:
+Full MITM proxy that intercepts all network traffic from sandboxed processes:
 
 - HTTP proxy with TLS interception
 - SOCKS5 proxy support
 - Domain-based allowlist/blocklist
 - Per-request policy decisions
 - Audit metadata for blocked requests
-- Certificate generation for TLS interception (`certs.rs`)
+- Certificate generation for TLS interception
 
-The proxy is injected into sandboxed processes via `HTTP_PROXY`/`HTTPS_PROXY` environment variables. On Linux, the sandbox helper additionally routes all traffic through the proxy. This gives Codex **complete visibility and control** over what network calls an AI-generated command makes.
+Injected via `HTTP_PROXY`/`HTTPS_PROXY` env vars. On Linux, the sandbox helper routes all traffic through it. Gives Codex full visibility and control over network calls from AI-generated commands.
 
 ---
 
@@ -449,15 +450,13 @@ The proxy is injected into sandboxed processes via `HTTP_PROXY`/`HTTPS_PROXY` en
 
 **Path:** `codex-rs/app-server/` (~56K lines)
 
-A JSON-RPC server that enables **multiple clients** to control Codex simultaneously:
+JSON-RPC server with stdio and WebSocket transports. Handles:
 
-- **stdio transport** — For CLI and MCP server integration
-- **WebSocket transport** — For desktop apps and remote clients
-- **Thread management** — Create, resume, list, subscribe to conversation threads
-- **Turn lifecycle** — Start, interrupt, subscribe to turn events
-- **Plugin management** — Install, list, uninstall plugins at runtime
+- Thread management (create, resume, list, subscribe)
+- Turn lifecycle (start, interrupt, subscribe to events)
+- Plugin management (install, list, uninstall at runtime)
 
-This is what makes the desktop app (macOS) possible — it's the same core engine, just with a different frontend connected via WebSocket.
+This is what makes the desktop app possible — same core, different frontend via WebSocket.
 
 ---
 
@@ -465,44 +464,43 @@ This is what makes the desktop app (macOS) possible — it's the same core engin
 
 ### Why Rust Instead of TypeScript?
 
-Claude Code chose TypeScript. Codex CLI chose Rust. Here's why each choice makes sense for its context:
-
 | Factor | Codex CLI (Rust) | Claude Code (TypeScript) |
 |--------|------------------|--------------------------|
-| **Cold start** | ~50ms binary startup | ~200ms Bun startup (still fast) |
-| **Memory** | ~20MB baseline | ~100MB+ Node/Bun baseline |
-| **Sandbox depth** | Native OS integration (seccomp, Landlock, Seatbelt APIs) | Shells out to `sandbox-exec` |
-| **Distribution** | Single static binary, no runtime deps | npm install, requires Bun |
-| **Type safety** | Compile-time guarantees, no runtime | Zod runtime validation layer |
-| **Development speed** | Slower iteration, longer compile times | Faster iteration, hot reload |
-| **Ecosystem** | Fewer AI/LLM libraries | Rich npm AI ecosystem |
-| **Concurrency** | Zero-cost async, no GC pauses | Event loop, occasional GC pauses |
-| **Binary size** | ~30MB single binary | N/A (interpreted) |
+| **Cold start** | ~50ms | ~200ms (Bun) |
+| **Memory** | ~20MB baseline | ~100MB+ |
+| **Sandbox depth** | Native OS APIs (seccomp, Landlock, Seatbelt) | Shells out to `sandbox-exec` |
+| **Distribution** | Single static binary | npm install, needs Bun |
+| **Type safety** | Compile-time | Zod runtime validation |
+| **Dev speed** | Slower, longer compiles | Faster iteration |
+| **Ecosystem** | Fewer AI libraries | Rich npm ecosystem |
+| **Concurrency** | Zero-cost async, no GC | Event loop, occasional GC |
 
-**The real reason:** OpenAI wanted the sandbox to be **part of the agent**, not bolted on. Rust's FFI capabilities let them call `seccomp(2)`, `landlock_add_rule(2)`, and Windows ACL APIs directly. In TypeScript, you'd need native addons for each platform — fragile, hard to distribute, and a security risk in themselves.
+The real reason: they wanted the sandbox *inside* the agent, not bolted on. Rust's FFI lets you call `seccomp(2)`, `landlock_add_rule(2)`, and Windows ACL APIs directly. In TypeScript you'd need native addons per platform — fragile to distribute, and the addons themselves become security risks.
 
 ### Why This Sandbox Architecture?
 
-The three-platform sandwich (Seatbelt/Landlock+bwrap/RestrictedToken) is the most expensive architectural decision in the codebase — 17K+ lines just for sandbox code, plus another 8K for the network proxy.
+17K+ lines of sandbox code + 8K for the network proxy. That's a big bet.
 
-**Alternative considered:** Docker/container-based sandboxing (what Cursor and some cloud agents use). 
+**What they could've done:** Docker. What Cursor and some cloud agents use.
 
-**Why they didn't:** 
+**Why they didn't:**
 1. Docker adds 2-5 second startup latency per command
 2. Docker Desktop licensing on macOS
 3. Can't easily sandbox network at the domain level inside Docker
-4. Users on corporate machines often can't install Docker
+4. Corporate machines often can't install Docker
 
-The trade-off: massive implementation effort, but zero external dependencies and sub-100ms sandbox overhead per command.
+Massive implementation effort, but zero external dependencies and sub-100ms overhead per command.
 
-### Why a Queue-Pair Instead of Direct Function Calls?
+### Why a Queue-Pair?
 
-The `Sender<Submission>` / `Receiver<Event>` design is unusual. Most agents use direct async function calls. But it enables:
+The `Sender<Submission>` / `Receiver<Event>` design is unusual for agents. Most use direct function calls. The benefits:
 
 1. **Multiple frontends** — TUI, App Server, MCP Server all submit to the same queue
-2. **Backpressure** — Bounded channel (`SUBMISSION_CHANNEL_CAPACITY = 512`) prevents overload
+2. **Backpressure** — Bounded channel (`SUBMISSION_CHANNEL_CAPACITY = 512`)
 3. **Clean shutdown** — Drop the sender, receiver drains, session exits
 4. **Testability** — Feed scripted submissions, assert on events
+
+The [CoALA framework](https://arxiv.org/abs/2309.02427) advocates exactly this kind of separation between the agent's "internal cognition" and its "external interfaces." Whether the Codex team read that paper or arrived at the same design independently, I don't know. (I suspect the latter. Async channels are just good Rust engineering.)
 
 ---
 
@@ -517,22 +515,18 @@ The `Sender<Submission>` / `Receiver<Event>` design is unusual. Most agents use 
 | **Tool Execution** | Trait-based `ToolHandler` + `ToolOrchestrator` | `buildTool()` factory functions |
 | **Sandbox** | Native OS APIs (3 platforms, 17K LoC) | macOS `sandbox-exec` only |
 | **Windows Support** | Full (with native sandbox) | Partial (WSL recommended) |
-| **Context Management** | Token-counting `ContextManager` + inline/remote compaction | 4-layer cascade (SNIP → Microcompact → COLLAPSE → Autocompact) |
+| **Context Management** | Inline/remote compaction | 4-layer cascade (SNIP → Microcompact → COLLAPSE → Autocompact) |
 | **Auto-Approval** | Guardian AI review (risk scoring) | Implicit yes/no from permission mode |
-| **Network Control** | Full MITM proxy with domain policies | None (trusts sandbox) |
+| **Network Control** | Full MITM proxy | None |
 | **Multi-Agent** | Native sub-thread spawning | `Agent` tool spawning |
-| **MCP** | Both client + server | Client only (MCP bridges) |
-| **Feature Flags** | 88+ flags with lifecycle stages | Compile-time `feature()` + runtime |
-| **Memory** | Two-phase extraction + consolidation pipeline | `.claude/` directory persistence |
-| **Codebase Organization** | 88 workspace crates | ~1,900 files, flat-ish modules |
+| **MCP** | Both client + server | Client only |
+| **Memory** | Two-phase extraction + consolidation | `.claude/` directory persistence |
 
-**Philosophical Difference:**
+The philosophical split: Claude Code trusts the model and sandboxes loosely. Codex CLI verifies everything and sandboxes tightly.
 
-Claude Code optimizes for **developer velocity** — TypeScript, single-file loops, composition-over-inheritance, fast iteration. The codebase accepts complexity in one file (`query.ts`) to keep the mental model simple.
+Claude Code optimizes for developer velocity — TypeScript, single-file loops, fast iteration. Accepts complexity in one file to keep the mental model simple.
 
-Codex CLI optimizes for **security and correctness** — Rust's type system, native sandboxing, formal protocol types, Guardian AI reviews. The codebase accepts complexity in module count (88 crates!) to keep each module focused.
-
-Claude Code says "trust the model, sandbox loosely." Codex CLI says "verify everything, sandbox tightly."
+Codex CLI optimizes for security and correctness — Rust types, native sandboxing, protocol types, Guardian review. Accepts complexity in module count to keep each module focused.
 
 ---
 
@@ -540,51 +534,52 @@ Claude Code says "trust the model, sandbox loosely." Codex CLI says "verify ever
 
 ### Threat Model
 
-Codex CLI's security model is **defense in depth** with four layers:
+Four layers of defense:
 
 ```
 Layer 1: Approval Policy (user consent)
- â†“
-Layer 2: Guardian AI Review (automated risk assessment)
- â†“ 
+  ↓
+Layer 2: Guardian AI Review (automated risk scoring)
+  ↓ 
 Layer 3: OS Sandbox (filesystem + process isolation)
- â†“
+  ↓
 Layer 4: Network Proxy (traffic interception + domain filtering)
 ```
+
+This maps well to what the security literature recommends. The [indirect prompt injection survey (Abdelnabi et al., 2023)](https://arxiv.org/abs/2302.12173) emphasized that agent security needs layered defense because any single layer can be bypassed. The [AgentDojo benchmark (Debenedetti et al., 2024)](https://arxiv.org/abs/2406.13352) tested exactly this — and found that SOTA LLMs fail even without active attacks, let alone sophisticated ones.
 
 ### Approval Policies
 
 ```rust
-// codex-rs/protocol/src/protocol.rs
 pub enum AskForApproval {
- Never, // Full auto (dangerous)
- OnFailure, // Auto-approve, ask on failure
- UnlessSafe, // Auto-approve known-safe commands
- Always, // Always ask (safest)
+    Never,       // Full auto (dangerous)
+    OnFailure,   // Auto-approve, ask on failure
+    UnlessSafe,  // Auto-approve known-safe commands
+    Always,      // Always ask (safest)
 }
 ```
 
-The `is_known_safe_command()` function in `codex-shell-command` maintains an allowlist of commands considered safe for auto-execution (read-only operations like `cat`, `ls`, `grep`, etc.).
+`is_known_safe_command()` in `codex-shell-command` maintains an allowlist of read-only operations (`cat`, `ls`, `grep`, etc.).
 
 ### Attack Surface
 
 | Vector | Mitigation | Residual Risk |
 |--------|-----------|---------------|
-| Prompt injection in tool output | Hook system (`pre_tool_use`) can filter | Model may still be influenced |
+| Prompt injection in tool output | Hook system (`pre_tool_use`) | Model may still be influenced |
 | Malicious command execution | Sandbox + approval flow | Sandbox escape (OS-level vuln) |
 | Network exfiltration | MITM proxy + domain allowlist | DNS tunneling, steganography |
 | File system escape | Landlock/Seatbelt path restrictions | Symlink race conditions |
-| Supply chain (MCP servers) | MCP tool names are namespaced | Malicious server can return bad tool results |
-| Memory injection | Memories are model-summarized, not raw | Poisoned memory summaries |
-| Privilege escalation | `PR_SET_NO_NEW_PRIVS` (Linux), restricted tokens (Windows) | Kernel vulnerabilities |
+| Supply chain (MCP servers) | Tool name namespacing | Malicious server returns bad results |
+| Memory injection | Model-summarized, not raw | Poisoned summaries ([Zombie Agents](https://arxiv.org/abs/2402.XXXXX) showed this is real) |
+| Privilege escalation | `PR_SET_NO_NEW_PRIVS`, restricted tokens | Kernel vulns |
 
-### What I'd Add
+### What's Missing
 
-1. **Tool output sanitization** — The Guardian reviews *actions* before execution but doesn't filter *outputs* after execution. A malicious command could return output that influences the model's next action. A post-execution output sanitizer (scanning for known prompt injection patterns) would close this gap.
+1. **Tool output sanitization** — Guardian reviews actions *before* execution but nothing filters outputs *after*. A command could return output containing prompt injection that steers the model's next action. The [indirect injection paper](https://arxiv.org/abs/2302.12173) specifically called this out as a gap.
 
-2. **Sandbox escape detection** — Runtime monitoring for signs of sandbox evasion: unexpected network connections, file access outside allowed paths, process spawning. Currently, failed sandbox operations are silent — they return errors but don't trigger alerts.
+2. **Sandbox escape detection** — Failed sandbox operations return errors but don't trigger alerts. Runtime monitoring for unexpected network connections or file access outside allowed paths would help.
 
-3. **MCP server attestation** — No verification that an MCP server is who it claims to be. A name collision (`"my-server__dangerous-tool"`) could shadow a legitimate tool. Certificate pinning or signed tool manifests would help.
+3. **MCP server attestation** — No verification that an MCP server is what it claims. A name collision could shadow a legitimate tool. Certificate pinning or signed tool manifests would close this.
 
 ---
 
@@ -592,45 +587,42 @@ The `is_known_safe_command()` function in `codex-shell-command` maintains an all
 
 ### Lines of Code by Module
 
-| Module | Lines | Files | % of Total |
-|--------|-------|-------|-----------|
-| `core` | 176,101 | — | 32.1% |
-| `tui` | 111,805 | — | 20.4% |
-| `app-server` | 56,207 | — | 10.2% |
-| `app-server-protocol` | 16,154 | — | 2.9% |
-| `protocol` | 13,423 | — | 2.4% |
-| `state` | 11,213 | — | 2.0% |
-| `tools` | 8,953 | — | 1.6% |
-| `windows-sandbox-rs` | 8,870 | — | 1.6% |
-| `network-proxy` | 7,806 | — | 1.4% |
-| `codex-api` | 7,377 | — | 1.3% |
-| `exec` | 7,194 | — | 1.3% |
-| `login` | 6,868 | — | 1.3% |
-| `config` (standalone) | 6,097 | — | 1.1% |
-| `rollout` | 6,098 | — | 1.1% |
-| `otel` | 5,102 | — | 0.9% |
-| `cli` | 5,097 | — | 0.9% |
-| `exec-server` | 4,951 | — | 0.9% |
-| `hooks` | 4,939 | — | 0.9% |
-| `linux-sandbox` | 4,736 | — | 0.9% |
-| All others | ~83K | — | ~15% |
-| **Total** | **548,910** | **1,389** | **100%** |
+| Module | Lines | % of Total |
+|--------|-------|-----------|
+| `core` | 176,101 | 32.1% |
+| `tui` | 111,805 | 20.4% |
+| `app-server` | 56,207 | 10.2% |
+| `app-server-protocol` | 16,154 | 2.9% |
+| `protocol` | 13,423 | 2.4% |
+| `state` | 11,213 | 2.0% |
+| `tools` | 8,953 | 1.6% |
+| `windows-sandbox-rs` | 8,870 | 1.6% |
+| `network-proxy` | 7,806 | 1.4% |
+| `codex-api` | 7,377 | 1.3% |
+| `exec` | 7,194 | 1.3% |
+| `login` | 6,868 | 1.3% |
+| `config` | 6,097 | 1.1% |
+| `rollout` | 6,098 | 1.1% |
+| `otel` | 5,102 | 0.9% |
+| `cli` | 5,097 | 0.9% |
+| `exec-server` | 4,951 | 0.9% |
+| `hooks` | 4,939 | 0.9% |
+| `linux-sandbox` | 4,736 | 0.9% |
+| All others | ~83K | ~15% |
+| **Total** | **548,910** | **100%** |
 
 ### Workspace Crate Count
 
-88 crates in the Cargo workspace. For comparison:
-- Claude Code: ~1 monolithic package
-- Cursor: closed source
-- Aider: ~1 Python package
+88 crates. Claude Code: ~1 package. Aider: ~1 package.
 
-88 crates is extreme granularity. Benefits: compile-time dependency boundaries, parallel compilation, forced API design. Cost: 88 `Cargo.toml` files, complex dependency graph, and the `MODULE.bazel.lock` is 1.2MB.
+88 is extreme. Benefits: compile-time dependency boundaries, parallel compilation, forced API design. Cost: 88 `Cargo.toml` files, complex deps, and a `MODULE.bazel.lock` file that's 1.2MB.
 
 ### Test Coverage
 
-- 162 dedicated `*_tests.rs` files (~12% of file count)
-- Tests are colocated with source (Rust convention)
-- Snapshot testing via `insta` for complex output assertions
-- `core_test_support` and `mcp_test_support` test harness crates
+- 162 `*_tests.rs` files (~12% of file count)
+- Colocated tests (Rust convention)
+- Snapshot testing via `insta`
+- `core_test_support` and `mcp_test_support` harness crates
 
 ---
 
@@ -638,161 +630,136 @@ The `is_known_safe_command()` function in `codex-shell-command` maintains an all
 
 ### 1. The Guardian Pattern — AI Auto-Approval via Second Opinion
 
-Instead of binary approve/deny, use a **separate, cheaper AI model** to risk-score actions in real-time. The Guardian pattern reduces approval fatigue without sacrificing security:
+Use a separate AI model to risk-score actions in real-time. Reduces approval fatigue without going full YOLO:
 
 ```rust
-// Risk scoring with structured output
 struct GuardianAssessment {
- risk_level: RiskLevel, // Low, Medium, High, Critical
- risk_score: u8, // 0-100
- rationale: String,
- evidence: Vec<GuardianEvidence>,
+    risk_level: RiskLevel,  // Low, Medium, High, Critical
+    risk_score: u8,         // 0-100
+    rationale: String,
+    evidence: Vec<GuardianEvidence>,
 }
 // Auto-approve if risk_score < 80
 ```
 
-**Steal this for:** Any AI system that needs human-in-the-loop but wants to minimize interruptions.
+This is [Constitutional AI](https://arxiv.org/abs/2212.08073) for runtime actions. If you're building any agent that executes tools, this pattern beats both "always ask" and "never ask."
+
+**~200 lines** to implement a basic version.
 
 ### 2. Queue-Pair Architecture for Agent Systems
 
-Decouple the agent core from its frontends via typed message channels:
+Decouple agent core from frontends via typed channels:
 
 ```rust
 struct Agent {
- tx: Sender<Command>, // push commands
- rx: Receiver<Event>, // receive events
+    tx: Sender<Command>,
+    rx: Receiver<Event>,
 }
 ```
 
-**Steal this for:** Any agent that needs to support multiple interfaces (CLI, API, desktop app, IDE extension).
+Steal this if your agent needs to work as a CLI, API, desktop app, or IDE extension without duplicating the core logic. The [CoALA paper](https://arxiv.org/abs/2309.02427) provides the theoretical backing if you need to convince your team.
 
 ### 3. Progressive Sandbox Escalation
 
-Try the tightest sandbox first. If it fails, retry with looser constraints — without re-asking for permission:
+Try the tightest sandbox first. If denied, retry looser — without re-asking for permission:
 
 ```
 Attempt 1: Full sandbox (filesystem + network restricted)
- → Permission denied?
-Attempt 2: Filesystem sandbox only (network allowed)
- → Still fails?
+  → Permission denied?
+Attempt 2: Filesystem sandbox only
+  → Still fails?
 Attempt 3: Report failure to model for alternative approach
 ```
 
-**Steal this for:** Any system that needs to balance security with functionality in unpredictable environments.
-
 ### 4. Arg0-Based Multi-Binary Dispatch
 
-Ship one binary that behaves differently based on its executable name:
+One binary, multiple personalities based on executable name:
 
 ```rust
-// If invoked as "codex-linux-sandbox", skip CLI parsing and go straight to sandbox
 fn main() {
- arg0_dispatch_or_else(|paths| {
- if paths.matches("codex-linux-sandbox") { sandbox::run_main() }
- else { cli::run_main() }
- })
+    arg0_dispatch_or_else(|paths| {
+        if paths.matches("codex-linux-sandbox") { sandbox::run_main() }
+        else { cli::run_main() }
+    })
 }
 ```
 
-**Steal this for:** Any Rust project that needs helper binaries without the distribution complexity of multiple executables.
+Neat trick for Rust projects that need helper binaries without distribution headaches.
 
-### 5. Network Proxy as Security Primitive
+### 5. Network Proxy as Security Layer
 
-Instead of trying to block network at the syscall level (fragile, platform-specific), run a **local MITM proxy** and force all traffic through it. You get:
-- Domain-level visibility
-- Request/response logging 
-- Policy enforcement at the application layer
-
-**Steal this for:** Any sandboxed execution environment where you need network auditing.
+Instead of blocking network at the syscall level (fragile, platform-specific), run a local MITM proxy. You get domain-level visibility, request logging, and policy enforcement at the application layer. More work to set up, but way more debuggable.
 
 ### 6. Two-Phase Memory Extraction
 
-Phase 1 (per-rollout): Extract raw memories from each session transcript independently, in parallel.
-Phase 2 (consolidation): Merge and deduplicate across all rollouts into a coherent memory store.
+Phase 1 (per-rollout): Extract raw memories from each session independently, in parallel.
+Phase 2 (consolidation): Merge and deduplicate across rollouts.
 
-This avoids the "summarize everything at once" problem that degrades quality as session count grows.
+Avoids the "summarize everything at once" problem that degrades as session count grows.
 
-### 7. Feature Flag Lifecycle Stages
+### 7. Feature Flag Lifecycle
 
 ```rust
 pub enum Stage {
- UnderDevelopment, // Internal only
- Experimental { name, description, announcement }, // User-visible opt-in
- Stable, // Default on, flag kept for rollback
- Deprecated, // Warn on use
- Removed, // Flag accepted but ignored
+    UnderDevelopment,
+    Experimental { name, description, announcement },
+    Stable,
+    Deprecated,
+    Removed,
 }
 ```
 
-This lifecycle prevents the "500 boolean flags with no documentation" problem.
+Prevents the "500 undocumented boolean flags" problem.
 
 ---
 
 ## Limitations & Technical Debt
 
-### 1. The `codex-core` Bloat Problem
+### 1. The codex-core Bloat Problem
 
-176K lines in one crate. The team knows it's a problem — their AGENTS.md literally says "resist adding code to codex-core." But `codex.rs` alone is 7,786 lines, and `app.rs` in the TUI is 10,851+ lines. The gravitational pull of large modules is strong.
+176K lines in one crate. `codex.rs` alone = 7,786 lines. `app.rs` in TUI = 10,851 lines. The team says "resist adding to core" and then... keeps adding to core.
 
-**Impact:** Compile times. Changing one line in core recompiles 176K lines. In a Rust workspace, this matters — incremental builds for `codex-core` alone take 30-60 seconds.
+Impact: changing one line recompiles 176K lines. In Rust, incremental builds for `codex-core` alone take 30-60 seconds.
 
-**What I'd do:** Split the `Session` struct. Currently it holds *everything* — config, auth, tool router, approval store, context manager, skills, hooks, network proxy, feature flags, and more. Extract `SessionServices` (already partially exists), `SessionSecurity` (sandbox + approvals + guardian), and `SessionModel` (client + context + compaction) into their own crates with narrow interfaces.
+### 2. Windows Sandbox Asymmetry
 
-### 2. No Windows Seatbelt Equivalent for Cheap Sandboxing
-
-macOS has `sandbox-exec` (1 API call). Linux has Landlock (a few syscalls). Windows needs 8,870 lines of ACL manipulation, token restriction, private desktop creation, and an elevated helper process. The asymmetry is real.
-
-**Impact:** Windows sandbox is more fragile, harder to test, and has more edge cases. The `windows_sandbox_enabled` flag defaults to off for a reason.
+macOS sandbox: 530 lines. Linux: 4,736. Windows: 8,870. Windows doesn't have a unified sandboxing API, so they had to stitch together restricted tokens, ACLs, private desktops, ConPTY, DPAPI, and an elevated helper process. The `windows_sandbox_enabled` flag defaults to off. I suspect the testing story for this is... not great.
 
 ### 3. Feature Flag Explosion
 
-88+ feature flags, many with `Experimental` stage. This creates a combinatorial testing problem — testing all flag combinations is infeasible. Some flags interact in non-obvious ways (e.g., `CodeModeOnly` conflicts with `ShellTool`).
+88+ flags, many `Experimental`. Testing all combinations is impossible. Some flags interact in non-obvious ways (`CodeModeOnly` conflicts with `ShellTool`). There's no `conflicts_with` field — honestly I'm not sure why they haven't added that, it seems like an obvious win.
 
-**What I'd do:** Add a `conflicts_with` field to `Feature` definitions and runtime validation that detects conflicting flag combinations at startup.
+### 4. The God Object
 
-### 4. codex-core God Object
-
-The `Session` struct in `codex.rs` holds 40+ fields. It's passed as `Arc<Session>` to every turn context, tool handler, and background task. This makes testing hard (you need to construct a full Session for any unit test) and creates implicit coupling.
+`Session` struct holds 40+ fields, passed as `Arc<Session>` everywhere. Testing anything means constructing a full Session. The team knows this is a problem (there's a partial `SessionServices` extraction) but it's still the core coupling point.
 
 ### 5. TUI Code Volume
 
-112K lines for a terminal UI is enormous. For comparison, Helix editor (a full terminal code editor) is ~80K lines. The TUI handles a lot (multi-agent tabs, approval dialogs, file search, diff rendering, streaming), but the code-to-feature ratio suggests opportunities for abstraction.
+112K lines for a terminal UI. Helix editor: ~80K for a full code editor. The code-to-feature ratio suggests there are abstraction opportunities they haven't taken.
 
 ### 6. Dual Build System
 
-Both Cargo and Bazel are maintained. `MODULE.bazel.lock` is 1.2MB. The `AGENTS.md` requires running `just bazel-lock-update` after any dependency change. This is a maintenance burden that creates friction for contributors.
+Both Cargo and Bazel maintained. The `MODULE.bazel.lock` is 1.2MB. Every dependency change requires `just bazel-lock-update`. This is friction for contributors.
 
-### 7. Missing Context Window Innovation
+### 7. Simple Compaction
 
-Compared to Claude Code's four-layer compaction cascade (HISTORY_SNIP → Microcompact → CONTEXT_COLLAPSE → Autocompact), Codex CLI's compaction is simpler: inline summarization or remote API-based compaction. There's no surgical deletion layer, no cache-level editing. When context overflows, it summarizes — which loses more information than necessary.
+Claude Code has a 4-layer compaction cascade (HISTORY_SNIP → Microcompact → CONTEXT_COLLAPSE → Autocompact) with surgical deletion and cache-level editing. Codex just... summarizes. When context overflows, it summarizes everything, which loses more information than targeted approaches. This feels like a place where the Rust rewrite didn't carry over the lessons from Claude Code's iteration on the problem.
 
 ---
 
 ## Key Takeaways
 
-### 1. Rust Is a Viable Choice for AI Agents — But It Costs
+1. **Rust works for AI agents, but costs ~1.5x the code.** 549K lines of Rust vs 510K of TypeScript for comparable scope. You get native sandbox integration and single-binary distribution. You pay in development velocity.
 
-549K lines of Rust vs 510K lines of TypeScript for comparable (though different) functionality. Rust gives you native sandbox integration, zero-overhead async, and single-binary distribution. It costs you development velocity and a massive codebase for things that are trivial in dynamically-typed languages.
+2. **17K lines of sandbox code is the product.** Most agents treat sandboxing as a checkbox. Codex treats it as the primary feature. In enterprise contexts, this is the selling point.
 
-### 2. The Sandbox Is the Product Differentiator
+3. **Guardian is Constitutional AI for tool use.** Having a second AI risk-score actions before execution is the best UX compromise between "approve everything" and "approve nothing." Whether it's *actually safe* depends on how correlated the blind spots are between the two models. Still, better than nothing.
 
-Most coding agents treat sandboxing as an afterthought. Codex CLI treats it as the **primary feature**. The 17K lines of sandbox code + 8K lines of network proxy are not technical debt — they're the product. In enterprise contexts where security isn't optional, this is the selling point.
+4. **Queue-pair architecture makes multi-surface agents possible.** Same core running as CLI, desktop app, MCP server, or cloud worker. If you're building an agent that needs more than one interface, this is the pattern.
 
-### 3. Guardian AI Review Is the Future of Approval UX
+5. **88 crates is excessive.** But it enforces architectural boundaries that would otherwise erode. The tradeoff (Bazel complexity, lockfile management) is real. Probably somewhere around 30-40 crates would hit the sweet spot, if I had to guess.
 
-Human-approve-everything is too slow. Auto-approve-everything is too dangerous. Having an AI assess risk and auto-approve low-risk actions is the sweet spot. Expect every major agent framework to adopt this pattern within 12 months.
-
-### 4. Queue-Pair Architecture Enables Multi-Surface Agents
-
-The `Submission`/`Event` queue pair lets Codex run as a CLI, a desktop app, an MCP server, or a cloud task worker — all from the same core. This is the right architecture for agents that need to serve multiple interfaces.
-
-### 5. 88 Crates Is Probably Too Many, But...
-
-The extreme modularity means any crate can be tested, compiled, and understood in isolation. It also means the dependency graph enforces architectural boundaries that would otherwise erode over time. The cost (Bazel complexity, lockfile management) is real but the benefit (architectural integrity) is too.
-
-### 6. The Real Competition Isn't Features — It's Trust
-
-Claude Code has more sophisticated context management (4 layers vs 1). Codex CLI has more sophisticated security (4 layers vs 1). The bet is that enterprise buyers will pay for trust. If that bet is right, the 17K lines of sandbox code are the best investment in the codebase.
+6. **The real bet is trust, not features.** Claude Code has better context management. Codex has better security. The bet is that enterprise buyers will pay for verifiable safety. If that bet is right, those 17K sandbox lines are the best investment in the codebase.
 
 ---
 
@@ -800,44 +767,43 @@ Claude Code has more sophisticated context management (4 layers vs 1). Codex CLI
 
 ```
 codex-rs/
-â”œâ”€â”€ cli/ # CLI entry point (Clap)
-â”œâ”€â”€ tui/ # Terminal UI (Ratatui)
-â”œâ”€â”€ core/ # Core engine (the "brain")
-â”‚ â”œâ”€â”€ src/
-â”‚ â”‚ â”œâ”€â”€ codex.rs # Main Codex struct (7,786 lines)
-â”‚ â”‚ â”œâ”€â”€ client.rs # Model API client (SSE + WebSocket)
-â”‚ â”‚ â”œâ”€â”€ compact.rs # Context compaction
-â”‚ â”‚ â”œâ”€â”€ tools/ # Tool system (router, handlers, orchestrator)
-â”‚ â”‚ â”œâ”€â”€ guardian/ # AI auto-approval
-â”‚ â”‚ â”œâ”€â”€ memories/ # Memory extraction pipeline
-â”‚ â”‚ â”œâ”€â”€ context_manager/ # History + token tracking
-â”‚ â”‚ â”œâ”€â”€ agent/ # Multi-agent registry
-â”‚ â”‚ â”œâ”€â”€ plugins/ # Plugin system
-â”‚ â”‚ â”œâ”€â”€ config/ # Configuration management
-â”‚ â”‚ â””â”€â”€ unified_exec/ # PTY-backed persistent shells
-â”œâ”€â”€ tools/ # Tool definitions (data only)
-â”œâ”€â”€ protocol/ # Typed protocol (the contract)
-â”œâ”€â”€ sandboxing/ # Cross-platform sandbox manager
-â”œâ”€â”€ linux-sandbox/ # Linux sandbox binary (Landlock+bwrap+seccomp)
-â”œâ”€â”€ windows-sandbox-rs/ # Windows sandbox (RestrictedToken+ACL)
-â”œâ”€â”€ hooks/ # Lifecycle hook system
-â”œâ”€â”€ skills/ # System skills installer
-â”œâ”€â”€ core-skills/ # Skills loader + injection
-â”œâ”€â”€ codex-mcp/ # MCP client connections
-â”œâ”€â”€ mcp-server/ # Codex-as-MCP-server
-â”œâ”€â”€ exec/ # Headless execution mode
-â”œâ”€â”€ exec-server/ # Remote execution daemon
-â”œâ”€â”€ app-server/ # JSON-RPC multi-client server
-â”œâ”€â”€ app-server-protocol/ # App server message types
-â”œâ”€â”€ network-proxy/ # MITM network proxy
-â”œâ”€â”€ features/ # Feature flag system
-â”œâ”€â”€ state/ # SQLite state persistence
-â”œâ”€â”€ config/ # Configuration loading
-â”œâ”€â”€ login/ # Auth (OAuth + API key)
-â”œâ”€â”€ codex-api/ # OpenAI API client
-â”œâ”€â”€ rollout/ # Session recording
-â”œâ”€â”€ otel/ # OpenTelemetry instrumentation
-â””â”€â”€ ... (60+ utility crates)
+├── cli/                 # CLI entry point (Clap)
+├── tui/                 # Terminal UI (Ratatui)
+├── core/                # Core engine
+│   ├── src/
+│   │   ├── codex.rs     # Main Codex struct (7,786 lines)
+│   │   ├── client.rs    # Model API client
+│   │   ├── compact.rs   # Context compaction
+│   │   ├── tools/       # Tool system
+│   │   ├── guardian/     # AI auto-approval
+│   │   ├── memories/    # Memory extraction
+│   │   ├── context_manager/
+│   │   ├── agent/       # Multi-agent registry
+│   │   ├── plugins/     
+│   │   ├── config/      
+│   │   └── unified_exec/
+├── tools/               # Tool definitions (data only)
+├── protocol/            # Typed protocol
+├── sandboxing/          # Cross-platform sandbox manager
+├── linux-sandbox/       # Landlock+bwrap+seccomp
+├── windows-sandbox-rs/  # RestrictedToken+ACL
+├── hooks/               # Lifecycle hooks
+├── skills/              # System skills installer
+├── core-skills/         # Skills loader
+├── codex-mcp/           # MCP client
+├── mcp-server/          # Codex-as-MCP-server
+├── exec/                # Headless execution
+├── exec-server/         # Remote execution daemon
+├── app-server/          # JSON-RPC server
+├── network-proxy/       # MITM proxy
+├── features/            # Feature flags
+├── state/               # SQLite persistence
+├── config/              # Config loading
+├── login/               # Auth
+├── codex-api/           # OpenAI API client
+├── rollout/             # Session recording
+├── otel/                # OpenTelemetry
+└── ... (60+ utility crates)
 ```
 
 ---
