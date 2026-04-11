@@ -1,6 +1,20 @@
-﻿# OpenHands/OpenHands: The 70K-Star Agent That's Rewriting Itself While You Watch
+﻿# OpenHands: 10 Ways to Forget on Purpose, 70K Stars, 400K Lines of Mid-Migration Python
 
-> OpenHands is in the middle of an ambitious architecture migration. The V0 "legacy" agent loop is 1,391 lines of event-driven Python with a 487-line stuck detector. The V1 replacement lives in a separate SDK repo that doesn't exist yet in this tree. Every core file has a deprecation banner dated April 1, 2026. That date has passed. The old code is still running.
+## TL;DR
+
+- **What it is** — The most popular open-source "build your own Devin" platform, with Docker sandboxing, 6 agent types, and a resolver that auto-fixes GitHub issues
+- **Why it matters** — It has the most sophisticated context management system in any open-source agent (10 composable condensation strategies), and a three-layer security stack nobody else matches
+- **What you'll learn** — How to build a condenser pipeline, why voluntary memory management matters, and what happens when you deprecate your entire codebase but keep shipping
+
+## Why Should You Care?
+
+Here's the thing that caught me off guard: OpenHands lets the agent *ask* to forget things.
+
+Most agents slam into their context window like a car into a wall — the system either truncates or summarizes, and the agent has no say in it. OpenHands gives the agent a `CondensationRequestTool`. The agent can literally say "my context is getting bloated, compress me now." That's... not something I'd seen before. (I'm still not 100% sure how well it works in practice versus the system-triggered condensation, but the idea is compelling.)
+
+And then there's the stuck detector. Not a "retry 3 times and give up" counter — a 487-line class that analyzes event history for repeated patterns, detects error-action cycles, and tries to break loops by changing the agent's approach. This thing has its own test suite (409 lines). Most agents pretend loops don't happen.
+
+Oh, and the entire codebase has deprecation banners dated April 1, 2026. That date passed. The old code is still running. Welcome to OpenHands.
 
 ## At a Glance
 
@@ -17,7 +31,9 @@
 | GitNexus Index | 21,157 nodes, 66,716 edges, 1,102 clusters, 300 execution flows |
 | Data as of | April 2026 |
 
-OpenHands is a web-based AI agent platform for software development. It runs code in Docker sandboxes, supports 6 different agent types, has 10 different memory condensation strategies, 3 security analyzers, integrations with 7 git platforms, and an enterprise layer with organization management. It was originally called OpenDevin (aiming to build an open-source Devin alternative), rebranded to OpenHands, and the GitHub organization moved from `All-Hands-AI` to `OpenHands` (`OpenHands/OpenHands`).
+OpenHands is a web-based AI agent platform for software development. Runs code in Docker sandboxes, supports 6 agent types, has 10 memory condensation strategies, 3 security analyzers, integrations with 7 git platforms, and an enterprise layer. Originally called OpenDevin (the "let's build open-source Devin" project), it rebranded to OpenHands and the GitHub org moved from `All-Hands-AI` to `OpenHands` (`OpenHands/OpenHands`).
+
+> **Paper link:** The OpenHands platform paper — *"OpenHands: An Open Platform for AI Software Developers as Generalist Agents"* (Wang, Neubig et al., arXiv:2407.16741, ICLR 2025) — lays out the architecture, sandbox design, and multi-agent coordination that this codebase implements. The related *SWE-agent* paper (Yang et al., arXiv:2405.15793) introduced the Agent-Computer Interface (ACI) concept that directly shaped how CodeActAgent interacts with shell, files, and browser. If you're wondering why the tool design looks the way it does — that's the lineage.
 
 ---
 
@@ -30,6 +46,7 @@ OpenHands is a web-based AI agent platform for software development. It runs cod
 | Security Approach | 3-layer: GraySwan (adversarial testing) + Invariant (runtime policy) + LLM-analyzer (semantic review of agent actions) |
 | Context Strategy | 10-condenser pipeline: progressive compression from observation masking to structured summarization to amortized forgetting |
 | Documentation | code comments solid, architectural docs assume familiarity with V0/V1 split, deprecation banners dated April 1 2026 |
+
 ## Architecture
 
 ![Architecture](architecture.png)
@@ -110,11 +127,11 @@ graph LR
 
 </details>
 
-The architecture has five layers. At the top, three entry points (web UI, CLI, issue resolver) converge on the V1 App Server, which manages conversations and routes them to the V0 Legacy Core. The core is an event-driven system centered on the `AgentController` — a 1,391-line class that orchestrates the agent loop, stuck detection, delegation, and security checks. Agents (primarily CodeActAgent) produce actions that flow through the Memory system (with configurable condensation) and Security layer before reaching the Runtime, which executes commands inside Docker containers.
+Five layers. Three entry points (web UI, CLI, issue resolver) funnel into the V1 App Server, which routes to the V0 Legacy Core. The core is event-driven, centered on the `AgentController` — a 1,391-line class that does... kind of everything. Agent loop, stuck detection, delegation, security checks. Agents (mainly CodeActAgent) produce actions that pass through Memory and Security before hitting the Runtime, which executes stuff inside Docker containers.
 
-The most important thing to understand: **this codebase is mid-migration.** Every file in `controller/`, `agenthub/`, `security/`, and `runtime/` has a deprecation banner pointing to a V1 Software Agent SDK. The V1 app server (`app_server/`) is already in this repo with 15,218 lines, but it still delegates to the V0 controller for the actual agent loop. This creates a two-headed architecture where the routing is V1 but the brains are V0.
+The important thing to internalize: **this codebase is mid-migration.** Every file in `controller/`, `agenthub/`, `security/`, and `runtime/` has a deprecation banner pointing to a V1 Software Agent SDK. The V1 app server (`app_server/`) is already here with 15,218 lines, but it still calls the V0 controller for the actual agent loop. So routing is V1 but brains are V0. A bit like renovating a house while living in it.
 
-**Files to reference:**
+**Files to dig into:**
 - `openhands/controller/agent_controller.py` — The 1,391-line God Object (Legacy V0)
 - `openhands/controller/stuck.py` — 487-line stuck detection (Legacy V0)
 - `openhands/memory/condenser/condenser.py` — Condenser base class and registry
@@ -125,12 +142,13 @@ The most important thing to understand: **this codebase is mid-migration.** Ever
 
 ## Core Innovation
 
-
 ### The Condenser System: 10 Ways to Forget
 
 ![Condenser Pipeline](openhands-1.png)
 
-Most agents have one context management strategy (usually "summarize when full" or "truncate from the beginning"). OpenHands has **ten**, organized as a configurable pipeline:
+Most agents have one context management strategy. "Summarize when full" or "truncate from the beginning." Pick one, that's it. OpenHands has **ten**, and you can chain them.
+
+This draws directly from the MemGPT paper (Packer et al., arXiv:2310.08560) — the idea of treating the LLM's context window like an OS treats main memory, with intelligent paging in and out. But OpenHands goes further than MemGPT's two-tier approach by offering a whole menu of condensation strategies with different tradeoffs:
 
 | Condenser | Lines | Strategy |
 |-----------|-------|----------|
@@ -145,11 +163,11 @@ Most agents have one context management strategy (usually "summarize when full" 
 | `StructuredSummaryCondenser` | 329 | LLM generates structured summary with task progress tracking |
 | `Pipeline` | 50 | Chain multiple condensers in sequence |
 
-The `Pipeline` condenser is the key: it lets you compose strategies. You could run `BrowserOutputCondenser` → `ObservationMaskingCondenser` → `LLMSummarizingCondenser` to first clean browser noise, then mask verbose observations, then summarize what's left.
+The `Pipeline` combinator is the key piece. You could run `BrowserOutputCondenser` → `ObservationMaskingCondenser` → `LLMSummarizingCondenser` to first clean browser noise, then mask verbose observations, then summarize. Each step tightens the context progressively.
 
-The `RollingCondenser` base class introduces a `should_condense` / `get_condensation` split. The condenser doesn't just return events — it can return a `Condensation` object, which is an action that gets added to the event stream. On the next agent step, the condenser uses that condensation event to produce a new `View`. This means condensation is itself an event in the history, creating an auditable trail of when and why context was compressed.
+The `RollingCondenser` base class introduces a `should_condense` / `get_condensation` split that I think is underappreciated. The condenser doesn't just return events — it can return a `Condensation` object, which is an action that goes into the event stream. So condensation itself becomes an auditable event. You can look at the history and see exactly when and why context was compressed. (Most systems just silently drop stuff and you never know what got lost.)
 
-The `AmortizedForgettingCondenser` (69 lines) is clever: instead of hard-truncating, it assigns each event a survival probability that decays with age. Older events are probabilistically dropped. This means the agent gradually "forgets" old context rather than cliff-edging at a window boundary. Simple idea, surprisingly rare in production.
+The `AmortizedForgettingCondenser` (69 lines) is probably my favorite. Instead of hard-truncating at a window boundary, it assigns each event a survival probability that decays with age. Older events get probabilistically dropped. The agent gradually forgets rather than cliff-edging. Simple idea, 69 lines, and I haven't seen it anywhere else in production.
 
 ### Three-Layer Security
 
@@ -157,40 +175,40 @@ The `AmortizedForgettingCondenser` (69 lines) is clever: instead of hard-truncat
 
 ```
 SecurityAnalyzer (base)
-â”œâ”€â”€ GraySwanAnalyzer     → External API (Cygnal) — ML-based risk scoring
-â”œâ”€â”€ InvariantAnalyzer    → Policy engine — rule-based action filtering
-â””â”€â”€ LLMRiskAnalyzer      → LLM-based — asks the model to evaluate its own actions
+├── GraySwanAnalyzer     → External API (Cygnal) — ML-based risk scoring
+├── InvariantAnalyzer    → Policy engine — rule-based action filtering
+└── LLMRiskAnalyzer      → LLM-based — asks the model to evaluate its own actions
 ```
 
-**GraySwan** (208 lines) calls an external API (Cygnal) with the recent conversation history, gets back a risk score, and maps it to LOW/MEDIUM/HIGH using configurable thresholds. It converts the OpenHands event stream to OpenAI message format before sending. This is the "phone a friend" approach — outsource the security judgment to a specialized model.
+**GraySwan** (208 lines) ships recent conversation history to an external API (Cygnal), gets back a risk score, and maps it to LOW/MEDIUM/HIGH. The "phone a friend" approach — outsource security judgment to a specialized model.
 
-**InvariantAnalyzer** (133 lines) uses a policy engine client. You define policies (rules about what the agent can/cannot do), and the analyzer evaluates each action against them. It maintains a trace of all events and checks if the proposed action would violate any policy. There's also an "ask for confirmation" mode where policy violations trigger user approval instead of outright denial.
+**InvariantAnalyzer** (133 lines) uses a policy engine. You define rules about what the agent can/cannot do, and it checks each action against them. There's an "ask for confirmation" mode where violations trigger user approval instead of denial. Pretty flexible.
 
-**LLMRiskAnalyzer** (48 lines) is the lightest: it asks the same LLM that's driving the agent to evaluate the risk of its own action. This is reflexive security — the model checking its own work. It's the weakest of the three (self-evaluation has known limitations) but it's zero-cost in terms of external dependencies.
+**LLMRiskAnalyzer** (48 lines) is the lightest — it asks the *same LLM* driving the agent to evaluate the risk of its own action. Yeah, self-evaluation has known limitations (the Reflexion paper by Shinn et al. showed that self-reflection helps but isn't foolproof). But it's zero-cost in dependencies and catches obvious stuff.
 
-No other open-source agent project we've analyzed has all three approaches. Goose has pattern matching + LLM review. Claude Code has an allowlist. OpenHands has external ML + policy engine + self-evaluation, and they're composable.
+No other open-source agent I've looked at combines all three. Goose has pattern matching + LLM review. Claude Code has an allowlist. OpenHands stacks external ML + policy engine + self-evaluation, and they're composable.
 
-### The Stuck Detector: 487 Lines of Loop Paranoia
+### The Stuck Detector: 487 Lines of Paranoia
 
-`StuckDetector` is a dedicated class (not a utility function, not a flag) that analyzes the event history for repeated patterns:
+`StuckDetector` isn't a utility function or a retry counter. It's a dedicated class that analyzes event history for patterns:
 
-- Detects repeated identical actions (same command run N times)
-- Detects repeated error-action cycles (same error → same fix attempt → same error)
-- Detects syntax error loops (specific Python error messages)
-- Handles interactive vs headless mode differently (interactive mode only looks at history after the last user message)
+- Repeated identical actions (same command N times)
+- Error-action cycles (same error → same fix → same error)
+- Syntax error loops (specific Python error messages it watches for)
+- Different behavior in interactive vs headless mode (interactive only looks at history after the last user message)
 - Produces a `StuckAnalysis` dataclass with loop type, repeat count, and start index
 
-When stuck is detected, the controller emits a `LoopDetectionObservation` and triggers `_handle_loop_recovery_action`, which attempts to break the loop by changing the agent's approach. There's also a separate 409-line test class (`TestAgentControllerLoopRecovery`) just for recovery logic.
+When stuck is detected, the controller emits a `LoopDetectionObservation` and calls `_handle_loop_recovery_action` to break the loop by changing approach. There's also a 409-line test class (`TestAgentControllerLoopRecovery`) just for recovery logic.
 
-This is the most thorough stuck-detection system in any open-source agent. Most agents either don't detect loops at all (Cline, Dify) or have a simple "max retries" counter (Claude Code). OpenHands treats it as a first-class problem with its own analysis framework.
+This is the most serious stuck-detection in any open-source agent. Most agents either ignore loops (Cline, Dify — they'll happily spin forever) or have a "max retries" counter (Claude Code). OpenHands treats it as a first-class engineering problem. Which, honestly, it is — anyone who's watched an agent retry the same broken `pip install` five times knows this.
 
 ---
 
 ## How It Actually Works
 
-### The Agent Hub: 6 Agents with Different Strategies
+### The Agent Hub: 6 Agents with Different Jobs
 
-OpenHands ships six agent implementations, but `CodeActAgent` is the primary one. The others exist for specialized tasks or testing:
+OpenHands ships six agents, but `CodeActAgent` does the heavy lifting. The rest are for specialized tasks or testing:
 
 | Agent | Purpose | Key Trait |
 |-------|---------|-----------|
@@ -201,85 +219,85 @@ OpenHands ships six agent implementations, but `CodeActAgent` is the primary one
 | `ReadOnlyAgent` | Read-only analysis | Cannot modify files |
 | `DummyAgent` | Testing | Predictable actions for CI |
 
-`CodeActAgent` (316 lines) is the interesting one. It uses function calling (not free-form text) to invoke tools. Each tool is a class: `create_cmd_run_tool` for bash, `BrowserTool` for web interaction, `LLMBasedFileEditTool` for AI-powered edits, `create_str_replace_editor_tool` for surgical text replacement, `CondensationRequestTool` for explicitly requesting context condensation, `ThinkTool` for scratchpad reasoning, `create_task_tracker_tool` for progress tracking, and `FinishTool` for completion.
+`CodeActAgent` (316 lines) uses function calling to invoke tools — not free-form text. Each tool is a class: `create_cmd_run_tool` for bash, `BrowserTool` for web, `LLMBasedFileEditTool` for AI edits, `create_str_replace_editor_tool` for surgical replacements, `CondensationRequestTool` for voluntary context compression, `ThinkTool` for scratchpad reasoning, `create_task_tracker_tool` for progress tracking, and `FinishTool` for completion.
 
-The `CondensationRequestTool` deserves attention: it lets the agent **voluntarily trigger condensation**. The agent can say "my context is getting long, please condense" instead of waiting for the system to force it. This is a form of meta-cognition — the agent managing its own memory budget.
+The tool design here echoes the SWE-agent paper's ACI insight — the interface you give the agent matters more than which model you use. CodeActAgent's 8 tools are carefully scoped: bash for general work, two different edit tools (AI-powered vs surgical), and that meta-cognitive condensation request tool.
 
 ### The Event-Driven Core
 
-OpenHands uses an event sourcing architecture. Everything is an `Event` — actions (what the agent wants to do), observations (what happened), messages (user input), and system events (state changes). The `EventStream` is a pub/sub bus where the controller, agents, and runtime are all subscribers.
+Everything is an event. Actions, observations, messages, state changes — all flow through an `EventStream` pub/sub bus. The controller, agents, and runtime all subscribe.
 
 ```
 User message → MessageAction → EventStream
-                                    â†“
+                                    ↓
 AgentController.on_event() → step() → agent.step(state)
-                                    â†“
+                                    ↓
                               Action (e.g., CmdRunAction)
-                                    â†“
+                                    ↓
                           SecurityAnalyzer.security_risk()
-                                    â†“
+                                    ↓
                           Runtime.execute(action)
-                                    â†“
+                                    ↓
                           Observation (e.g., CmdOutputObservation)
-                                    â†“
+                                    ↓
                               EventStream → AgentController
-                                    â†“
+                                    ↓
                               Next step...
 ```
 
-The events are typed. `ActionType` has 20+ variants: `RUN` (shell command), `READ` (file read), `WRITE` (file write), `EDIT` (file edit), `BROWSE` (web browsing), `BROWSE_INTERACTIVE` (browser interaction), `RUN_IPYTHON` (Jupyter execution), `DELEGATE` (spawn sub-agent), `FINISH` (task complete), `REJECT` (refuse task), `MCP` (MCP tool call), `THINK` (reasoning). Each maps to a typed dataclass.
+This is essentially a ReAct loop (Yao et al., arXiv:2210.03629) implemented as event sourcing. The `ActionType` enum has 20+ variants: `RUN`, `READ`, `WRITE`, `EDIT`, `BROWSE`, `BROWSE_INTERACTIVE`, `RUN_IPYTHON`, `DELEGATE`, `FINISH`, `REJECT`, `MCP`, `THINK`. Each maps to a typed dataclass. The event sourcing means you can replay the entire agent session from the event log — useful for debugging, less useful for your storage bill.
 
 ### Docker Sandboxing
 
-The runtime layer provisions Docker containers for code execution. The `ActionExecutionServer` runs inside the container and accepts gRPC-style commands from the host. Four runtime implementations:
+The runtime provisions Docker containers for code execution. An `ActionExecutionServer` runs inside each container and accepts commands from the host. Four runtime implementations:
 
 - **Docker** — Standard container lifecycle
 - **Kubernetes** — K8s pod management
-- **Local** — Direct host execution (development only)
+- **Local** — Direct host execution (development only, probably don't do this in prod)
 - **Remote** — Connects to a pre-provisioned runtime
 
-The Docker runtime mounts a workspace directory and runs an `action_execution_server.py` inside the container. This server handles file operations, shell commands, Jupyter cells, and browser automation. Commands flow over HTTP between the host controller and the in-sandbox server.
+The Docker runtime mounts a workspace directory and runs an `action_execution_server.py` inside. File operations, shell commands, Jupyter cells, browser automation — all flow over HTTP between host and sandbox.
 
 ### Agent Delegation
 
-`AgentController` supports hierarchical delegation. When the primary agent emits an `AgentDelegateAction`, the controller spawns a child `AgentController` with a different agent type. The child has its own state, iteration budget, and can itself delegate further. The parent/child relationship is tracked via `parent` and `delegate` properties.
+`AgentController` supports hierarchical delegation. When CodeActAgent emits an `AgentDelegateAction`, the controller spawns a child `AgentController` with a different agent type. The child has its own state, its own iteration budget, and can delegate further. Parent/child tracked via `parent` and `delegate` properties.
 
-This enables patterns like: `CodeActAgent` delegates web research to `BrowsingAgent`, which completes and returns results to the parent. Each delegate gets its own iteration count within a global budget.
+So you get patterns like: CodeActAgent delegates web research to BrowsingAgent, which finishes and returns results to the parent. Each delegate runs within a global iteration budget. Reminds me of the HuggingGPT paper's task decomposition (Shen et al., arXiv:2303.17580) — an orchestrator LLM dispatching to specialized agents — but implemented as a concrete runtime mechanism rather than prompt engineering.
 
 ---
 
 ## The V0/V1 Split
 
-This is the elephant in the room. Every core file has this banner:
+The elephant in the room. Every core file has this:
 
 ```python
 # IMPORTANT: LEGACY V0 CODE - Deprecated since version 1.0.0, scheduled for removal April 1, 2026
 # V1 replacement for this module lives in the Software Agent SDK.
 ```
 
-The V1 architecture is split between:
+V1 is split between:
 1. **Software Agent SDK** (external repo: `github.com/OpenHands/software-agent-sdk`) — The new agent core
-2. **`openhands/app_server/`** (15,218 lines in this repo) — The new web application server
+2. **`openhands/app_server/`** (15,218 lines in this repo) — The new web server
 
-The V1 app server already handles conversations, settings, auth, git integrations, and user management. But for the actual agent loop, it still delegates to the V0 `AgentController`. The migration is in-progress: the V0 code is heavily used, the V1 SDK isn't in this repo, and the deprecation date has passed.
+The V1 app server handles conversations, settings, auth, git integrations, user management. But for the actual agent loop? Still delegates to V0 `AgentController`. The migration is in-progress, the deprecation date passed, and the V0 code is what actually runs.
 
-This creates an interesting transition period for contributors: do you fix bugs in V0 code that's slated for removal, or do you wait for V1 which isn't fully available? The codebase comments explicitly say "please avoid extending this legacy file."
+Awkward situation for contributors: do you fix bugs in code marked for removal, or wait for V1 that isn't fully available? The comments explicitly say "please avoid extending this legacy file." But the legacy file *is* the product right now.
 
 ---
 
 ## The Verdict
 
-OpenHands has the deepest memory management system in any open-source agent. The 10-condenser pipeline with composable strategies, voluntary condensation requests, and auditable condensation events is the most interesting context management design in any open-source agent we've analyzed. If you're building an agent and need inspiration for context management, start here.
+The condenser pipeline is the standout. Ten composable strategies, voluntary condensation requests, auditable condensation events — it's the most thoughtful context management in any open-source agent I've read. If you're building an agent and need context management inspiration, start here. (Though I'd love to see benchmarks on which pipeline combinations actually work best — the code is there but the evaluation data isn't public as far as I can tell.)
 
-The security architecture is more structured than any other open-source agent we analyzed: three complementary approaches (external ML, policy engine, self-evaluation) that can be used individually or together. Compare this to Claude Code's static allowlist or Cline's "do nothing and hope for the best."
+Security is more structured than anything else in the open-source agent space. Three complementary approaches that can be used alone or together. Compare to Claude Code's static allowlist or Cline's ¯\_(ツ)_/¯ approach.
 
-The stuck detector is a standout feature that other projects should steal. A 487-line class dedicated to detecting and recovering from agent loops, with pattern analysis, configurable thresholds, and a separate test suite — this treats stuck detection as the engineering problem it actually is.
+Stuck detection is what other projects should steal tomorrow. A 487-line dedicated class with pattern analysis and a real test suite. This is what "treating a problem seriously" looks like.
 
-But the V0/V1 transition is worth watching — 287K lines of Python with deprecation banners and a deferred migration means contributors should check which code path is canonical. The `AgentController` (1,391 lines) would benefit from splitting into focused modules, and the V1 SDK architecture promises exactly that.
+But. The V0/V1 migration looms large. 287K lines of Python with deprecation banners and a deferred timeline means you should check which code path is canonical before building on top. The `AgentController` at 1,391 lines wants to be split into focused modules — and the V1 SDK promises that, eventually.
 
-The `critic` module is surprisingly thin — just 57 lines total. `AgentFinishedCritic` checks if the agent called `AgentFinishAction` and if the git patch is non-empty. The base class is clean — adding richer evaluators would be a high-impact contribution.
+The `critic` module is thin — 57 lines total. `AgentFinishedCritic` checks if the agent called finish and if the git patch is non-empty. The base class is clean; adding richer evaluators would be high-impact. (An integration with SWE-bench scoring here would be interesting.)
 
-Would I use it? For automated issue resolution and PR workflows, yes — the resolver module (7,039 lines) with 7 git platform integrations is production-tested. For interactive coding, the CodeActAgent with Docker sandboxing is safer than most alternatives. But I'd watch the V0/V1 migration closely before building anything long-term on the internal APIs.
+Would I use it? For automated issue resolution and PR workflows — yeah, the resolver module (7,039 lines) with 7 git platform integrations is battle-tested. For interactive coding, CodeActAgent + Docker sandboxing is safer than most alternatives. But I'd watch the V0/V1 situation closely before building anything long-term on internal APIs.
 
 ---
 
@@ -298,7 +316,7 @@ Would I use it? For automated issue resolution and PR workflows, yes — the res
 | Delegation | Hierarchical sub-agents | Multi-agent | Sub-agent handler | None |
 | LOC | ~400K | ~510K | ~200K | ~560K |
 
-OpenHands wins on breadth: more agent types, more condensation strategies, more security layers, more git integrations. But breadth comes at the cost of the V0/V1 transition debt and a 400K-line codebase that's actively being rewritten. Claude Code and Goose are more cohesive — they do fewer things but the code is unified. Cline is the Wild West: no sandboxing, no security, no stuck detection, but the simplest codebase to understand.
+OpenHands wins on breadth. More agent types, more condensation strategies, more security layers, more git integrations. But breadth costs: the V0/V1 transition debt and a 400K-line codebase getting rewritten while it ships. Claude Code and Goose are more cohesive — fewer things, unified code. Cline is the Wild West: no sandbox, no security, no stuck detection, but the simplest to understand.
 
 ---
 
@@ -306,7 +324,7 @@ OpenHands wins on breadth: more agent types, more condensation strategies, more 
 
 ### 1. The Condenser Pipeline Pattern
 
-The idea of composable, registerable condensation strategies with a pipeline combinator:
+Composable, registerable condensation strategies with a pipeline combinator:
 
 ```python
 class Condenser(ABC):
@@ -317,29 +335,29 @@ class Condenser(ABC):
 CONDENSER_REGISTRY: dict[type[CondenserConfig], type[Condenser]] = {}
 ```
 
-Any agent framework could adopt this pattern. Define your condensation strategies as plugins, register them with configs, and chain them in a pipeline. The `Condensation` return type (an action that goes into the event stream) makes condensation auditable.
+Any agent framework could use this. Define condensation strategies as plugins, register them, chain them. The `Condensation` return type (an action in the event stream) makes it auditable. ~50 lines for the pipeline, ~20-330 lines per strategy.
 
 ### 2. Voluntary Condensation Requests
 
-Giving the agent a `CondensationRequestTool` so it can say "condense my history now" instead of waiting for the system to force it. This is meta-cognitive memory management — the agent participates in its own context budget decisions.
+Give the agent a tool to say "compress my history now." Meta-cognitive memory management — the agent participates in its own context budget. This is the MemGPT idea made concrete: the agent isn't just a passive consumer of its context window, it actively manages what stays and what goes.
 
-### 3. The Environment Variable Blocklist Pattern (from Goose, but applicable here)
+### 3. Probabilistic Forgetting (AmortizedForgettingCondenser)
 
-OpenHands doesn't do this yet, but should. The Docker sandbox helps, but extensions and plugins that set environment variables inside the container could still exploit `LD_PRELOAD`-style attacks.
+Instead of hard window cutoffs, assign survival probabilities that decay with age. Older events are probabilistically dropped. 69 lines. Graceful degradation instead of cliff-edge.
 
 ---
 
 ## Hooks & Easter Eggs
 
-**The Resolver is a standalone product.** `openhands/resolver/` (7,039 lines) is essentially an automated PR review and issue resolution system. It integrates with 7 git platforms, analyzes issues, generates fixes, and creates PRs. This could be extracted as its own project.
+**The Resolver is basically its own product.** `openhands/resolver/` (7,039 lines) auto-reviews PRs and fixes issues across 7 git platforms. Could be extracted as standalone.
 
-**LiteLLM is everywhere.** OpenHands uses LiteLLM for all LLM interactions, including error handling. The import block at the top of `agent_controller.py` imports 12 specific LiteLLM exception types. This tight coupling means switching away from LiteLLM would be a major refactor.
+**LiteLLM is load-bearing.** The import block at the top of `agent_controller.py` imports 12 specific LiteLLM exception types. Switching away would be a major refactor. (For better or worse, LiteLLM is the jQuery of the LLM world.)
 
-**The `microagent` system.** A separate module (416 lines) for lightweight, task-specific agents that don't need the full AgentController machinery. These are closer to "skills" in OpenClaw terminology — small, focused capabilities that can be invoked without spinning up a full agent session.
+**The `microagent` system.** A separate module (416 lines) for lightweight task-specific agents that skip the full AgentController. Closer to "skills" in OpenClaw — small focused capabilities without spinning up a whole session.
 
-**Enterprise layer exists.** The `enterprise/` directory contains organization management, solvability prediction (ML model that predicts if an issue is solvable by the agent), Jira/Linear/Slack integrations, and usage billing. This is the commercial moat around the open-source core.
+**Enterprise layer.** `enterprise/` has org management, solvability prediction (ML model guessing if an issue is solvable), Jira/Linear/Slack integrations, usage billing. The commercial moat.
 
-**Memory monitor VSCode extension.** Inside `openhands/runtime/utils/vscode-extensions/memory-monitor/` there's a tiny VSCode extension that monitors memory usage inside the Docker sandbox. Practical, paranoid, and the kind of thing you add after an OOM kills your agent mid-task.
+**Memory monitor VSCode extension.** Inside `openhands/runtime/utils/vscode-extensions/memory-monitor/` — a tiny extension that watches memory usage in the Docker sandbox. The kind of thing you build after an OOM kills your agent mid-task and you lose two hours of work. (Been there.)
 
 ---
 
@@ -380,5 +398,3 @@ OpenHands doesn't do this yet, but should. The Docker sandbox helps, but extensi
 ---
 
 *Part of [awesome-ai-anatomy](https://github.com/NeuZhou/awesome-ai-anatomy) — source-level teardowns of how production AI systems actually work. This teardown was produced using GitNexus for structural analysis combined with manual source code review for architectural judgment.*
-t.*
-ment.*
