@@ -18,7 +18,7 @@ Here's the thing that got me: Codex CLI has an AI that reviews its own AI's acti
 
 This is Anthropic's [Constitutional AI](https://arxiv.org/abs/2212.08073) idea - AI self-review driven by explicit principles - except applied to runtime tool execution instead of training-time alignment. Constitutional AI has the model critique and revise its own outputs against a set of rules. Guardian does the same thing but for `rm -rf` and `curl` commands, in real-time, before they run.
 
-(Whether an AI is fully qualified to judge another AI's safety is an open and fascinating question. What's clear is that the engineering execution here is impressive.)
+(Whether an AI is actually qualified to judge another AI's safety is... a whole debate. But the engineering is solid.)
 
 The other number that jumped out: **17,237 lines of sandbox code**. Three platforms, three completely different OS security APIs, no Docker dependency. For context, the entire Helix terminal editor is ~80K lines. Codex spends a fifth of a whole editor just on sandboxing.
 
@@ -45,8 +45,8 @@ The other number that jumped out: **17,237 lines of sandbox code**. Three platfo
 | Architecture | Queue-pair async event system - cleanly separating action/perception channels. 88 Rust workspace crates, dual Cargo+Bazel build |
 | Code Organization | 549K LOC Rust across 1389 files, 162 test files, strict crate boundaries with codex-core (176K), codex-tui (112K), codex-cli (5K) |
 | Security Approach | 4-layer defense-in-depth covering the critical surfaces: approval → Guardian AI → OS sandbox → network proxy |
-| Context Strategy | Two-phase memory extraction: per-rollout raw extraction then cross-rollout consolidation. A more streamlined approach than Claude Code's 4-layer cascade -- it'll be interesting to see how each evolves |
-| Documentation | Crate-level docs, architecture decision records. Cross-crate architecture rewards reading the code directly (a high-level design doc would be a welcome future addition) |
+| Context Strategy | Two-phase memory extraction: per-rollout raw extraction then cross-rollout consolidation. Simpler than Claude Code's 4-layer cascade - open question how each approach ages |
+| Documentation | Crate-level docs, architecture decision records. Cross-crate architecture requires reading the code directly (there's no high-level design doc, which is annoying) |
 
 ## Table of Contents
 
@@ -94,9 +94,9 @@ If you think about agent architectures needing a clear separation between the "c
 
 **Path:** `codex-rs/core/`
 
-The biggest crate, and one the team is actively managing the growth of -- their `AGENTS.md` says "**resist adding code to codex-core!**" in bold. At 176K lines, the crate's gravity speaks to how central it is.
+The biggest crate, and the team knows it's too big - their `AGENTS.md` says "**resist adding code to codex-core!**" in bold. Didn't stop them from putting 176K lines in it though.
 
-The central type is `Codex` in `codex-rs/core/src/codex.rs` -- a 7,786-line file. Their own guideline targets 500-line modules, so this file clearly serves as the gravitational center of the whole system.
+The central type is `Codex` in `codex-rs/core/src/codex.rs` - a 7,786-line file. Their own guideline targets 500-line modules. So, you know.
 
 What it does:
 
@@ -155,7 +155,7 @@ pub struct Codex {
 }
 ```
 
-The `Session` arc holds config, auth, tool router, approval store, context manager, skills, hooks, network proxy, feature flags, and more. It's a central coordination hub -- they're aware of the coupling (there's a partial `SessionServices` extraction underway), and when a turn needs access to 40+ things, this kind of aggregation is a pragmatic choice.
+The `Session` arc holds config, auth, tool router, approval store, context manager, skills, hooks, network proxy, feature flags, and more. It's a god object - they know it, I know it, everybody knows it. But when a turn needs access to 40+ things, you either pass them all around or shove them in one struct. They chose the struct. (There's a partial `SessionServices` extraction underway, which is the right direction.)
 
 ---
 
@@ -172,9 +172,9 @@ Built on [Ratatui](https://ratatui.rs/) + [Crossterm](https://github.com/crosste
 - Streaming with frame rate limiting
 - Clipboard via `arboard`
 
-`app.rs` is the main event loop -- **10,851+ lines**, the largest single file in the project. Their `AGENTS.md` calls it a "high-touch file" where new functionality should go into separate modules. A natural focal point for future modularization.
+`app.rs` is the main event loop - **10,851+ lines**, the largest single file in the project. Their `AGENTS.md` calls it a "high-touch file" where new functionality should go into separate modules. And yet.
 
-112K lines for a terminal UI. For reference, the entire Helix editor is ~80K lines. Ratatui is imperative -- you draw each frame explicitly, which means more code for complex UIs than you'd write with React/Ink. The investment reflects just how rich the interactive experience is.
+112K lines for a terminal UI. For reference, the entire Helix editor is ~80K lines. Ratatui is imperative - you draw each frame explicitly, which means more code for complex UIs than you'd write with React/Ink. But still... 112K is a lot. It shows how seriously they take the interactive experience.
 
 ---
 
@@ -253,7 +253,7 @@ Progressive sandbox escalation: if a sandboxed execution fails due to permission
 
 17,237 lines of sandbox code. This is where most of the paranoia budget went.
 
-An agent that can run arbitrary shell commands is an agent that can do real damage. "Excessive Agency" is consistently flagged as a top concern for AI agents -- and rightly so. Research has shown that GPT-4 agents can autonomously exploit vulnerabilities without prior knowledge of them.
+An agent that can run arbitrary shell commands is an agent that can do real damage. "Excessive Agency" is consistently flagged as a top concern for AI agents - and rightly so. Research has shown that GPT-4 agents can autonomously exploit vulnerabilities without prior knowledge of them.
 
 Codex's answer: don't just tell the agent what it can't do. Make the OS enforce it.
 
@@ -425,7 +425,7 @@ How it works:
 
 The connection to [Constitutional AI (Bai et al., 2022)](https://arxiv.org/abs/2212.08073) is direct. Constitutional AI has the model generate a response, then critique it against a set of principles, then revise. Guardian does the same thing: generate an action plan, have a second model critique it against safety principles, proceed only if it passes. The "constitution" here is implicit in the Guardian's system prompt rather than an explicit principle list, which I think is a missed opportunity - a declarative rule set would be easier to audit and update.
 
-There's an inherent circularity here that's intellectually fascinating. The Guardian AI is made by the same company as the agent AI. If there's a systematic blind spot in one, it could exist in the other. Safety training is an active area of research -- which means an external Guardian using the same family of models has correlated strengths. It adds a meaningful layer of protection, and it'll be interesting to see how the technique evolves as models diversify.
+There's an inherent circularity here that's intellectually fascinating. The Guardian AI is made by the same company as the agent AI. If there's a systematic blind spot in one, it could exist in the other. Safety training is an active area of research — which means an external Guardian using the same family of models has correlated strengths. It adds a real layer of protection, and I wonder how the technique evolves once you can mix model families (say, a Claude Guardian reviewing GPT actions).
 
 ---
 
@@ -475,7 +475,7 @@ This is what makes the desktop app possible - same core, different frontend via 
 | **Ecosystem** | Fewer AI libraries | Rich npm ecosystem |
 | **Concurrency** | Zero-cost async, no GC | Event loop, occasional GC |
 
-The real reason: they wanted the sandbox *inside* the agent, not bolted on. Rust's FFI lets you call `seccomp(2)`, `landlock_add_rule(2)`, and Windows ACL APIs directly. In TypeScript you'd need native addons per platform -- harder to distribute, and the addons themselves become security considerations.
+The real reason: they wanted the sandbox *inside* the agent, not bolted on. Rust's FFI lets you call `seccomp(2)`, `landlock_add_rule(2)`, and Windows ACL APIs directly. In TypeScript you'd need native addons per platform - harder to distribute, and the addons themselves become security considerations.
 
 ### Why This Sandbox Architecture?
 
@@ -575,11 +575,11 @@ pub enum AskForApproval {
 
 ### Areas for Future Growth
 
-1. **Tool output sanitization** -- Guardian reviews actions *before* execution, and an interesting next step would be filtering outputs *after* execution too. A command could return output containing prompt injection that steers the model's next action. This is an active area of research in agent security that several teams are exploring.
+1. **Tool output sanitization** - Guardian reviews actions *before* execution, and an interesting next step would be filtering outputs *after* execution too. A command could return output containing prompt injection that steers the model's next action. This is an active area of research in agent security that several teams are exploring.
 
-2. **Sandbox escape detection** -- Failed sandbox operations return errors, and adding proactive alerts would strengthen the model further. Runtime monitoring for unexpected network connections or file access outside allowed paths is a natural extension of the existing security layers.
+2. **Sandbox escape detection** - Failed sandbox operations return errors, and adding proactive alerts would strengthen the model further. Runtime monitoring for unexpected network connections or file access outside allowed paths is a natural extension of the existing security layers.
 
-3. **MCP server attestation** -- Currently delegates trust to the connection layer. Certificate pinning or signed tool manifests could add another level of confidence, especially as the MCP ecosystem grows.
+3. **MCP server attestation** - Currently delegates trust to the connection layer. Certificate pinning or signed tool manifests could add another level of confidence, especially as the MCP ecosystem grows.
 
 ---
 
@@ -615,7 +615,7 @@ pub enum AskForApproval {
 
 88 crates. Claude Code: ~1 package. Aider: ~1 package.
 
-88 is ambitious -- and deliberate. Benefits: compile-time dependency boundaries, parallel compilation, forced API design. Cost: 88 `Cargo.toml` files, complex deps, and a `MODULE.bazel.lock` file that's 1.2MB. It's an investment in architectural rigor that pays off at scale.
+88 is ambitious - and deliberate. Benefits: compile-time dependency boundaries, parallel compilation, forced API design. Cost: 88 `Cargo.toml` files, complex deps, and a `MODULE.bazel.lock` file that's 1.2MB. It's an investment in architectural rigor that pays off at scale.
 
 ### Test Coverage
 
@@ -715,27 +715,27 @@ Prevents the "500 undocumented boolean flags" problem.
 
 ## Limitations & Technical Debt
 
-### 1. The codex-core Growth Challenge
+### 1. The codex-core Size Problem
 
-176K lines in one crate. `codex.rs` alone = 7,786 lines. `app.rs` in TUI = 10,851 lines. The team has clear aspirations to modularize further ("resist adding to core"), and this will be an interesting architectural evolution to watch.
+176K lines in one crate. `codex.rs` alone = 7,786 lines. `app.rs` in TUI = 10,851 lines. The team clearly wants to modularize ("resist adding to core"), and it'll be fun to see how they chip away at it.
 
 Impact: changing one line recompiles 176K lines. In Rust, incremental builds for `codex-core` alone take 30-60 seconds.
 
 ### 2. Windows Sandbox Complexity
 
-macOS sandbox: 530 lines. Linux: 4,736. Windows: 8,870. Windows doesn't have a unified sandboxing API, so the team impressively stitched together restricted tokens, ACLs, private desktops, ConPTY, DPAPI, and an elevated helper process. The `windows_sandbox_enabled` flag defaults to off -- the testing surface for all that Windows-specific code is something to watch as the project matures.
+macOS sandbox: 530 lines. Linux: 4,736. Windows: 8,870. Windows doesn't have a unified sandboxing API, so the team had to stitch together restricted tokens, ACLs, private desktops, ConPTY, DPAPI, and an elevated helper process. Impressive work - but `windows_sandbox_enabled` defaults to off, which tells you something about the testing confidence there.
 
 ### 3. Feature Flag Richness
 
-88+ flags, many `Experimental`. Testing all combinations is a real challenge. Some flags interact in non-obvious ways (`CodeModeOnly` conflicts with `ShellTool`). A `conflicts_with` field would be a natural next step -- I'm curious whether the team is already tracking this.
+88+ flags, many `Experimental`. Testing all combinations is a real challenge. Some flags interact in non-obvious ways (`CodeModeOnly` conflicts with `ShellTool`). A `conflicts_with` field seems like a no-brainer - honestly not sure why they haven't added that, it seems like an obvious win.
 
-### 4. The Central Coordination Hub
+### 4. The Session God Object
 
-`Session` struct holds 40+ fields, passed as `Arc<Session>` everywhere. Testing anything means constructing a full Session. The team is already working on this (there's a partial `SessionServices` extraction), and the direction is promising.
+`Session` struct holds 40+ fields, passed as `Arc<Session>` everywhere. Testing anything means constructing a full Session. The partial `SessionServices` extraction is the right move - once that lands, testing gets way easier.
 
 ### 5. TUI Investment
 
-112K lines for a terminal UI. Helix editor: ~80K for a full code editor. The code-to-feature ratio reflects how rich the interactive experience is -- and there are likely abstraction opportunities that could reduce this over time.
+112K lines for a terminal UI. Helix editor: ~80K for a full code editor. Part of this is Ratatui's imperative model requiring more code per feature, but there are probably abstraction opportunities hiding in there.
 
 ### 6. Dual Build System
 
@@ -743,7 +743,7 @@ Both Cargo and Bazel maintained. The `MODULE.bazel.lock` is 1.2MB. Every depende
 
 ### 7. Streamlined Compaction
 
-Claude Code has a 4-layer compaction cascade (HISTORY_SNIP -> Microcompact -> CONTEXT_COLLAPSE -> Autocompact) with surgical deletion and cache-level editing. Codex takes a more streamlined summarization approach. When context overflows, it summarizes everything -- a simpler strategy that trades granularity for implementation clarity. It'll be interesting to see whether the team adopts more targeted approaches as the project evolves.
+Claude Code has a 4-layer compaction cascade (HISTORY_SNIP → Microcompact → CONTEXT_COLLAPSE → Autocompact) with surgical deletion and cache-level editing. Codex takes a simpler approach - when context overflows, just summarize everything. Trades granularity for implementation clarity. I'd be surprised if they don't move toward something more layered eventually.
 
 ---
 
@@ -753,7 +753,7 @@ Claude Code has a 4-layer compaction cascade (HISTORY_SNIP -> Microcompact -> CO
 
 2. **17K lines of sandbox code is the product.** Most agents treat sandboxing as a checkbox. Codex treats it as the primary feature. In enterprise contexts, this is the selling point.
 
-3. **Guardian is Constitutional AI for tool use.** Having a second AI risk-score actions before execution is the best UX compromise between "approve everything" and "approve nothing." How well it performs depends on the diversity between the reviewing model and the acting model. A strong foundation that will only get better as model families diversify.
+3. **Guardian is Constitutional AI for tool use.** Having a second AI risk-score actions before execution is the best UX compromise between "approve everything" and "approve nothing." How well it performs depends on the diversity between the reviewing model and the acting model. A strong foundation that only gets better as model families diversify.
 
 4. **Queue-pair architecture makes multi-surface agents possible.** Same core running as CLI, desktop app, MCP server, or cloud worker. If you're building an agent that needs more than one interface, this is the pattern.
 
