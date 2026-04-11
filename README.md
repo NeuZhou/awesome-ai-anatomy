@@ -72,19 +72,19 @@ Ever wondered how Claude Code manages its context window? Or why Codex CLI chose
 |---|---------|-------|----------|-------|-------------|--------|
 | 001 | [**Dify**](dify/) | 136K | Python + TS | 1.24M | `graphon` engine, 7+ containers, 30+ vector DBs | Published |
 | 002 | [**Claude Code**](claude-code/) | 109K | TypeScript | 510K | 4-layer context, hidden pet system (18 species) | Published |
-| 003 | [**OpenHands**](openhands/) | 71K | Python + TS | 400K | 10 condensers, 3-layer security, 487-line stuck detector, V0/V1 mid-migration | **NEW** |
-| 004 | [**DeerFlow**](deer-flow/) | 58K | Python + TS | — | 14-layer middleware, hash loop kill@5, no RBAC | Published |
-| 005 | [**MiroFish**](mirofish/) | 50K | Python + Vue | 39K | LLM social simulation engine for collective intelligence | Published |
-| 006 | [**Goose**](goose/) | 37K | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | Published |
-| 007 | [**Pi Mono**](pi-mono/) | 32K | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | Published |
-| 008 | [**MemPalace**](mempalace/) | 30K | Python | 9K | Milla Jovovich's memory palace, 4-layer stack, 4-layer memory stack, AAAK dialect under iteration, shell injection fix pending | **NEW** |
-| 009 | [**Lightpanda**](lightpanda-browser/) | 27K | Zig + Rust | 91K | From-scratch browser for AI agents, 9x Chrome | Published |
-| 010 | [**Hermes Agent**](hermes-agent/) | 26K | Python | 260K | Self-improving skills, FTS5 search, frozen mem | Published |
-| 011 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | Published |
-| 012 | [**oh-my-codex**](oh-my-codex/) | 19.5K | TypeScript | 124K | 30 agents, git worktrees, plugin hook SDK, autoresearch loops | **NEW** |
-| 013 | [**Guardrails AI**](guardrails-ai/) | 6.6K | Python | 18K | Validator Hub, reask self-correction loop | Published |
-| 014 | [**OpenAI Codex CLI**](codex-cli/) | 27K+ | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | Published |
-| 015 | [**Cline**](cline/) | 60K | TypeScript | 560K | 3,756-line God Object, 40+ providers, YOLO mode, hooks system | Published |
+| 003 | [**OpenHands**](openhands/) | 71K | Python + TS | 400K | 10 condensers, 3-layer security, 487-line stuck detector | **NEW** |
+| 004 | [**Cline**](cline/) | 60K | TypeScript | 560K | 3,756-line God Object, 40+ providers, YOLO mode, hooks system | Published |
+| 005 | [**DeerFlow**](deer-flow/) | 58K | Python + TS | 180K | 14-layer middleware, hash loop kill@5, no RBAC | Published |
+| 006 | [**MiroFish**](mirofish/) | 50K | Python + Vue | 39K | LLM social simulation engine for collective intelligence | Published |
+| 007 | [**Goose**](goose/) | 37K | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | Published |
+| 008 | [**Pi Mono**](pi-mono/) | 32K | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | Published |
+| 009 | [**MemPalace**](mempalace/) | 30K | Python | 9K | Milla Jovovich's 4-layer memory palace, AAAK dialect debunked | **NEW** |
+| 010 | [**OpenAI Codex CLI**](codex-cli/) | 27K | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | Published |
+| 011 | [**Lightpanda**](lightpanda-browser/) | 27K | Zig + Rust | 91K | From-scratch browser for AI agents, 9x Chrome | Published |
+| 012 | [**Hermes Agent**](hermes-agent/) | 26K | Python | 260K | Self-improving skills, FTS5 search, frozen mem | Published |
+| 013 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | Published |
+| 014 | [**oh-my-codex**](oh-my-codex/) | 19.5K | TypeScript | 124K | 30 agents, git worktrees, plugin hook SDK, autoresearch loops | **NEW** |
+| 015 | [**Guardrails AI**](guardrails-ai/) | 6.6K | Python | 18K | Validator Hub, reask self-correction loop | Published |
 
 Projects sorted by GitHub stars (descending).
 
@@ -92,7 +92,7 @@ Projects sorted by GitHub stars (descending).
 
 ## Cross-Project Comparison
 
-**[Interactive Comparison Tool](https://neuzhou.github.io/awesome-ai-anatomy/comparison.html)** -- filter, search, and compare projects side by side.
+**[Interactive Comparison Tool](https://neuzhou.github.io/awesome-ai-anatomy/comparison.html)** — filter, search, and compare projects side by side.
 
 We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 15 projects:
 
@@ -101,7 +101,7 @@ We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side anal
 - Multi-agent & orchestration approaches
 - Memory & persistence strategies
 
-We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** -- a deep horizontal analysis covering:
+We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal analysis covering:
 
 - Architecture pattern taxonomy across all projects
 - Context management strategies compared
@@ -130,9 +130,9 @@ We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** -- a deep horizontal ana
 
 ## Each Teardown Includes
 
-- **Architecture diagrams** -- d2-rendered PNG with component relationships
-- **Detailed evaluation** -- security, architecture, code quality, and more
-- **Core innovation analysis** -- what the project does that nobody else does
+- **Architecture diagrams** — Mermaid + hand-drawn style PNGs showing component relationships
+- **Detailed analysis** — security posture, architecture trade-offs, code quality observations
+- **Core innovation analysis** — what the project does that nobody else does
 - **Code-level references** — file paths + line numbers for every claim
 - **Cross-project comparison table** — how it stacks up against alternatives
 - **"Stuff Worth Stealing"** — patterns other projects should adopt
@@ -155,7 +155,12 @@ Beyond individual teardowns, we maintain cross-cutting analysis:
 
 - [ ] browser-use (86K stars) — AI browser automation, Python
 - [ ] Crush (22K stars) — OpenCode's successor, built by the Charm team (Bubble Tea)
+- [ ] Aider (36K stars) — Git-native AI pair programming, Python
+- [ ] Continue (28K stars) — Open-source AI IDE extension, TypeScript
 - [ ] Cursor — the most controversial AI IDE (closed source, partial analysis)
+- [ ] Windsurf — Codeium's AI IDE fork (closed source, partial analysis)
+
+Have a project in mind? → [Suggest a teardown](https://github.com/NeuZhou/awesome-ai-anatomy/issues)
 
 ---
 
@@ -174,21 +179,15 @@ Found an error? Have a better analysis? PRs welcome.
 
 New teardown every week. Cursor, Windsurf, and others are on the list.
 
-**Star this repo** — GitHub will notify you when new teardowns drop.
+**⭐ Star this repo** — GitHub will notify you when new teardowns drop.
 
 **Watch** — Get notified for every new teardown, not just the ones that trend.
 
 15 deep-dives published so far. The next batch is already in progress.
 
 - [Changelog](CHANGELOG.md) — track every update
-- Substack: [AI Anatomy Newsletter](https://neuzhou.substack.com) — condensed teardowns in your inbox
-- Discord: [Join the community](https://discord.gg/kAQD7Cj8) — discuss architecture decisions
-
----
-
-## ⭐ Stay in the Loop
-
-Star this repo to get notified when new teardowns drop.
+- Substack: [AI Anatomy Newsletter](https://neuzhou.substack.com) — teardown highlights in your inbox (coming soon)
+- Discord: [Join the discussion](https://discord.gg/kAQD7Cj8) — talk architecture decisions with us
 
 <p align="center">
  <a href="https://star-history.com/#NeuZhou/awesome-ai-anatomy&Date">
