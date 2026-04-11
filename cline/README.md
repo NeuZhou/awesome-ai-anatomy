@@ -32,7 +32,7 @@ Cline is a VS Code extension that puts an AI coding agent in your sidebar. You d
 ## Table of Contents
 
 - [Architecture Overview](#architecture-overview)
-- [The Core Orchestrator: Task (3,756 lines)](#the-god-object-task-3756-lines)
+- [The Core Class: Task (3,756 lines)](#the-core-class-task-3756-lines)
 - [The Agent Loop: How It Actually Works](#the-agent-loop-how-it-actually-works)
 - [Tool System: 28 Tools, Coordinator Pattern](#tool-system-28-tools-coordinator-pattern)
 - [API Providers: 40+ Adapters, Factory Pattern](#api-providers-40-adapters-factory-pattern)
@@ -60,18 +60,18 @@ Cline is a VS Code extension that puts an AI coding agent in your sidebar. You d
 ![Cline Architecture](architecture.png)
 
 
-*Architecture diagram ([source .d2](architecture.d2)) -- Red highlights the 3,756-line central orchestrator at the center of the system. Dashed red line shows the polling-based approval flow between Task and the VS Code webview.*
+*Architecture diagram ([source .d2](architecture.d2)) — Red highlights the 3,756-line central orchestrator at the center of the system. Dashed red line shows the polling-based approval flow between Task and the VS Code webview.*
 
 
 The architecture is a four-layer hierarchy: **Extension → Controller → Task → ToolExecutor**. The VS Code extension entry point (`extension.ts`, 440 lines) sets up the host provider and registers commands. `common.ts` handles cross-platform initialization. The `Controller` manages task lifecycle, MCP servers, auth, and state. The `Task` class is where 80% of the complexity lives — it orchestrates the entire agent loop, streaming, context management, hooks, checkpoints, and tool execution.
 
-The layers are coupled through callback injection rather than clean interfaces -- a pragmatic choice that enabled rapid feature development. The `Task` constructor takes 20+ parameters. The `ToolExecutor` constructor takes 30+ parameters including 15 callback functions like `saveCheckpoint`, `sayAndCreateMissingParamError`, `removeLastPartialMessageIfExistsWithType`, and `switchToActModeCallback`. This is constructor injection taken to its logical extreme -- it works, it's testable in theory, and it represents a natural refactoring opportunity as the project matures.
+The layers are coupled through callback injection rather than clean interfaces — a pragmatic choice that enabled rapid feature development. The `Task` constructor takes 20+ parameters. The `ToolExecutor` constructor takes 30+ parameters including 15 callback functions like `saveCheckpoint`, `sayAndCreateMissingParamError`, `removeLastPartialMessageIfExistsWithType`, and `switchToActModeCallback`. This is constructor injection taken to its logical extreme — it works, it's testable in theory, and it represents a natural refactoring opportunity as the project matures.
 
 ---
 
 ## The Core Class: Task (3,756 lines)
 
-`src/core/task/index.ts` is the beating heart of Cline -- a comprehensive orchestrator that coordinates the entire agent lifecycle. This single class handles:
+`src/core/task/index.ts` is the beating heart of Cline — a comprehensive orchestrator that coordinates the entire agent lifecycle. This single class handles:
 
 - **Agent loop orchestration** (`initiateTaskLoop`, `recursivelyMakeClineRequests`)
 - **API request management** (`attemptApiRequest`, retry logic, auto-retry with exponential backoff)
@@ -115,7 +115,7 @@ The core loop pattern:
 8. **Tool results are appended** to `userMessageContent` and the loop recurses via `recursivelyMakeClineRequests`
 9. **If no tools** — a `noToolsUsed` nudge is added and `consecutiveMistakeCount` increments. After `maxConsecutiveMistakes` (configurable), the user is asked to intervene.
 
-The recursive nature is notable: `recursivelyMakeClineRequests` calls itself with tool results. This is recursive in the call stack, not just conceptually -- deep tool chains produce deep recursion. In practice, the stack depth is bounded by the context window running out, and converting to an iterative loop (like Claude Code's `while(true)`) could be a future improvement for even more robustness.
+The recursive nature is notable: `recursivelyMakeClineRequests` calls itself with tool results. This is recursive in the call stack, not just conceptually — deep tool chains produce deep recursion. In practice, the stack depth is bounded by the context window running out, and converting to an iterative loop (like Claude Code's `while(true)`) could be a future improvement for even more robustness.
 
 ---
 
@@ -194,7 +194,7 @@ The factory function (`buildApiHandler`) is a 300+ line switch statement that in
 
 **The Plan/Act dual-mode complication:** Cline supports separate API providers and models for "Plan" mode (thinking/planning) and "Act" mode (executing). This means the factory takes a `mode` parameter and selects different API keys, model IDs, and thinking budget tokens per mode. The configuration surface area is enormous — `ApiConfiguration` has 100+ fields.
 
-**What's notable:** The sheer number of providers is a competitive moat. No other open-source coding agent supports this many backends. Claude Code supports only Anthropic (plus Bedrock/Vertex for enterprise). Goose supports 30+ but through a unified registry. Pi Mono supports all major providers with lazy loading. Cline's approach is comprehensive -- each provider is a distinct class with its own SDK import, error handling, and streaming adaptation.
+**What's notable:** The sheer number of providers is a competitive moat. No other open-source coding agent supports this many backends. Claude Code supports only Anthropic (plus Bedrock/Vertex for enterprise). Goose supports 30+ but through a unified registry. Pi Mono supports all major providers with lazy loading. Cline's approach is comprehensive — each provider is a distinct class with its own SDK import, error handling, and streaming adaptation.
 
 ---
 
@@ -246,11 +246,11 @@ After overflow: Deleted range becomes [0, 5]
 Sent to API: [msg6, msg7, msg8, msg9]
 ```
 
-**Auto-condense (next-gen models only):** For Claude 4+ and GPT-5 family models, Cline supports `useAutoCondense` -- when the context window reaches ~75% utilization, it asks the model to summarize the conversation using the `summarize_task` tool. This produces a compressed version that replaces the old messages. It's a step toward Claude Code's L3/L4 approach, focused on simplicity rather than the multi-layer cascade -- a pragmatic trade-off that keeps the implementation clean.
+**Auto-condense (next-gen models only):** For Claude 4+ and GPT-5 family models, Cline supports `useAutoCondense` — when the context window reaches ~75% utilization, it asks the model to summarize the conversation using the `summarize_task` tool. This produces a compressed version that replaces the old messages. It's a step toward Claude Code's L3/L4 approach, focused on simplicity rather than the multi-layer cascade — a pragmatic trade-off that keeps the implementation clean.
 
 **File read optimization:** Before triggering truncation, the `ContextManager.attemptFileReadOptimization` method tries to reduce context usage by rewriting file-read tool results — replacing full file contents with abbreviated versions when the file hasn't changed. This is a pragmatic optimization that avoids the overhead of full compaction.
 
-**Compared to Claude Code:** Claude Code has 4 layers (HISTORY_SNIP -> Microcompact -> CONTEXT_COLLAPSE -> Autocompact), each progressively more aggressive but starting from lossless operations. Cline opts for a simpler approach -- truncation first, with auto-condense as an upgrade path for newer models. This means Cline prioritizes implementation simplicity over Claude Code's multi-layer strategy, and the auto-condense feature shows the team is actively evolving this area.
+**Compared to Claude Code:** Claude Code has 4 layers (HISTORY_SNIP -> Microcompact -> CONTEXT_COLLAPSE -> Autocompact), each progressively more aggressive but starting from lossless operations. Cline opts for a simpler approach — truncation first, with auto-condense as an upgrade path for newer models. This means Cline prioritizes implementation simplicity over Claude Code's multi-layer strategy, and the auto-condense feature shows the team is actively evolving this area.
 
 ---
 
@@ -273,7 +273,7 @@ Hooks are shell scripts discovered from the `.cline/hooks/` directory. The `Hook
 
 **Context injection:** Cancellable hooks can return `contextModification` — arbitrary text that gets injected into the conversation as `<hook_context source="HookName">...</hook_context>`. This is powerful: a `UserPromptSubmit` hook could run linting, check git status, or query a database and inject the results as additional context for the LLM.
 
-**Something to watch:** Hook scripts run with the same permissions as VS Code. A `.cline/hooks/` directory in a cloned repo could execute code when the user opens the project. The `HookDiscoveryCache` caches discovered hooks for performance, and there's a `hooksEnabled` global setting -- adding sandboxing or signature verification would be a natural next step to strengthen this already-useful system.
+**Something to watch:** Hook scripts run with the same permissions as VS Code. A `.cline/hooks/` directory in a cloned repo could execute code when the user opens the project. The `HookDiscoveryCache` caches discovered hooks for performance, and there's a `hooksEnabled` global setting — adding sandboxing or signature verification would be a natural next step to strengthen this already-useful system.
 
 ---
 
@@ -403,6 +403,8 @@ This is essentially a "todo list" that the AI maintains as it works. It gives us
 
 ## Architecture Observations
 
+These aren't complaints — Cline ships and works. These are observations from reading the code that might inform the next evolution of the architecture.
+
 ### 1. The 30-Parameter Constructor
 The `ToolExecutor` constructor takes 30+ parameters, 15 of which are callback functions:
 
@@ -435,7 +437,7 @@ constructor(
 )
 ```
 
-This constructor is a clear candidate for decomposition. It signals "I need to be broken into smaller components with defined interfaces."
+This constructor is a clear sign of organic growth — everything was added as it was needed. Decomposing into a service-bag pattern or dependency injection container would clean this up, but honestly it works fine as-is for a project iterating this fast.
 
 ### 2. Duplicated Ask/Say Patterns
 The `ask()` and `say()` methods in `Task` are ~200 lines each, with nearly identical branching logic for partial/complete/new messages. The logic for "is this updating a previous partial? Is this completing a partial? Is this a new message?" is duplicated across both methods. A single `MessagePublisher` abstraction could reduce this to ~50 lines.
@@ -447,10 +449,10 @@ The `ask()` and `say()` methods in `Task` are ~200 lines each, with nearly ident
 `TaskState` has 40+ mutable fields modified from multiple code paths — extending mutex protection to cover `askResponse` (the approval flow's critical field) would improve robustness.
 
 ### 5. Tool Sandboxing as an Area for Future Growth
-Every tool handler runs in the same process as the VS Code extension -- adding process isolation (like Goose's MCP extensions or Codex CLI's seatbelt/landlock sandbox) would be a meaningful safety enhancement.
+Every tool handler runs in the same process as the VS Code extension — adding process isolation (like Goose's MCP extensions or Codex CLI's seatbelt/landlock sandbox) would be a meaningful safety enhancement.
 
 ### 6. `package.json` Legacy Naming
-The npm package name is still `claude-dev` while the display name is `Cline` -- cleaning up the legacy naming would reduce contributor confusion.
+The npm package name is still `claude-dev` while the display name is `Cline` — cleaning up the legacy naming would reduce contributor confusion.
 
 ---
 
@@ -502,11 +504,9 @@ Cline is a remarkable growth story — from a weekend `claude-dev` side project 
 
 The feature set is impressive, and certain subsystems are well-designed. The prompt variant system shows sophisticated understanding of how different models respond to different instruction styles. The hooks architecture provides extension points that other agents lack entirely. The MCP integration is the most complete in any VS Code extension. The Focus Chain is a novel idea — giving the model a persistent checklist that users can edit — and it actually works.
 
-The core is ready for its next evolution. The 3,756-line `Task` class is the largest single-class agent loop in our survey -- splitting it into focused modules (`AgentLoop`, `StreamProcessor`, `ContextManager`, `UIBridge`) would make contributions easier and unlock event-driven patterns. The foundation is there -- the `ToolExecutorCoordinator` and handler pattern is the right direction, and the project is well-positioned for a focused refactor sprint to make it the primary architecture.
+The core is ready for its next evolution. The 3,756-line `Task` class is the largest single-class agent loop in our survey — splitting it into focused modules (`AgentLoop`, `StreamProcessor`, `ContextManager`, `UIBridge`) would make contributions easier and unlock event-driven patterns. The foundation is there — the `ToolExecutorCoordinator` and handler pattern is the right direction, and the project is well-positioned for a focused refactor sprint to make it the primary architecture.
 
 Would I use Cline? Yes — the VS Code integration and provider diversity are unmatched. Would I contribute to it? Absolutely, especially if the team invests in the architectural refactor that's clearly on the roadmap. The pieces are all there.
-
-**Grade: B+** — A feature-complete product with genuine innovation in extensibility, ready for an architectural leap that would make it the definitive coding agent.
 
 ---
 
@@ -515,25 +515,25 @@ Would I use Cline? Yes — the VS Code integration and provider diversity are un
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| ~60K stars | Task description states "60K GitHub stars" | âœ… Per specification |
-| ~560K lines | Task description states "~560K lines TypeScript" | âœ… Per specification |
-| 3,756 lines in Task | Counted `src/core/task/index.ts` (200 header + 3,556 remaining) | âœ… Verified via `read` |
-| 28 tools in ClineDefaultTool enum | Counted enum values in `src/shared/tools.ts` | âœ… Verified (28 entries) |
-| 43 provider files | Listed `src/core/api/providers/` directory | âœ… Verified |
-| Apache-2.0 license | Read `package.json` | âœ… Verified |
-| Package name is `claude-dev` | Read `package.json` first line | âœ… Verified |
-| Version 3.77.0 | Read `package.json` version field | âœ… Verified |
-| Puppeteer used (not Playwright) | Read `BrowserSession.ts` imports | âœ… Verified (puppeteer-core) |
-| ToolExecutor 30+ constructor params | Read `ToolExecutor.ts` constructor | âœ… Verified |
-| `pWaitFor` polling at 100ms | Read `Task.ask()` method | âœ… Verified |
-| YOLO mode auto-approves everything | Read `autoApprove.ts` | âœ… Verified |
-| 8 hook types | Read `hook-executor.ts` and hook references in `Task` | âœ… Verified |
-| Focus Chain uses chokidar | Read `src/core/task/focus-chain/index.ts` | âœ… Verified |
-| McpHub 1,700+ lines | Read file header showing continuation needed | âœ… Verified |
-| ContextManager quarter truncation | Read `ContextManager.ts` | âœ… Verified |
-| `recursivelyMakeClineRequests` is recursive | Read method — calls itself directly | âœ… Verified |
-| SubagentRunner in-process | Read `SubagentRunner.ts` — no process spawning | âœ… Verified |
-| Prompt variant names | Listed `src/core/prompts/system-prompt/variants/` | âœ… Verified |
+| ~60K stars | Task description states "60K GitHub stars" | Verified Per specification |
+| ~560K lines | Task description states "~560K lines TypeScript" | Verified Per specification |
+| 3,756 lines in Task | Counted `src/core/task/index.ts` (200 header + 3,556 remaining) | Verified Verified via `read` |
+| 28 tools in ClineDefaultTool enum | Counted enum values in `src/shared/tools.ts` | Verified Verified (28 entries) |
+| 43 provider files | Listed `src/core/api/providers/` directory | Verified Verified |
+| Apache-2.0 license | Read `package.json` | Verified Verified |
+| Package name is `claude-dev` | Read `package.json` first line | Verified Verified |
+| Version 3.77.0 | Read `package.json` version field | Verified Verified |
+| Puppeteer used (not Playwright) | Read `BrowserSession.ts` imports | Verified Verified (puppeteer-core) |
+| ToolExecutor 30+ constructor params | Read `ToolExecutor.ts` constructor | Verified Verified |
+| `pWaitFor` polling at 100ms | Read `Task.ask()` method | Verified Verified |
+| YOLO mode auto-approves everything | Read `autoApprove.ts` | Verified Verified |
+| 8 hook types | Read `hook-executor.ts` and hook references in `Task` | Verified Verified |
+| Focus Chain uses chokidar | Read `src/core/task/focus-chain/index.ts` | Verified Verified |
+| McpHub 1,700+ lines | Read file header showing continuation needed | Verified Verified |
+| ContextManager quarter truncation | Read `ContextManager.ts` | Verified Verified |
+| `recursivelyMakeClineRequests` is recursive | Read method — calls itself directly | Verified Verified |
+| SubagentRunner in-process | Read `SubagentRunner.ts` — no process spawning | Verified Verified |
+| Prompt variant names | Listed `src/core/prompts/system-prompt/variants/` | Verified Verified |
 
 </details>
 
