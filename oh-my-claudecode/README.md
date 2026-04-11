@@ -42,7 +42,7 @@ The weird part: it also spawns Codex and Gemini CLI workers alongside Claude. So
 
 ![Architecture](architecture.png)
 
-## File-Based IPC: mkdir as a Distributed Lock
+## Core Innovation: File-Based IPC with mkdir Locks
 
 This is where it gets interesting. And honestly, a little weird.
 
@@ -93,7 +93,7 @@ OMC defines 19 agent roles with model tier assignments.
 
 The interesting bit isn't the number of agents — it's the model routing. Simple tasks get Haiku (cheap), complex reasoning gets Opus (expensive), everything else gets Sonnet. The `critic` agent specifically uses Haiku because criticism doesn't need deep reasoning — it just needs to point out problems.
 
-This maps directly to what's called **model routing** or **LLM cascading** — the idea that you can cut costs dramatically by routing queries to the cheapest model that can handle them. FrugalGPT ([Chen et al., 2023](https://arxiv.org/abs/2305.05176)) formalized this and showed up to 98% cost savings. OMC's approach is simpler — static role-to-tier mapping rather than dynamic routing — but it captures the core insight: not every token needs your most expensive model.
+This maps directly to what's called **model routing** or **LLM cascading** — the idea that you can cut costs significantly by routing queries to the cheapest model that can handle them. FrugalGPT ([Chen et al., 2023](https://arxiv.org/abs/2305.05176)) formalized this and showed up to 98% cost savings. OMC's approach is simpler — static role-to-tier mapping rather than dynamic routing — but it captures the core idea: not every token needs your most expensive model.
 
 Each agent's prompt is loaded from a Markdown file in `/agents/*.md`, which means you can customize agent behavior without touching code. Prompt-as-config, basically.
 
@@ -117,7 +117,7 @@ A subtle but important detail: tasks with `metadata.permanentlyFailed === true` 
 
 So here's the thing — OMC is implementing multi-agent coordination in production, and there's a whole body of work on exactly this problem.
 
-The academic multi-agent literature (CAMEL, MetaGPT, ChatDev) has been arguing for years about the best communication structure: free-form dialogue vs. structured outputs vs. rigid pipelines. The key insight from MetaGPT was that free-form dialogue between agents leads to "hallucination contagion" — one agent hallucinates, the next one builds on it — so you should pass structured documents, not chat messages.
+The academic multi-agent literature (CAMEL, MetaGPT, ChatDev) has been arguing for years about the best communication structure: free-form dialogue vs. structured outputs vs. rigid pipelines. The main finding from MetaGPT was that free-form dialogue between agents leads to "hallucination contagion" — one agent hallucinates, the next one builds on it — so you should pass structured documents, not chat messages.
 
 OMC lands somewhere between these approaches. The agents communicate through structured JSONL files (closer to the "pass documents, not chat" school), but the coordination is looser than a rigid pipeline. The _content_ is still free text though. I don't know if hallucination contagion is a real problem at this scale (19 agents is a lot of telephone-game hops), but it's something worth watching.
 
@@ -176,16 +176,24 @@ const prompt = fs.readFileSync(`./agents/${agentRole}.md`, "utf-8");
 ## Verification Log
 
 <details>
-<summary>Details</summary>
+<summary>Fact-check log (click to expand)</summary>
 
 | Claim | Method | Result |
 |-------|--------|--------|
-| 24,423 stars | GitHub API | Confirmed |
-| 194K LOC | wc -l on src/**/*.ts | Confirmed |
-| 19 agents | Counted in definitions.ts | Confirmed |
-| 125 files in team/ | ls count | Confirmed |
-| mkdir-based locking | dispatch-queue.ts source | Confirmed |
-| File paths referenced | Verified exist in clone | Confirmed |
+| 24,423 stars | GitHub API | ✅ Verified |
+| ~194K LOC TypeScript | `wc -l` on `src/**/*.ts` | ✅ Verified |
+| 19 agent roles | Counted in agent definitions | ✅ Verified |
+| 125 files in `team/` | `ls` count | ✅ Verified |
+| mkdir-based locking | `dispatch-queue.ts` source | ✅ Verified (O_EXCL mkdir, 5-min stale timeout) |
+| MIT license | GitHub API `license.spdx_id` | ✅ Verified |
+| Creator: Yeachan Heo | GitHub profile + commit history | ✅ Verified |
+| Tri-model support (Claude+Codex+Gemini) | Agent config + worker spawn code | ✅ Verified |
+| 5-phase pipeline (plan→prd→exec→verify→fix) | Phase controller source | ✅ Verified |
+| Haiku/Sonnet/Opus tier routing | Model mapping in agent definitions | ✅ Verified |
+| JSONL inbox/outbox per worker | File structure in `.omc/state/team/` | ✅ Verified |
+| LOCK_STALE_MS = 5 minutes | `dispatch-queue.ts` constant | ✅ Verified (300,000ms) |
+| Exponential backoff 25ms→500ms | `dispatch-queue.ts` polling constants | ✅ Verified |
+| FrugalGPT paper reference | arXiv:2305.05176 | ✅ Paper exists, 98% cost savings claim verified |
 
 </details>
 

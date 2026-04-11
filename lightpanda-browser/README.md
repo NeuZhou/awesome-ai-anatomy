@@ -281,29 +281,19 @@ Lightpanda shares its HTML parser (html5ever) with Servo — it's literally the 
 
 ---
 
-## What They Got Right (and Why)
+## The Verdict
 
-**1. The "no rendering" decision is load-bearing.** Every other headless browser solution is a full browser with the window hidden. Lightpanda is a *different architecture*. This isn't a flag you pass at startup — it's a design decision that permeates the codebase. There is no layout tree, no style resolver, no paint logic. The 16x memory reduction is a *consequence* of this architecture, not an optimization applied to Chromium.
+The "no rendering" decision is load-bearing. Every other headless browser solution is a full browser with the window hidden. Lightpanda is a *different architecture*. This isn't a flag you pass at startup — it's a design decision that permeates the codebase. There is no layout tree, no style resolver, no paint logic. The 16x memory reduction is a *consequence* of this, not an optimization applied to Chromium.
 
-**2. V8 over building their own JS engine.** Ladybird built LibJS. It's an admirably ambitious decision, and it will probably always struggle with compatibility. Lightpanda uses V8, the same engine Chrome uses. This means every JavaScript edge case, every NPM package, every framework that works in Chrome works in Lightpanda — assuming the Web APIs it touches are implemented. It's the right trade-off for a tool targeting automation.
+The technology choices reinforce this. Using V8 over building their own JS engine (unlike Ladybird's LibJS) means every JavaScript edge case that works in Chrome works in Lightpanda — assuming the Web APIs are implemented. Using Servo's html5ever for HTML parsing gets a spec-compliant parser for free, because a correct HTML5 parser is surprisingly hard (dozens of insertion modes, foster parenting edge cases, years of work). And the comptime bridge — the V8 binding system that turns Zig type declarations into V8 function templates at compile time — is the quiet hero of the codebase, delivering zero-runtime-dispatch overhead on every Web API call.
 
-**3. html5ever over writing their own parser.** A spec-compliant HTML5 parser is surprisingly hard. The HTML5 spec has dozens of insertion modes, error recovery rules, and edge cases (like `<table>` foster parenting) that take years to get right. By using Servo's html5ever, Lightpanda gets a battle-tested parser for free. The FFI cost is worth it.
+That said, the Web API coverage is a marathon they've barely started. About 60 implementations sounds like a lot until you count the 800+ in the full Web API surface. IntersectionObserver is stubbed. CORS is unimplemented. Service Workers, Web Workers, WebTransport — all missing. The "works with Playwright" claim needs a large asterisk. And it will be months or years before this gap closes — the browser specifications committee (WHATWG/W3C) keeps expanding the target.
 
-**4. The comptime bridge is the quiet hero.** The V8 binding system doesn't get mentioned in their marketing, but it's the most interesting piece of engineering in the codebase. It turns Zig type declarations into V8 function templates at compile time, with zero runtime dispatch overhead. Every Web API method call goes through a direct function pointer, not a vtable or hash lookup.
+The single-threaded page execution model will also pinch at scale. One page per connection, one connection at a time. If you want to crawl 100 pages concurrently, you need 100 Lightpanda processes. The architecture (one Session, one Page per Browser) would need restructuring for tab multiplexing.
 
-**5. Arena-based memory management delivers measurable results.** By scoping allocations to page lifetimes and CDP message lifetimes, they avoid the garbage that accumulates in long-running browser processes. When you navigate to a new page, the old page's memory is freed in one operation. Simple, fast, correct.
+The 14-callback FFI boundary with html5ever is a smaller concern that's worth watching. Each function pointer crossing the Zig-Rust boundary is a potential ABI mismatch — if html5ever's types change or Zig's C ABI shifts between versions, breakage is silent. A message-based protocol would be more robust, but the performance cost probably isn't worth it yet.
 
-## What I'd Push Back On
-
-**1. The 14-callback FFI boundary with html5ever is brittle.** Each function pointer crossing the Zig-Rust boundary is a potential ABI mismatch. If html5ever's Rust types change, or if Zig's C ABI representation shifts between versions, this breaks silently. There's no type-safety crossing that boundary. A more robust approach would be a message-based protocol or a shared memory structure, but the performance cost might not be worth it at this stage.
-
-**2. Web API coverage is a marathon they've barely started.** 60-ish Web API implementations sounds like a lot until you realize the full Web API surface is 800+. Every real-world page hits APIs that Lightpanda doesn't have yet. IntersectionObserver is stubbed. ResizeObserver exists but is limited. CORS is unimplemented. Service Workers, Web Workers, WebTransport — all missing. The "works with Playwright" claim needs a large asterisk: it works *for the subset of APIs that are implemented*.
-
-**3. Single-threaded page execution will hurt at scale.** One page per connection, one connection at a time. If you want to crawl 100 pages concurrently, you need 100 Lightpanda processes. Chrome DevTools Protocol was designed for multi-tab browsers; Lightpanda's implementation is inherently single-tab. They could add tab multiplexing within a single process, but the current architecture (one Session, one Page per Browser) would need restructuring.
-
-**4. AGPL-3.0 licensing limits commercial adoption.** AGPL requires that anyone running modified Lightpanda as a service must open-source their changes. For companies building internal scraping infrastructure or agent platforms, this is a non-trivial legal barrier. Chrome, Playwright, and Selenium are all on permissive licenses (Apache-2.0). This is likely intentional — Lightpanda the company probably offers a commercial license — but it limits community adoption.
-
-**5. The Zig 0.15.2 dependency is a risk.** Zig doesn't have a stable 1.0 release. The language breaks backward compatibility between minor versions. A Zig update can (and does) require touching files across the entire codebase. This is fine for a small team that controls the build environment, but it makes contributions harder and makes the project's future dependent on Zig's future. If Zig development slows or pivots, Lightpanda has limited escape routes.
+Two strategic factors round out the picture. The AGPL-3.0 license limits commercial adoption — companies building internal scraping or agent platforms face a legal barrier that Chrome, Playwright, and Selenium (all Apache-2.0) don't impose. And the Zig 0.15.2 dependency ties the project's future to a language that hasn't reached 1.0 and breaks backward compatibility between minor versions. Both are likely intentional choices (commercial dual-licensing, Zig's compile-time capabilities are core to the architecture), but they shape the adoption ceiling.
 
 ---
 
@@ -313,7 +303,7 @@ Lightpanda shares its HTML parser (html5ever) with Servo — it's literally the 
 
 **2. The integer-cast dispatch trick.** The CDP dispatcher's approach of casting fixed-length strings to integers for switch dispatch (`src/cdp/CDP.zig`, `asUint` function) is a clean zero-allocation string matching pattern. For any protocol where you're dispatching on a small set of known string values, this avoids both hash map overhead and sequential string comparisons.
 
-**3. Arena lifetime scoping for request-response systems.** The cascading arena pattern (message arena → page arena → session arena) is applicable to any server that processes requests with predictable lifetimes. HTTP servers, game servers, RPC frameworks — anywhere you know that the allocations for handling one request can be freed together at the end.
+**3. Arena lifetime scoping for request-response systems.** The cascading arena pattern (message arena → page arena → session arena) is applicable to any server that processes requests with predictable lifetimes. HTTP servers, game servers, RPC frameworks — anywhere you know that the allocations for handling one request can be freed together at the end. The idea traces back to region-based memory management (Tofte & Talpin, 1997), but Zig's comptime generics make it practical without the type-system complexity that academic region systems tend to require.
 
 ---
 

@@ -122,7 +122,34 @@ for index in range(self.num_reasks + 1):
 
 The reask mechanism supports three scenarios: non-parseable output (LLM returned unparseable output), skeleton errors (JSON structure doesn't match schema), and field-level errors (individual values failed validation). Each gets a different prompt template.
 
-This is where the `OnFailAction` enum comes in — `REASK` triggers the loop, `FIX` applies a static correction, `FIX_REASK` tries the fix first and reasks only if the fix also fails. Simple idea, but having it built into the framework saves a lot of boilerplate.
+This is where the `OnFailAction` enum comes in — `REASK` triggers the loop, `FIX` applies a static correction, `FIX_REASK` tries the fix first and reasks only if the fix also fails. Simple idea, but having it built into the framework saves a lot of boilerplate. The general concept traces back to the "self-refine" pattern described by Madaan et al. (2023) in *Self-Refine: Iterative Refinement with Self-Feedback* — the LLM generates, evaluates, and revises in a loop. Guardrails externalizes the evaluation step (validators instead of self-critique) but the loop structure is the same.
+
+### Reask Loop Flow
+
+```mermaid
+flowchart TD
+    A[User calls Guard] --> B[Runner: Call LLM]
+    B --> C{Parse output}
+    C -->|Parse failure| D[Build reask prompt<br/>with parse error]
+    C -->|Parse OK| E[Run validators<br/>DFS over schema]
+    E --> F{All validators pass?}
+    F -->|Yes| G[Return validated output]
+    F -->|No| H{Reask budget<br/>remaining?}
+    H -->|No| I[Return with<br/>validation errors]
+    H -->|Yes| J{OnFailAction?}
+    J -->|REASK| D
+    J -->|FIX| K[Apply fix_value]
+    J -->|FIX_REASK| L[Try fix → still fails? → reask]
+    J -->|FILTER/REFRAIN| M[Remove/skip field]
+    D --> B
+    K --> G
+    L --> D
+    M --> G
+
+    style A fill:#e1f5fe
+    style G fill:#e8f5e9
+    style I fill:#fce4ec
+```
 
 ---
 

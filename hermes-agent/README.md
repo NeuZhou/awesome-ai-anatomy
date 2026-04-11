@@ -76,7 +76,7 @@ The learning loop has three components, and they map surprisingly well to two pa
 
 ### 1. Autonomous Skill Creation (← Voyager's Skill Library)
 
-Voyager (Wang et al., 2023) introduced the idea of a skill library - a growing collection of executable code that the agent accumulates through exploration. The agent discovers how to do something, saves it as a reusable skill, and retrieves it later. The key insight was that skills are *composable*: complex behaviors build on simpler ones, avoiding catastrophic forgetting.
+Voyager (Wang et al., 2023) introduced the idea of a skill library - a growing collection of executable code that the agent accumulates through exploration. The agent discovers how to do something, saves it as a reusable skill, and retrieves it later. The core idea was that skills are *composable*: complex behaviors build on simpler ones, avoiding catastrophic forgetting.
 
 Hermes implements this directly. After completing a complex task, the agent creates a new skill:
 
@@ -196,7 +196,7 @@ Flow:
 
 When you ask "what did I work on last week?", it doesn't grep MEMORY.md - it searches actual conversation transcripts, finds the most relevant sessions, and uses a cheap model (Gemini Flash) to summarize them. The main model's context stays clean.
 
-This is the missing piece that most agent memory systems imply but don't fully implement. Typical approaches use recency-weighted retrieval over memory streams. Hermes has full-text search over raw transcripts. The FTS5 approach is less elegant but more practical — you don't need embedding infrastructure, and SQLite is already in every Python installation.
+This is the missing piece that most agent memory systems imply but don't fully implement. Typical approaches use recency-weighted retrieval over memory streams. Hermes has full-text search over raw transcripts. The FTS5 approach is less fancy but more practical — you don't need embedding infrastructure, and SQLite is already in every Python installation.
 
 ---
 
@@ -260,7 +260,7 @@ No cost budgets. For an agent that advertises Modal and Daytona (serverless, pay
 
 ## The Academic Lineage: What Hermes Actually Implements
 
-It's worth mapping Hermes's two core features to the papers that proposed them, because this is — possibly accidentally — the most faithful implementation of these research ideas I've seen in a production agent.
+It's worth mapping Hermes's two core features to the papers that proposed them, because this is — possibly accidentally — the closest implementation of these research ideas in a production agent that I'm aware of.
 
 | Hermes Feature | Academic Origin | What Changed |
 |----------------|----------------|-------------|
@@ -323,7 +323,7 @@ Snapshot MEMORY.md once at session start, never update the system prompt during 
 
 1. **Self-improving skills are Voyager + Reflexion in production.** Create from experience (Voyager), patch from failure (Reflexion). This is the compound growth mechanism that turns a tool into a teammate.
 2. **Memory is an attack surface.** Hermes is the first agent I've seen that scans memory writes for prompt injection before persisting. Everyone else should be doing this.
-3. **FTS5 beats embeddings for session recall.** No infrastructure, no vector DB, no GPU. Just SQLite. Less elegant, more practical.
+3. **FTS5 beats embeddings for session recall.** No infrastructure, no vector DB, no GPU. Just SQLite. Less fancy, more practical.
 4. **The 9,000-line file is a warning, not a feature.** Fast-moving projects accumulate technical debt. Hermes proves you can get to 26K stars with it, but the maintenance cost is real.
 5. **Forking concepts is fine if you add value.** `hermes claw migrate` is honest about the lineage, and the self-improving skills + session search are genuine innovations on top of the OpenClaw foundation.
 
