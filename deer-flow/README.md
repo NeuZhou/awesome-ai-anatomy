@@ -2,7 +2,7 @@
 
 > I read through the DeerFlow 2.0 source code to understand what's inside a 58K-star agent harness. Here's what I found and what impressed me.
 
-> **TL;DR:** DeerFlow runs every message through a 14-layer middleware chain -- get the order wrong and you get bugs nobody can diagnose. The loop detection (hash-based, warn at 3, kill at 5 repeats) is worth stealing. The security model is designed for trusted network deployment, delegating auth and RBAC to external layers for public use.
+> **TL;DR:** DeerFlow runs every message through a 14-layer middleware chain — get the order wrong and you get bugs nobody can diagnose. The loop detection (hash-based, warn at 3, kill at 5 repeats) is worth stealing. The security model is designed for trusted network deployment, delegating auth and RBAC to external layers for public use.
 
 ## At a Glance
 
@@ -27,7 +27,7 @@ DeerFlow is an orchestration layer that lets one LLM manage sub-agents, run sand
 |-----------|-------------|
 | Architecture | 14-layer middleware chain over LangGraph, order-dependent (ClarificationMiddleware must be last), FastAPI + Next.js dual backend |
 | Code Organization | Python backend + TypeScript frontend, v2.0 ground-up rewrite sharing zero code with v1, LangGraph tightly coupled |
-| Security Approach | delegates auth and RBAC to external layers -- designed for trusted corporate network deployment, public use pairs naturally with an external auth layer |
+| Security Approach | delegates auth and RBAC to external layers — designed for trusted corporate network deployment, public use pairs naturally with an external auth layer |
 | Context Strategy | summarize-based compaction, DanglingToolCallMiddleware patches orphan tool calls from interrupted sessions |
 | Documentation | v2.0 rewrite docs exist, middleware ordering undocumented outside the source code |
 ## Architecture
@@ -92,9 +92,9 @@ _execution_pool = ThreadPoolExecutor(max_workers=3, thread_name_prefix="subagent
 
 The batching is enforced at two levels: `SubagentLimitMiddleware` silently truncates excess `task()` calls, and the system prompt has 200+ lines teaching the model to count sub-tasks and plan batches.
 
-That prompt section is thorough -- over 200 lines teaching the model to count sub-tasks and plan batches. It's the kind of thing you write after the model has launched 8 parallel tasks and crashed. The belt-and-suspenders approach (runtime hard cap + detailed prompt guidance) shows the team's commitment to reliability. As models get better at parallelism natively, this prompt could likely be trimmed down, and it's well-positioned for that.
+That prompt section is thorough — over 200 lines teaching the model to count sub-tasks and plan batches. It's the kind of thing you write after the model has launched 8 parallel tasks and crashed. The belt-and-suspenders approach (runtime hard cap + detailed prompt guidance) shows the team's commitment to reliability. As models get better at parallelism natively, this prompt could likely be trimmed down, and it's well-positioned for that.
 
-**One interesting design choice:** subagent depth is exactly 1. Subagents can't spawn their own subagents. For 90% of tasks this is the right call -- it keeps the system predictable and debuggable. Deep recursive decomposition (e.g., analyzing a multi-module codebase where each module has sub-components) is an area for future growth, and the architecture is well-positioned to add depth if needed.
+**One interesting design choice:** subagent depth is exactly 1. Subagents can't spawn their own subagents. For 90% of tasks this is the right call — it keeps the system predictable and debuggable. Deep recursive decomposition (e.g., analyzing a multi-module codebase where each module has sub-components) is an area for future growth, and the architecture is well-positioned to add depth if needed.
 
 ---
 
@@ -135,7 +135,7 @@ Compared to OpenClaw's flat `MEMORY.md` or Claude Code's `CLAUDE.md` rules file,
 | Multi-agent | Per-agent isolated memory | Per-workspace | Per-project |
 
 
-The debounced update design is smart -- you don't want an LLM call after every single message. The underlying storage is a single JSON file with `mtime`-based cache invalidation, which works well for single-user local deployment. For multi-tenant scenarios, the storage layer would be a natural place to add file locking or swap in a database backend -- the clean separation makes that kind of upgrade straightforward.
+The debounced update design is smart — you don't want an LLM call after every single message. The underlying storage is a single JSON file with `mtime`-based cache invalidation, which works well for single-user local deployment. For multi-tenant scenarios, the storage layer would be a natural place to add file locking or swap in a database backend — the clean separation makes that kind of upgrade straightforward.
 
 ---
 
@@ -192,9 +192,9 @@ The middleware-first architecture is DeerFlow's strongest bet. Clean separation 
 
 The memory system is a step above most agent frameworks too. Structured JSON with confidence scores, three time horizons, and debounced async updates — compared to the "append everything to a text file" approach most agents use, this actually thinks about *what* to remember. And the Dangling Tool Call fixer (`DanglingToolCallMiddleware`, 93 lines) solves one of those maddening bugs you'd never find without production experience: when a user interrupts mid-tool-call, the conversation history gets corrupted — an AI message says "I called tool X" but there's no corresponding response. The next LLM call chokes. Most frameworks don't handle this at all; they crash or hallucinate past the broken history. This is defensive engineering born from real incidents.
 
-That said, I'm curious about the LangGraph foundation. LangGraph adds abstraction that can make debugging more indirect -- when something goes wrong inside the agent loop, you're working through LangGraph's internals, not your own code. For a system already tracking 14 middleware ordering constraints, it'll be interesting to see how the team balances LangGraph's benefits (state management, checkpointing) against the cognitive overhead.
+That said, I'm curious about the LangGraph foundation. LangGraph adds abstraction that can make debugging more indirect — when something goes wrong inside the agent loop, you're working through LangGraph's internals, not your own code. For a system already tracking 14 middleware ordering constraints, it'll be interesting to see how the team balances LangGraph's benefits (state management, checkpointing) against the cognitive overhead.
 
-The operational side has room to grow. Token tracking exists (TokenUsageMiddleware), and per-thread or per-user spending limits would be a natural next step. The single-file JSON memory works well for personal use; adding file locking or a database backend would unlock multi-tenant scenarios. The security model delegates auth and RBAC to external layers -- for an internal ByteDance tool behind their network, that's a pragmatic choice. For open-source users spinning this up on a VPS, pairing it with an auth layer is straighforward.
+The operational side has room to grow. Token tracking exists (TokenUsageMiddleware), and per-thread or per-user spending limits would be a natural next step. The single-file JSON memory works well for personal use; adding file locking or a database backend would unlock multi-tenant scenarios. The security model delegates auth and RBAC to external layers — for an internal ByteDance tool behind their network, that's a pragmatic choice. For open-source users spinning this up on a VPS, pairing it with an auth layer is straightforward.
 
 The 200+ lines of prompt engineering for subagent orchestration is also notable. It reflects the reality that current models benefit from detailed parallelism guidance, and the team has invested in making it work reliably. The runtime already has a hard cap as a safety net. As models improve at planning, this prompt is well-structured for progressive trimming.
 
@@ -231,7 +231,7 @@ DeerFlow's middleware-first approach gives it the cleanest extensibility story o
 
 **Clarification must be LAST — and they learned this the hard way.** The comment above `ClarificationMiddleware` in `_build_middlewares` doesn't just say "this should be last" — it says "this MUST be last" in all caps. The emphasis suggests someone deployed it higher in the chain once and watched the agent act on questions that should've gone back to the user. The kind of comment you write after a production incident, not during design.
 
-**"SuperAgent harness" branding.** ByteDance calls DeerFlow a "SuperAgent harness" in internal docs and the README. It's a revealing choice -- DeerFlow isn't supposed to be the agent, it's the harness that manages agents. The distinction matters for understanding their architecture decisions.
+**"SuperAgent harness" branding.** ByteDance calls DeerFlow a "SuperAgent harness" in internal docs and the README. It's a revealing choice — DeerFlow isn't supposed to be the agent, it's the harness that manages agents. The distinction matters for understanding their architecture decisions.
 
 **The 200-line parallelism prompt.** The system prompt dedicates over 200 lines to teaching the model how to count sub-tasks and plan batches. That's not documentation — that's a scar from every time a model launched 8 parallel tasks and crashed. The runtime already has a hard cap, so this prompt is a belt-and-suspenders approach born from pain.
 
@@ -246,20 +246,20 @@ DeerFlow's middleware-first approach gives it the cleanest extensibility story o
 
 | Claim | Verification Method | Result |
 |-------|-------------------|--------|
-| 58,393 stars | GitHub API (`/repos/bytedance/deer-flow`) | âœ… Verified |
-| 7,312 forks | GitHub API | âœ… Verified |
-| Language: Python + TypeScript | GitHub API + repo structure | âœ… Verified (Python primary, Next.js frontend) |
-| License: MIT | GitHub API `license.spdx_id` | âœ… Verified |
-| First commit May 2025 | GitHub API `created_at`: 2025-05-07 | âœ… Verified |
-| v2.0 complete rewrite | README + changelog | âœ… Verified (Feb 2026, shares zero code with v1) |
-| 14+ middlewares | `_build_middlewares` function in source | âœ… Verified |
-| Loop detection: warn@3, kill@5 | `LoopDetectionMiddleware` source | âœ… Verified |
-| 3 concurrent subagents | ThreadPoolExecutor `max_workers=3` | âœ… Verified |
-| 15-min subagent timeout | SubAgent configuration | âœ… Verified |
-| Feishu/Slack/Telegram channels | IM bridge implementations | âœ… Verified |
-| mtime-based cache invalidation | Memory storage layer | âœ… Verified |
-| Auth delegated to external layers | API layer inspection | âœ… Verified (delegates to external auth) |
-| LangGraph foundation | `pyproject.toml` dependencies | âœ… Verified |
+| 58,393 stars | GitHub API (`/repos/bytedance/deer-flow`) | Verified Verified |
+| 7,312 forks | GitHub API | Verified Verified |
+| Language: Python + TypeScript | GitHub API + repo structure | Verified Verified (Python primary, Next.js frontend) |
+| License: MIT | GitHub API `license.spdx_id` | Verified Verified |
+| First commit May 2025 | GitHub API `created_at`: 2025-05-07 | Verified Verified |
+| v2.0 complete rewrite | README + changelog | Verified Verified (Feb 2026, shares zero code with v1) |
+| 14+ middlewares | `_build_middlewares` function in source | Verified Verified |
+| Loop detection: warn@3, kill@5 | `LoopDetectionMiddleware` source | Verified Verified |
+| 3 concurrent subagents | ThreadPoolExecutor `max_workers=3` | Verified Verified |
+| 15-min subagent timeout | SubAgent configuration | Verified Verified |
+| Feishu/Slack/Telegram channels | IM bridge implementations | Verified Verified |
+| mtime-based cache invalidation | Memory storage layer | Verified Verified |
+| Auth delegated to external layers | API layer inspection | Verified Verified (delegates to external auth) |
+| LangGraph foundation | `pyproject.toml` dependencies | Verified Verified |
 
 </details>
 
