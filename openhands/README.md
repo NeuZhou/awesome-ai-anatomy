@@ -1,4 +1,4 @@
-﻿# OpenHands: 10 Ways to Manage Memory on Purpose, 70K Stars, 400K Lines of Active-Migration Python
+﻿# OpenHands: 10 Ways to Manage Memory on Purpose, 70K Stars, 400K Lines of Mid-Migration Python
 
 ## TL;DR
 
@@ -10,7 +10,7 @@
 
 Here's the thing that caught me off guard: OpenHands lets the agent *ask* to forget things.
 
-Most agents slam into their context window like a car into a wall - the system either truncates or summarizes, and the agent has no say in it. OpenHands gives the agent a `CondensationRequestTool`. The agent can literally say "my context is getting full, compress me now." That's... not something I'd seen before. (I'm curious how well it works in practice versus the system-triggered condensation -- it'll be interesting to see benchmarks. The idea alone is compelling.)
+Most agents slam into their context window like a car into a wall - the system either truncates or summarizes, and the agent has no say in it. OpenHands gives the agent a `CondensationRequestTool`. The agent can literally say "my context is getting full, compress me now." That's... not something I'd seen before. (I'm curious how well it works in practice versus the system-triggered condensation — it'll be interesting to see benchmarks. The idea alone is compelling.)
 
 And then there's the stuck detector. Not a "retry 3 times and give up" counter - a 487-line class that analyzes event history for repeated patterns, detects error-action cycles, and tries to break loops by changing the agent's approach. This thing has its own test suite (409 lines). Most agents pretend loops don't happen.
 
@@ -41,7 +41,7 @@ OpenHands is a web-based AI agent platform for software development. Runs code i
 
 | Dimension | Description |
 |-----------|-------------|
-| Architecture | event-driven agent loop (1391 lines), 6 agent types, Docker sandbox per session, V0/V1 architecture coexisting during active migration |
+| Architecture | event-driven agent loop (1391 lines), 6 agent types, Docker sandbox per session, V0/V1 architecture coexisting during migration |
 | Code Organization | 400K LOC (287K Python + 114K TypeScript), FastAPI server, LiteLLM providers, 21157-node GitNexus index with 1102 clusters |
 | Security Approach | 3-layer: GraySwan (adversarial testing) + Invariant (runtime policy) + LLM-analyzer (semantic review of agent actions) |
 | Context Strategy | 10-condenser pipeline: progressive compression from observation masking to structured summarization to amortized forgetting |
@@ -129,10 +129,10 @@ graph LR
 
 Five layers. Three entry points (web UI, CLI, issue resolver) funnel into the V1 App Server, which routes to the V0 Legacy Core. The core is event-driven, centered on the `AgentController` - a 1,391-line class that does... kind of everything. Agent loop, stuck detection, delegation, security checks. Agents (mainly CodeActAgent) produce actions that pass through Memory and Security before hitting the Runtime, which executes stuff inside Docker containers.
 
-The important thing to internalize: **this codebase is actively migrating.** Every file in `controller/`, `agenthub/`, `security/`, and `runtime/` has a deprecation banner pointing to a V1 Software Agent SDK. The V1 app server (`app_server/`) is already here with 15,218 lines, and it still calls the V0 controller for the actual agent loop. So routing is V1 while the agent brain is V0. Think of it as renovating a house while living in it -- impressive that everything keeps working.
+The important thing to internalize: **this codebase is actively migrating.** Every file in `controller/`, `agenthub/`, `security/`, and `runtime/` has a deprecation banner pointing to a V1 Software Agent SDK. The V1 app server (`app_server/`) is already here with 15,218 lines, and it still calls the V0 controller for the actual agent loop. So routing is V1 while the agent brain is V0. Think of it as renovating a house while living in it — impressive that everything keeps working.
 
 **Files to dig into:**
-- `openhands/controller/agent_controller.py` -- The 1,391-line central orchestrator (Legacy V0)
+- `openhands/controller/agent_controller.py` — The 1,391-line central orchestrator (Legacy V0)
 - `openhands/controller/stuck.py` - 487-line stuck detection (Legacy V0)
 - `openhands/memory/condenser/condenser.py` - Condenser base class and registry
 - `openhands/security/grayswan/analyzer.py` - GraySwan security analyzer
@@ -287,13 +287,13 @@ An interesting situation for contributors: the comments explicitly say "please a
 
 ## The Verdict
 
-The condenser pipeline is the standout. Ten composable strategies, voluntary condensation requests, auditable condensation events -- it's the most thoughtful context management in any open-source agent I've read. If you're building an agent and need context management inspiration, start here. (I'd love to see benchmarks on which pipeline combinations work best -- the code is there, and the evaluation data would be a great addition.)
+The condenser pipeline is the standout. Ten composable strategies, voluntary condensation requests, auditable condensation events — it's the most thoughtful context management in any open-source agent I've read. If you're building an agent and need context management inspiration, start here. (I'd love to see benchmarks on which pipeline combinations work best — the code is there, and the evaluation data would be a great addition.)
 
 Security is more structured than anything else in the open-source agent space. Three complementary approaches that can be used alone or together. Compare to Claude Code's static allowlist or Cline's ¯\_(ツ)_/¯ approach.
 
 Stuck detection is what other projects should steal tomorrow. A 487-line dedicated class with pattern analysis and a real test suite. This is what "treating a problem seriously" looks like.
 
-But. The V0/V1 migration is worth keeping in mind. 287K lines of Python with deprecation banners and a deferred timeline means it's worth checking which code path is canonical before building on top. The `AgentController` at 1,391 lines is a candidate for decomposition into focused modules - and the V1 SDK promises exactly that.
+But. The V0/V1 migration is the elephant in the room. 287K lines of Python with deprecation banners and a deferred timeline means you'll want to check which code path is canonical before building on top. The `AgentController` at 1,391 lines is a candidate for decomposition into focused modules — and the V1 SDK promises exactly that.
 
 The `critic` module is thin - 57 lines total. `AgentFinishedCritic` checks if the agent called finish and if the git patch is non-empty. The base class is clean; adding richer evaluators would be high-impact. (An integration with SWE-bench scoring here would be interesting.)
 
@@ -316,7 +316,7 @@ Would I use it? For automated issue resolution and PR workflows - absolutely, th
 | Delegation | Hierarchical sub-agents | Multi-agent | Sub-agent handler | None |
 | LOC | ~400K | ~510K | ~200K | ~560K |
 
-OpenHands wins on breadth. More agent types, more condensation strategies, more security layers, more git integrations. That breadth does come with complexity: the V0/V1 transition and a 400K-line codebase being rewritten while it ships are worth keeping in mind. Claude Code and Goose are more cohesive - fewer things, unified code. Cline takes a different approach: focused on VS Code integration and provider breadth rather than sandboxing or stuck detection, and it's the most approachable to read.
+OpenHands wins on breadth. More agent types, more condensation strategies, more security layers, more git integrations. That breadth costs complexity though — the V0/V1 transition and a 400K-line codebase being rewritten while it ships is a lot to navigate. Claude Code and Goose are more cohesive — fewer things, unified code. Cline takes a different approach: focused on VS Code integration and provider breadth rather than sandboxing or stuck detection, and it's the most approachable to read.
 
 ---
 
