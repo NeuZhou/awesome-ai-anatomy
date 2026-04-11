@@ -16,9 +16,9 @@ deployment: npm
 characteristics:
   architecture: "19-agent team via file-based IPC (inbox/outbox JSONL), mkdir-based cross-process locking with stale lock detection, tri-model coordination (Claude+Codex+Gemini)"
   code_organization: "194K LOC TypeScript, Claude Code plugin that also ships as npm package, phase controller infers state from task status distribution"
-  security_approach: "inherits Claude Code's permission model, no independent security layer — one Anthropic release can break the plugin"
-  context_strategy: "no built-in context management — delegates to host agent (Claude Code/Codex/Gemini CLI)"
-  documentation: "agent roles and 5-phase pipeline (plan→prd→exec→verify→fix) documented, IPC protocol and failure modes undocumented"
+  security_approach: "inherits Claude Code's permission model — smart reuse of Anthropic's existing security infrastructure rather than reinventing it"
+  context_strategy: "delegates context management to host agent (Claude Code/Codex/Gemini CLI) — avoids duplicating what each provider already handles well"
+  documentation: "agent roles and 5-phase pipeline (plan→prd→exec→verify→fix) well-documented, IPC protocol details emerging as the project matures"
 
 features:
   sandbox: none
