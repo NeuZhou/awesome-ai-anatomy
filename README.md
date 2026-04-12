@@ -24,7 +24,9 @@
 > **oh-my-codex** runs 30 AI agents in parallel using git worktrees for isolation.
 > None of this is in the docs. We found it by reading every file.
 
-<p align="center"><i>⭐ Star = subscribe to weekly teardowns. GitHub notifies you when we publish.</i></p>
+<p align="center">
+ <b>New teardown every Tuesday</b> · <a href="https://neuzhou.substack.com"><b>Get it in your inbox</b></a> (free) · <a href="https://twitter.com/Neuzhou_">Follow on X</a>
+</p>
 
 # Awesome AI Anatomy
 
@@ -178,17 +180,15 @@ Found an error? Have a better analysis? PRs welcome.
 
 ## Stay Updated
 
-New teardown every week. Cursor, Windsurf, and others are on the list.
+New teardown every Tuesday.
 
-**⭐ Star this repo** - GitHub will notify you when new teardowns drop.
+**[Subscribe to AI Anatomy Newsletter](https://neuzhou.substack.com)** -- the full analysis, delivered to your inbox. Free.
 
-**Watch** - Get notified for every new teardown, not just the ones that trend.
+**[Follow @Neuzhou_ on X](https://twitter.com/Neuzhou_)** -- teardown highlights + AI agent commentary.
 
-15 deep-dives published so far. The next batch is already in progress.
+Star to bookmark this repo. Watch > Releases to get GitHub notifications when new teardowns drop.
 
-- [Changelog](CHANGELOG.md) - track every update
-- Substack: [AI Anatomy Newsletter](https://neuzhou.substack.com) - teardown highlights in your inbox (coming soon)
-- Discord: [Join the discussion](https://discord.gg/kAQD7Cj8) - talk architecture decisions with us
+16 deep-dives published so far. The next batch is already in progress.
 
 <p align="center">
  <a href="https://star-history.com/#NeuZhou/awesome-ai-anatomy&Date">
