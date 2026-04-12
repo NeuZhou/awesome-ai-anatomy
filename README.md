@@ -11,7 +11,7 @@
  <a href="https://github.com/NeuZhou/awesome-ai-anatomy/network/members"><img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks"></a>
  <a href="https://twitter.com/Neuzhou_"><img src="https://img.shields.io/twitter/follow/Neuzhou_?style=social" alt="Twitter"></a>
  <a href="https://neuzhou.substack.com"><img src="https://img.shields.io/badge/Substack-Newsletter-orange?logo=substack" alt="Substack"></a>
- <img src="https://img.shields.io/badge/teardowns-15-blue" alt="Teardowns">
+ <img src="https://img.shields.io/badge/teardowns-16-blue" alt="Teardowns">
  <img src="https://img.shields.io/badge/updated-weekly-brightgreen" alt="Updated Weekly">
  <img src="https://img.shields.io/github/last-commit/NeuZhou/awesome-ai-anatomy?label=Last%20Updated" alt="Last Updated">
  <img src="https://img.shields.io/badge/license-MIT-orange" alt="License">
@@ -20,7 +20,7 @@
 <h3 align="center">Source code teardowns of AI coding agents. Architecture diagrams, design patterns, and the stuff nobody documents.</h3>
 
 > **Claude Code** hides 18 virtual pet species inside production code that runs on your machine.
-> **MemPalace** got 30K stars in 4 days — with 7,600 lines of Python.
+> **MemPalace** got 30K stars in 4 days - with 7,600 lines of Python.
 > **oh-my-codex** runs 30 AI agents in parallel using git worktrees for isolation.
 > None of this is in the docs. We found it by reading every file.
 
@@ -28,7 +28,7 @@
 
 # Awesome AI Anatomy
 
-15 AI agent projects dissected — architecture diagrams, design patterns, and the engineering decisions nobody documents.
+15 AI agent projects dissected - architecture diagrams, design patterns, and the engineering decisions nobody documents.
 
 ---
 
@@ -51,11 +51,11 @@ The 5 findings people can't stop sharing:
 
 | # | Finding | Project | Why It Matters |
 |---|---------|---------|---------------|
-| 1 | **Claude Code ships 18 virtual pet species** — a full tamagotchi system hidden in a coding agent | [Claude Code](claude-code/) | What else is hiding in tools you run with `sudo`? |
+| 1 | **Claude Code ships 18 virtual pet species** - a full tamagotchi system hidden in a coding agent | [Claude Code](claude-code/) | What else is hiding in tools you run with `sudo`? |
 | 2 | **Pi Mono's "stealth mode" mirrors Claude Code tool names** for provider compatibility | [Pi Mono](pi-mono/) | Open-source projects gaming API providers is a trend |
-| 3 | **MiroFish's "collective intelligence" = LLM social simulation** — agents role-playing humans on a simulated social network | [MiroFish](mirofish/) | 50K stars driven by a compelling vision of agent-based prediction |
-| 4 | **Lightpanda's bitcast dispatch** makes Zig act like a language with vtables — a systems trick we'd never seen before | [Lightpanda](lightpanda-browser/) | Zig comptime metaprogramming pushed to its limits |
-| 5 | **DeerFlow's orphan tool call bug** — 93 lines of code fix a crash that affects every LangGraph-based agent | [DeerFlow](deer-flow/) | If you use LangGraph, you probably have this bug too |
+| 3 | **MiroFish's "collective intelligence" = LLM social simulation** - agents role-playing humans on a simulated social network | [MiroFish](mirofish/) | 50K stars driven by a compelling vision of agent-based prediction |
+| 4 | **Lightpanda's bitcast dispatch** makes Zig act like a language with vtables - a systems trick we'd never seen before | [Lightpanda](lightpanda-browser/) | Zig comptime metaprogramming pushed to its limits |
+| 5 | **DeerFlow's orphan tool call bug** - 93 lines of code fix a crash that affects every LangGraph-based agent | [DeerFlow](deer-flow/) | If you use LangGraph, you probably have this bug too |
 
 > These are real findings from reading source code, not vibes from README files.
 
@@ -65,7 +65,7 @@ Ever wondered how Claude Code manages its context window? Or why Codex CLI chose
 
 ## Project Index
 
-15 AI agent source code analyses — from orchestration frameworks to coding assistants.
+15 AI agent source code analyses - from orchestration frameworks to coding assistants.
 
 > On mobile? Scroll right to see all columns, or tap a project name to read the full teardown.
 
@@ -73,19 +73,20 @@ Ever wondered how Claude Code manages its context window? Or why Codex CLI chose
 |---|---------|-------|----------|-------|-------------|--------|
 | 001 | [**Dify**](dify/) | 136K | Python + TS | 1.24M | `graphon` engine, 7+ containers, 30+ vector DBs | Published |
 | 002 | [**Claude Code**](claude-code/) | 109K | TypeScript | 510K | 4-layer context, hidden pet system (18 species) | Published |
-| 003 | [**OpenHands**](openhands/) | 71K | Python + TS | 400K | 10 condensers, 3-layer security, 487-line stuck detector | **NEW** |
-| 004 | [**Cline**](cline/) | 60K | TypeScript | 560K | 3,756-line God Object, 40+ providers, YOLO mode, hooks system | Published |
-| 005 | [**DeerFlow**](deer-flow/) | 58K | Python + TS | 180K | 14-layer middleware, hash loop kill@5, no RBAC | Published |
-| 006 | [**MiroFish**](mirofish/) | 50K | Python + Vue | 39K | LLM social simulation engine for collective intelligence | Published |
-| 007 | [**Goose**](goose/) | 37K | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | Published |
-| 008 | [**Pi Mono**](pi-mono/) | 32K | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | Published |
-| 009 | [**MemPalace**](mempalace/) | 30K | Python | 9K | Milla Jovovich's 4-layer memory palace, AAAK dialect debunked | **NEW** |
-| 010 | [**OpenAI Codex CLI**](codex-cli/) | 27K | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | Published |
-| 011 | [**Lightpanda**](lightpanda-browser/) | 27K | Zig + Rust | 91K | From-scratch browser for AI agents, 9x Chrome | Published |
-| 012 | [**Hermes Agent**](hermes-agent/) | 26K | Python | 260K | Self-improving skills, FTS5 search, frozen mem | Published |
-| 013 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | Published |
-| 014 | [**oh-my-codex**](oh-my-codex/) | 19.5K | TypeScript | 124K | 30 agents, git worktrees, plugin hook SDK, autoresearch loops | **NEW** |
-| 015 | [**Guardrails AI**](guardrails-ai/) | 6.6K | Python | 18K | Validator Hub, reask self-correction loop | Published |
+| 003 | [**Browser Use**](browser-use/) | 87K | Python | 53K | Raw CDP over Playwright, DOM pipeline beats screenshots 5x, skills system, custom Chromium fork | **NEW** |
+| 004 | [**OpenHands**](openhands/) | 71K | Python + TS | 400K | 10 condensers, 3-layer security, 487-line stuck detector | Published |
+| 005 | [**Cline**](cline/) | 60K | TypeScript | 560K | 3,756-line God Object, 40+ providers, YOLO mode, hooks system | Published |
+| 006 | [**DeerFlow**](deer-flow/) | 58K | Python + TS | 180K | 14-layer middleware, hash loop kill@5, no RBAC | Published |
+| 007 | [**MiroFish**](mirofish/) | 50K | Python + Vue | 39K | LLM social simulation engine for collective intelligence | Published |
+| 008 | [**Goose**](goose/) | 37K | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | Published |
+| 009 | [**Pi Mono**](pi-mono/) | 32K | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | Published |
+| 010 | [**MemPalace**](mempalace/) | 30K | Python | 9K | Milla Jovovich's 4-layer memory palace, AAAK dialect debunked | Published |
+| 011 | [**OpenAI Codex CLI**](codex-cli/) | 27K | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | Published |
+| 012 | [**Lightpanda**](lightpanda-browser/) | 27K | Zig + Rust | 91K | From-scratch browser for AI agents, 9x Chrome | Published |
+| 013 | [**Hermes Agent**](hermes-agent/) | 26K | Python | 260K | Self-improving skills, FTS5 search, frozen mem | Published |
+| 014 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | Published |
+| 015 | [**oh-my-codex**](oh-my-codex/) | 19.5K | TypeScript | 124K | 30 agents, git worktrees, plugin hook SDK, autoresearch loops | Published |
+| 016 | [**Guardrails AI**](guardrails-ai/) | 6.6K | Python | 18K | Validator Hub, reask self-correction loop | Published |
 
 Projects sorted by GitHub stars (descending).
 
@@ -93,16 +94,16 @@ Projects sorted by GitHub stars (descending).
 
 ## Cross-Project Comparison
 
-**[Interactive Comparison Tool](https://neuzhou.github.io/awesome-ai-anatomy/comparison.html)** — filter, search, and compare projects side by side.
+**[Interactive Comparison Tool](https://neuzhou.github.io/awesome-ai-anatomy/comparison.html)** - filter, search, and compare projects side by side.
 
-We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 15 projects:
+We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 16 projects:
 
 - Quick Reference (creator, stars, language, type, license)
 - Architecture patterns (agent loop, extensibility, deployment)
 - Multi-agent & orchestration approaches
 - Memory & persistence strategies
 
-We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal analysis covering:
+We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** - a deep horizontal analysis covering:
 
 - Architecture pattern taxonomy across all projects
 - Context management strategies compared
@@ -131,14 +132,14 @@ We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal an
 
 ## Each Teardown Includes
 
-- **Architecture diagrams** — Mermaid + hand-drawn style PNGs showing component relationships
-- **Detailed analysis** — security posture, architecture trade-offs, code quality observations
-- **Core innovation analysis** — what the project does that nobody else does
-- **Code-level references** — file paths + line numbers for every claim
-- **Cross-project comparison table** — how it stacks up against alternatives
-- **"Stuff Worth Stealing"** — patterns other projects should adopt
-- **Verification log** — every factual claim fact-checked against source code
-- **Easter eggs and hidden details** — the stuff you'd only find reading every file
+- **Architecture diagrams** - Mermaid + hand-drawn style PNGs showing component relationships
+- **Detailed analysis** - security posture, architecture trade-offs, code quality observations
+- **Core innovation analysis** - what the project does that nobody else does
+- **Code-level references** - file paths + line numbers for every claim
+- **Cross-project comparison table** - how it stacks up against alternatives
+- **"Stuff Worth Stealing"** - patterns other projects should adopt
+- **Verification log** - every factual claim fact-checked against source code
+- **Easter eggs and hidden details** - the stuff you'd only find reading every file
 
 ---
 
@@ -146,20 +147,19 @@ We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal an
 
 Beyond individual teardowns, we maintain cross-cutting analysis:
 
-- **[COMPARISON.md](COMPARISON.md)** — Side-by-side comparison across all 15 projects
-- **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — Patterns, anti-patterns, and architectural trends
-- **[knowledge/](knowledge/)** — Structured knowledge base: design patterns, anti-patterns, and project metadata
+- **[COMPARISON.md](COMPARISON.md)** - Side-by-side comparison across all 16 projects
+- **[CROSS-CUTTING.md](CROSS-CUTTING.md)** - Patterns, anti-patterns, and architectural trends
+- **[knowledge/](knowledge/)** - Structured knowledge base: design patterns, anti-patterns, and project metadata
 
 ---
 
 ## Coming Next
 
-- [ ] browser-use (86K stars) — AI browser automation, Python
-- [ ] Crush (22K stars) — OpenCode's successor, built by the Charm team (Bubble Tea)
-- [ ] Aider (36K stars) — Git-native AI pair programming, Python
-- [ ] Continue (28K stars) — Open-source AI IDE extension, TypeScript
-- [ ] Cursor — the most controversial AI IDE (closed source, partial analysis)
-- [ ] Windsurf — Codeium's AI IDE fork (closed source, partial analysis)
+- [ ] Crush (22K stars) - OpenCode's successor, built by the Charm team (Bubble Tea)
+- [ ] Aider (36K stars) - Git-native AI pair programming, Python
+- [ ] Continue (28K stars) - Open-source AI IDE extension, TypeScript
+- [ ] Cursor - the most controversial AI IDE (closed source, partial analysis)
+- [ ] Windsurf - Codeium's AI IDE fork (closed source, partial analysis)
 
 Have a project in mind? → [Suggest a teardown](https://github.com/NeuZhou/awesome-ai-anatomy/issues)
 
@@ -180,15 +180,15 @@ Found an error? Have a better analysis? PRs welcome.
 
 New teardown every week. Cursor, Windsurf, and others are on the list.
 
-**⭐ Star this repo** — GitHub will notify you when new teardowns drop.
+**⭐ Star this repo** - GitHub will notify you when new teardowns drop.
 
-**Watch** — Get notified for every new teardown, not just the ones that trend.
+**Watch** - Get notified for every new teardown, not just the ones that trend.
 
 15 deep-dives published so far. The next batch is already in progress.
 
-- [Changelog](CHANGELOG.md) — track every update
-- Substack: [AI Anatomy Newsletter](https://neuzhou.substack.com) — teardown highlights in your inbox (coming soon)
-- Discord: [Join the discussion](https://discord.gg/kAQD7Cj8) — talk architecture decisions with us
+- [Changelog](CHANGELOG.md) - track every update
+- Substack: [AI Anatomy Newsletter](https://neuzhou.substack.com) - teardown highlights in your inbox (coming soon)
+- Discord: [Join the discussion](https://discord.gg/kAQD7Cj8) - talk architecture decisions with us
 
 <p align="center">
  <a href="https://star-history.com/#NeuZhou/awesome-ai-anatomy&Date">
@@ -200,14 +200,14 @@ New teardown every week. Cursor, Windsurf, and others are on the list.
 
 ## Legal Notice
 
-These teardowns are independent technical commentary for educational purposes under fair use (criticism, commentary, and education). Analysis of proprietary products is based on publicly available information including published npm packages, source maps, and documentation. No source code from analyzed projects is hosted in this repository — only short citations for commentary.
+These teardowns are independent technical commentary for educational purposes under fair use (criticism, commentary, and education). Analysis of proprietary products is based on publicly available information including published npm packages, source maps, and documentation. No source code from analyzed projects is hosted in this repository - only short citations for commentary.
 
-Project names and trademarks belong to their respective owners. Star counts and metrics are snapshots at time of writing. Analysis may contain errors — please verify claims against current source code.
+Project names and trademarks belong to their respective owners. Star counts and metrics are snapshots at time of writing. Analysis may contain errors - please verify claims against current source code.
 
 For takedown requests, please [open an issue](https://github.com/NeuZhou/awesome-ai-anatomy/issues/new) with specific concerns.
 
 ---
 
 <p align="center">
- <i>15 projects dissected. Updated weekly.</i>
+ <i>16 projects dissected. Updated weekly.</i>
 </p>
