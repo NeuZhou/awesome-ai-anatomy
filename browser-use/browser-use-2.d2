@@ -1,0 +1,74 @@
+direction: down
+
+title: "Agent Loop: Just a For-Loop (With Smart Tricks)" {
+  style.font-size: 24
+  near: top-center
+}
+
+loop: "while step < max_steps" {
+  style.fill: "#fefce8"
+  style.stroke: "#d97706"
+  style.bold: true
+
+  step1: "1. Get Browser State" {
+    style.fill: "#0891b2"
+    style.font-color: "#fff"
+    label: "1. Get Browser State\n(DOM + optional screenshot)"
+  }
+  step2: "2. Build Message" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+    label: "2. Build Message\n(history + state + task)"
+  }
+  step3: "3. Call LLM" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+    label: "3. Call LLM\n{thinking, memory,\nnext_goal, actions}"
+  }
+  step4: "4. Execute Actions" {
+    style.fill: "#16a34a"
+    style.font-color: "#fff"
+    label: "4. Execute Actions\n(abort if page changes)"
+  }
+  step5: "5. Record + Check" {
+    style.fill: "#059669"
+    style.font-color: "#fff"
+    label: "5. Record Results\n(done? continue?)"
+  }
+
+  step1 -> step2
+  step2 -> step3
+  step3 -> step4
+  step4 -> step5
+  step5 -> step1: next step
+}
+
+tricks: "Smart Tricks Around the Loop" {
+  style.fill: "#f0f4ff"
+  style.stroke: "#2563eb"
+
+  plan: "Planning Mode" {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+    label: "Planning Mode\n(todo.md with checkboxes\nfor complex tasks)"
+  }
+  judge: "Judge" {
+    style.fill: "#3b82f6"
+    style.font-color: "#fff"
+    label: "Judge\n(detect loops: repeated\nactions, same URL 3+ steps)"
+  }
+  compact: "Compaction" {
+    style.fill: "#60a5fa"
+    style.font-color: "#fff"
+    label: "History Compaction\n(summarize after ~40K chars,\ntag as 'unverified')"
+  }
+  ephemeral: "Ephemeral State" {
+    style.fill: "#93c5fd"
+    label: "Ephemeral Messages\n(DOM snapshot shown once,\nthen discarded)"
+  }
+}
+
+loop.step3 -> tricks.plan: complex?
+loop.step5 -> tricks.judge: stuck?
+loop.step2 -> tricks.compact: too long?
+loop.step1 -> tricks.ephemeral: include once

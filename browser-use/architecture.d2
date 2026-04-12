@@ -1,0 +1,165 @@
+direction: down
+
+entry: Entry Points {
+  style.fill: "#f0f4ff"
+  style.stroke: "#2563eb"
+
+  sdk: Python SDK {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+    label: "Python SDK\n(pip install browser-use)"
+  }
+  cloud: Cloud API {
+    style.fill: "#3b82f6"
+    style.font-color: "#fff"
+    label: "Cloud API\n(browser-use.com)"
+  }
+}
+
+agent: "Agent Core (agent/service.py -- 4,100 lines)" {
+  style.fill: "#fefce8"
+  style.stroke: "#d97706"
+  style.bold: true
+
+  loop: "while step < max_steps" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+    style.bold: true
+  }
+  planner: Planner {
+    label: "Planner\n(todo.md for complex tasks)"
+    style.fill: "#f59e0b"
+    style.font-color: "#fff"
+  }
+  judge: Judge {
+    label: "Judge\n(loop detection, stuck check)"
+    style.fill: "#f59e0b"
+    style.font-color: "#fff"
+  }
+  history: Message Manager {
+    label: "Message Manager\n(compaction + ephemeral state)"
+    style.fill: "#f59e0b"
+    style.font-color: "#fff"
+  }
+
+  loop -> planner: complex tasks
+  loop -> judge: every N steps
+  loop -> history: context mgmt
+}
+
+browser: Browser Layer {
+  style.fill: "#ecfeff"
+  style.stroke: "#0891b2"
+
+  cdp: "Raw CDP\n(Chrome DevTools Protocol)" {
+    style.fill: "#0891b2"
+    style.font-color: "#fff"
+  }
+  fork: "Custom Chromium Fork\n(stealth patches at C++ level)" {
+    style.fill: "#0e7490"
+    style.font-color: "#fff"
+  }
+  watchdogs: "Watchdogs (14 modules, 360KB)" {
+    label: "Watchdogs\n(CAPTCHA, popups, crashes,\ndownloads, security, HAR)"
+    style.fill: "#06b6d4"
+    style.font-color: "#fff"
+  }
+}
+
+dom: DOM Pipeline {
+  style.fill: "#f0fdf4"
+  style.stroke: "#16a34a"
+
+  service: "DomService (1,166 lines)" {
+    style.fill: "#16a34a"
+    style.font-color: "#fff"
+    label: "DomService\n(3 parallel CDP calls)"
+  }
+  serializer: "DOMTreeSerializer (1,290 lines)" {
+    style.fill: "#22c55e"
+    style.font-color: "#fff"
+    label: "Serializer\n(simplify + paint order +\nbbox + index assignment)"
+  }
+  output: "LLM-ready text" {
+    label: "Output\n[index]<tag attr=val />\n(tab-indented, compact)"
+    style.fill: "#bbf7d0"
+  }
+
+  service -> serializer: enhanced DOM tree
+  serializer -> output: 4 filter passes
+}
+
+llm: LLM Providers {
+  style.fill: "#faf5ff"
+  style.stroke: "#7c3aed"
+
+  custom: "Custom Client Layer\n(no LangChain)" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+  }
+  providers: "Anthropic | OpenAI | Google\nGroq | DeepSeek | Ollama" {
+    style.fill: "#8b5cf6"
+    style.font-color: "#fff"
+  }
+  cache: "KV Cache Optimization\n(history before state)" {
+    style.fill: "#a855f7"
+    style.font-color: "#fff"
+  }
+
+  custom -> providers
+  custom -> cache
+}
+
+skills: Skills System {
+  style.fill: "#ecfdf5"
+  style.stroke: "#059669"
+
+  extract: "Trajectory Review\n(post-task LLM pass)" {
+    style.fill: "#059669"
+    style.font-color: "#fff"
+  }
+  store: "Skill Store\n(URL pattern + recipe)" {
+    style.fill: "#10b981"
+    style.font-color: "#fff"
+  }
+  feedback: "Social Feedback\n(+1/-1 with reasons)" {
+    style.fill: "#34d399"
+    style.font-color: "#fff"
+  }
+  pii: "PII Gate\n(LLM-based filter)" {
+    style.fill: "#6ee7b7"
+  }
+
+  extract -> pii: skill candidate
+  pii -> store: clean skill
+  store -> feedback: agent usage
+}
+
+sandbox: Sandbox (Cloud) {
+  style.fill: "#fdf4ff"
+  style.stroke: "#a855f7"
+
+  vm: "Unikraft micro-VM\n(<1s boot)" {
+    style.fill: "#a855f7"
+    style.font-color: "#fff"
+  }
+  ctrl: "Control Plane\n(LLM proxy, S3 presign)" {
+    style.fill: "#c084fc"
+    style.font-color: "#fff"
+  }
+
+  vm -> ctrl: all external calls
+}
+
+# Connections
+entry.sdk -> agent.loop: Agent()
+entry.cloud -> sandbox.vm: API request
+sandbox.vm -> agent.loop: isolated exec
+
+agent.loop -> dom.service: get browser state
+agent.loop -> llm.custom: LLM call
+agent.loop -> skills.store: check for known skill
+
+dom.service -> browser.cdp: 3 parallel CDP calls
+browser.cdp -> browser.fork: raw protocol
+browser.watchdogs -> browser.cdp: async event listeners

@@ -1,0 +1,87 @@
+direction: down
+
+title: "DOM Pipeline: From Raw Page to LLM-Ready Text" {
+  style.font-size: 24
+  near: top-center
+}
+
+cdp: "3 Parallel CDP Calls" {
+  style.fill: "#ecfeff"
+  style.stroke: "#0891b2"
+
+  snap: "DOMSnapshot\n.captureSnapshot" {
+    style.fill: "#0891b2"
+    style.font-color: "#fff"
+    label: "DOMSnapshot\n.captureSnapshot\n(full DOM + computed styles)"
+  }
+  ax: "Accessibility\n.getFullAXTree" {
+    style.fill: "#0891b2"
+    style.font-color: "#fff"
+    label: "Accessibility\n.getFullAXTree\n(roles, names, states)"
+  }
+  rt: "Runtime.evaluate" {
+    style.fill: "#0891b2"
+    style.font-color: "#fff"
+    label: "Runtime.evaluate\n(scroll, viewport, paint order)"
+  }
+}
+
+merge: "EnhancedDOMTreeNode" {
+  style.fill: "#fefce8"
+  style.stroke: "#d97706"
+  style.bold: true
+  label: "Merged: EnhancedDOMTreeNode\n(tag + ARIA role + visibility +\nposition + shadow DOM + iframe)"
+}
+
+cdp.snap -> merge
+cdp.ax -> merge
+cdp.rt -> merge
+
+filters: "DOMTreeSerializer -- 4 Filter Passes" {
+  style.fill: "#f0fdf4"
+  style.stroke: "#16a34a"
+
+  f1: "1. Simplification" {
+    style.fill: "#16a34a"
+    style.font-color: "#fff"
+    label: "1. Simplify\n(strip script/style/SVG,\ndetect clickable elements)"
+  }
+  f2: "2. Paint Order" {
+    style.fill: "#22c55e"
+    style.font-color: "#fff"
+    label: "2. Paint Order\n(if A covers B,\nremove B)"
+  }
+  f3: "3. Bounding Box" {
+    style.fill: "#4ade80"
+    style.font-color: "#fff"
+    label: "3. Bounding Box\n(child fills 99% of parent?\nremove parent)"
+  }
+  f4: "4. Index Assignment" {
+    style.fill: "#86efac"
+    label: "4. Index Assignment\n([1] [2] [3]...\n*[4] = new element)"
+  }
+
+  f1 -> f2
+  f2 -> f3
+  f3 -> f4
+}
+
+merge -> filters.f1
+
+output: "LLM-Ready Output" {
+  style.fill: "#faf5ff"
+  style.stroke: "#7c3aed"
+  style.bold: true
+  label: |md
+    ```
+    <page_stats>15 links, 8 interactive</page_stats>
+    [33]<div />
+      User form
+      [35]<input type=text />
+      *[38]<button>Submit</button>
+    [40]<a />About us
+    ```
+  |
+}
+
+filters.f4 -> output
