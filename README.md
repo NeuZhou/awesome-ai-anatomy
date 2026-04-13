@@ -1,3 +1,5 @@
+> **NEW: [AgentSentinel](https://github.com/NeuZhou/agent-sentinel)** -- We went from studying agent anatomy to protecting it. A zero-trust local proxy that monitors, secures, and records every decision your AI agent makes. Built from the security findings of our 16+ agent teardowns. `npx agent-sentinel start`
+
 <p align="center">
  <img src="assets/hero-banner.png" alt="Awesome AI Anatomy" width="100%">
 </p>
